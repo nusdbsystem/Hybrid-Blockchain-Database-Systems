@@ -1,0 +1,74 @@
+syntax = "proto3";
+package kv;
+
+option go_package = "proto/raftkv";
+
+service DB {
+    rpc Set (SetRequest) returns (SetResponse);
+    rpc Get (GetRequest) returns (GetResponse);
+    rpc Verify(VerifyRequest) returns (VerifyResponse);
+    rpc IsLeader (IsLeaderRequest) returns (IsLeaderResponse);
+    rpc Join (JoinRequest) returns (JoinResponse);
+    rpc Leave (LeaveRequest) returns (LeaveResponse);
+}
+
+message VerifyRequest {
+    string key = 1;
+}
+
+message VerifyResponse {
+    bytes root_digest = 1;
+    repeated bytes side_nodes = 2;
+	bytes non_membership_leaf_data = 3;
+}
+
+message SetRequest {
+    string key = 1;
+    string value = 2;
+}
+
+message SetResponse {
+    // Empty
+}
+
+message Block {
+    repeated SetRequest reqs = 1;
+}
+
+message JoinRequest {
+    string peer_id = 1;
+    string peer_addr = 2;
+}
+
+message JoinResponse {
+    // Empty
+}
+
+message LeaveRequest {
+    string peer_id = 1;
+}
+
+message LeaveResponse {
+    // Empty
+}
+
+message GetRequest {
+    string key = 1;
+}
+
+message GetResponse {
+    string value = 1;
+}
+
+message IsLeaderRequest {
+    // Empty.
+}
+
+message IsLeaderResponse {
+    bool is_leader = 1;
+}
+
+message KVItem {
+    bytes key = 1;
+    bytes value = 2;
+}

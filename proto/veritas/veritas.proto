@@ -1,0 +1,66 @@
+syntax = "proto3";
+package controller;
+
+option go_package = "proto/veritas";
+
+service Node {
+    rpc Get (GetRequest) returns (GetResponse);
+    rpc Set (SetRequest) returns (SetResponse);
+    rpc Verify(VerifyRequest) returns (VerifyResponse);
+    rpc BatchSet (BatchSetRequest) returns (BatchSetResponse);
+}
+
+message VerifyRequest {
+    string key = 1;
+}
+
+message VerifyResponse {
+    bytes root_digest = 1;
+    repeated bytes side_nodes = 2;
+    bytes non_membership_leaf_data = 3;
+}
+
+enum MessageType {
+    Approve = 0;
+    Abort = 1;
+}
+
+message SharedLog {
+    int64 seq = 1;
+    repeated SetRequest sets = 2;
+}
+
+message Block {
+    repeated SharedLog txs = 1;
+    MessageType type = 2;
+    string signature = 3;
+}
+
+message GetRequest {
+    string signature = 1;
+    string key = 2;
+}
+
+message GetResponse {
+    string value = 1;
+}
+
+message SetRequest {
+    string signature = 1;
+    string key = 2;
+    string value = 3;
+    int64 version = 4;
+}
+
+message SetResponse {
+    // Empty.
+}
+
+message BatchSetRequest {
+    string signature = 1;
+    repeated SetRequest sets = 2;
+}
+
+message BatchSetResponse {
+    // Empty.
+}
