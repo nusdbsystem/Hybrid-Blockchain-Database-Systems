@@ -16,6 +16,7 @@ sudo ufw allow 26656/tcp
 sudo ufw allow 26657/tcp
 yes | sudo ufw enable
 
+git clone https://github.com/bigchaindb/benchmark.git
 git clone https://github.com/bigchaindb/bigchaindb.git
 
 sudo pip3 install -e bigchaindb/

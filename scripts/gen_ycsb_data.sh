@@ -2,7 +2,7 @@
 
 # shellcheck disable=SC2236
 if [ ! -n "$1" ] ;then
-    RECORD_COUNT=10000
+    RECORD_COUNT=100000
 else
     # shellcheck disable=SC2034
     RECORD_COUNT=$1
