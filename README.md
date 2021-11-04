@@ -1,4 +1,26 @@
-# Hybrid-Blockchain-Database
+# Hybrid Blockchain Database Systems
+
+This repository contains the code and instructions to reproduce the experiments presented in the paper "Hybrid Blockchain Database Systems: Design and Performance".
+
+## Reproduce
+
+### Pre-requisites
+
+- Install dependecies
+- Download and prepare YCSB data
+- Build binaries
+- Build docker images
+
+```bash
+$ cd scripts
+$ ./install_dependencies.sh
+$ ./gen_ycsb_data.sh 
+$ ./build_binaries.sh
+$ cd ../docker/veritas
+$ ./build-docker.sh
+```
+
+
 ## Veritas (Kafka)
 
 ### Setup
