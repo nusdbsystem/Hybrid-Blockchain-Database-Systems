@@ -1,4 +1,4 @@
-package main
+package veritastendermint
 
 import (
 	"bytes"
