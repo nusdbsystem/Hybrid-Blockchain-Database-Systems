@@ -74,7 +74,7 @@ func main() {
 		for ts := range latencyCh {
 			all += ts.Microseconds()
 		}
-		avaLatency = float64(all) / float64(reqNum.Load()*20)
+		avaLatency = float64(all) / (1000 * float64(reqNum.Load()))
 	}()
 	for i := 0; i < 10; i++ {
 		wg.Add(1)

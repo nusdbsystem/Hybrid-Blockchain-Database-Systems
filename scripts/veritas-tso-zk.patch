@@ -1,0 +1,13 @@
+diff --git a/veritas/driver/driver.go b/veritas/driver/driver.go
+index a91d6ff..d8e9457 100644
+--- a/veritas/driver/driver.go
++++ b/veritas/driver/driver.go
+@@ -6,7 +6,7 @@ import (
+ 	"google.golang.org/grpc"
+ 
+ 	pbv "hybrid/proto/veritas"
+-	"hybrid/tso"
++	tso "hybrid/tso_zookeeper"
+ 	"hybrid/veritas/db"
+ )
+ 

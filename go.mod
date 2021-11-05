@@ -7,6 +7,7 @@ require (
 	github.com/confluentinc/confluent-kafka-go v1.5.2 // indirect
 	github.com/dgraph-io/badger/v3 v3.2011.0
 	github.com/go-redis/redis/v8 v8.4.4
+	github.com/go-zookeeper/zk v1.0.2
 	github.com/golang/protobuf v1.5.2
 	github.com/hashicorp/raft v1.3.1
 	github.com/hashicorp/raft-boltdb v0.0.0-20210422161416-485fa74b0b01

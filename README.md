@@ -17,9 +17,31 @@ $ ./install_dependencies.sh
 $ ./gen_ycsb_data.sh 
 $ ./build_binaries.sh
 $ cd ../docker/veritas
-$ ./build-docker.sh
+$ ./build_docker.sh
+$ cd ../bigchaindb
+$ ./build_docker.sh
 ```
 
+### Effect of Number of Clients
+
+This set of experiments requires 4 nodes for each system. Note that Veritas Kafka also needs a node for Kafka.
+
+#### Veritas Kafka
+
+```
+$ cd scripts
+$ ./start_containers_veritas.sh
+$ sudo ./set_ovs_veritas.sh
+$ ./run_benchmark_clients_veritas_kafka.sh
+```
+
+#### Veritas Tendermint
+
+The containers are already up.
+
+```
+$ ./run_benchmark_clients_veritas_tendermint.sh
+```
 
 ## Veritas (Kafka)
 
