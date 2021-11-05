@@ -39,7 +39,7 @@ func check(err error) {
 func main() {
 	kingpin.Parse()
 
-	r, err := dbconn.NewRedisqlConn(*addr, 1)
+	r, err := dbconn.NewRedisqlConn(*redisAddr, 10)
 	check(err)
 
 	c, err := kafkarole.NewConsumer(*kafkaAddr, *kafkaGroup, []string{*kafkaTopic})
