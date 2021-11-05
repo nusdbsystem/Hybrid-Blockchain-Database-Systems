@@ -1,5 +1,5 @@
 diff --git a/veritas/server.go b/veritas/server.go
-index a5188ca..02bffd2 100644
+index a5188ca..01c0bb9 100644
 --- a/veritas/server.go
 +++ b/veritas/server.go
 @@ -7,9 +7,9 @@ import (
@@ -22,24 +22,24 @@ index a5188ca..02bffd2 100644
  
  	puller *kafka.Consumer
  	pusher *kafka.Producer
-@@ -44,12 +44,49 @@ type BlockPurpose struct {
+@@ -44,12 +44,52 @@ type BlockPurpose struct {
  	approved map[string]struct{}
  }
  
 -func NewServer(redisCli *redis.Client, consumer *kafka.Consumer, producer *kafka.Producer, ledgerPath string, config *Config) *server {
 +func rediSQLGet(r *radix.Pool, key string) (string, error) {
-+	var items [][]string
++	var items []string
 +	err := r.Do(radix.Cmd(
 +		&items,
 +		"REDISQL.EXEC",
 +		"VERITAS",
-+		fmt.Sprintf("SELECT * FROM kv WHERE kv.key=\"%s\";", key),
++		fmt.Sprintf("SELECT kv.value FROM kv WHERE kv.key=\"%s\";", key),
 +	))
-+
 +	if err != nil {
++		fmt.Printf("Get %v |%s|\n", err, key)
 +		return "", err
 +	}
-+	return items[0][0], nil
++	return items[0], nil
 +}
 +
 +func rediSQLSet(r *radix.Pool, key string, val string) error {
@@ -47,8 +47,11 @@ index a5188ca..02bffd2 100644
 +		nil,
 +		"REDISQL.EXEC",
 +		"VERITAS",
-+		fmt.Sprintf("INSERT INTO kv VALUES(%s, %s);", key, val),
++		fmt.Sprintf("INSERT INTO kv VALUES(\"%s\", \"%s\");", key, val),
 +	))
++	if err != nil {
++		fmt.Printf("Set %v\n", err)
++	}
 +	return err
 +}
 +
@@ -73,7 +76,7 @@ index a5188ca..02bffd2 100644
  	s := &server{
  		ctx:      ctx,
  		cancel:   cancel,
-@@ -117,10 +154,8 @@ func (s *server) applyLoop() {
+@@ -117,10 +157,8 @@ func (s *server) applyLoop() {
  			LOOP:
  				for _, sl := range blk.Txs {
  					for _, t := range sl.Sets {
@@ -86,7 +89,7 @@ index a5188ca..02bffd2 100644
  							log.Fatalf("Commit log %v get failed: %v", blk.Txs[0].GetSeq(), err)
  						}
  						v, err := Decode(res)
-@@ -176,7 +211,7 @@ func (s *server) applyLoop() {
+@@ -176,7 +214,7 @@ func (s *server) applyLoop() {
  					if err != nil {
  						log.Fatalf("Commit log %v encode failed: %v", blkBuf.blk.Txs[0].GetSeq(), err)
  					}
@@ -95,7 +98,7 @@ index a5188ca..02bffd2 100644
  						log.Fatalf("Commit log %v redis set failed: %v", blkBuf.blk.Txs[0].GetSeq(), err)
  					}
  					if _, ok := s.getCache.Get(t.Key); ok {
-@@ -272,7 +307,7 @@ func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse
+@@ -272,7 +310,7 @@ func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse
  	if v, ok := s.getCache.Get(req.Key); ok {
  		return &pbv.GetResponse{Value: v.(string)}, nil
  	}
