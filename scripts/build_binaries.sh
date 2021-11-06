@@ -17,6 +17,7 @@ cd ..
 git apply scripts/veritas-tso-zk.patch
 cd bin
 go build -o veritas-kafka-zk ../cmd/veritas/main.go
+go build -o veritas-kafka-zk-bench ../veritas/benchmark/ycsbbench/main.go
 git checkout ../veritas/driver/driver.go
 
 # build Veritas Kafka + RediSQL

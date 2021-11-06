@@ -10,7 +10,7 @@ fi
 
 # shellcheck disable=SC2236
 if [ ! -n "$2" ] ;then
-    OPERATION_COUNT=1000000
+    OPERATION_COUNT=100000
 else
     # shellcheck disable=SC2034
     OPERATION_COUNT=$2

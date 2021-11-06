@@ -5,6 +5,13 @@ if [ $EUID -ne 0 ]; then
 fi
 
 N=5
+if [ $# -gt 0 ]; then
+	N=$1
+else
+	echo -e "Usage: $0 <# containers>"
+	echo -e "\tDefault: $N containers"
+fi
+
 PREFIX="veritas"
 NET_PREFIX="192.168.20"
 

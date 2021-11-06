@@ -1,8 +1,13 @@
 diff --git a/veritas/driver/driver.go b/veritas/driver/driver.go
-index a91d6ff..d8e9457 100644
+index a91d6ff..b929d65 100644
 --- a/veritas/driver/driver.go
 +++ b/veritas/driver/driver.go
-@@ -6,7 +6,7 @@ import (
+@@ -2,11 +2,12 @@ package driver
+ 
+ import (
+ 	"context"
++	"fmt"
+ 
  	"google.golang.org/grpc"
  
  	pbv "hybrid/proto/veritas"
@@ -11,3 +16,12 @@ index a91d6ff..d8e9457 100644
  	"hybrid/veritas/db"
  )
  
+@@ -18,6 +19,8 @@ type Driver struct {
+ }
+ 
+ func Open(serverAddr, tsoAddr, signature string) (*Driver, error) {
++	fmt.Println("Using Zookeeper TSO ...")
++
+ 	cc, err := grpc.Dial(serverAddr, grpc.WithInsecure())
+ 	if err != nil {
+ 		return nil, err

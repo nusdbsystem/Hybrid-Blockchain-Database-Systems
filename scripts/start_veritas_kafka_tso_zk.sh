@@ -10,9 +10,7 @@ else
         N=5
 fi
 
-#TSO
-../bin/veritas-tso --addr=":7070" > tso.log 2>&1 &
-
+# TSO via ZooKeeper
 # Kafka
 KAFKA_ADDR="192.168.20.$(($N+1))"
 ssh -o StrictHostKeyChecking=no root@$KAFKA_ADDR "cd /kafka_2.12-2.7.0/config && echo 'advertised.listeners=PLAINTEXT://$KAFKA_ADDR:9092' >> server.properties"
@@ -33,5 +31,5 @@ done
 for I in `seq 1 $(($N-1))`; do
 	ADDR="192.168.20.$(($I+1))"
 	ssh -o StrictHostKeyChecking=no root@$ADDR "cd /; redis-server > redis.log 2>&1 &"
-	ssh -o StrictHostKeyChecking=no root@$ADDR "cd /; nohup /bin/veritas-kafka --signature=node$I --parties=${NODES} --addr=:1990 --kafka-addr=$KAFKA_ADDR:9092 --kafka-group=$I --kafka-topic=shared-log --redis-addr=0.0.0.0:6379 --redis-db=0 --ledger-path=veritas$I > veritas-$I.log 2>&1 &"
+	ssh -o StrictHostKeyChecking=no root@$ADDR "cd /; nohup /bin/veritas-kafka-zk --signature=node$I --parties=${NODES} --addr=:1990 --kafka-addr=$KAFKA_ADDR:9092 --kafka-group=$I --kafka-topic=shared-log --redis-addr=0.0.0.0:6379 --redis-db=0 --ledger-path=veritas$I > veritas-$I.log 2>&1 &"
 done
