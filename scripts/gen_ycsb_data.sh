@@ -75,24 +75,24 @@ bin/ycsb.sh run basic -P $WLOAD_DIR/uniform/workloadc -p recordcount="${RECORD_C
 # Latest
 echo "Workload A..."
 bin/ycsb.sh load basic -P $WLOAD_DIR/latest/workloada -p recordcount="${RECORD_COUNT}"> "${WORK_DIR}"/ycsb_data_latest/workloada.dat
-bin/ycsb.sh run basic -P $WLOAD_DIR/latest/workloada -p recordcount="${RECORD_COUNT}" -p operationcount="${OPERATION_COUNT}"> "${WORK_DIR}"/ycsb_data/run_workloada.dat
+bin/ycsb.sh run basic -P $WLOAD_DIR/latest/workloada -p recordcount="${RECORD_COUNT}" -p operationcount="${OPERATION_COUNT}"> "${WORK_DIR}"/ycsb_data_latest/run_workloada.dat
 echo "Workload B..."
 bin/ycsb.sh load basic -P $WLOAD_DIR/latest/workloadb -p recordcount="${RECORD_COUNT}"> "${WORK_DIR}"/ycsb_data_latest/workloadb.dat
-bin/ycsb.sh run basic -P $WLOAD_DIR/latest/workloadb -p recordcount="${RECORD_COUNT}" -p operationcount="${OPERATION_COUNT}"> "${WORK_DIR}"/ycsb_data/run_workloadb.dat
+bin/ycsb.sh run basic -P $WLOAD_DIR/latest/workloadb -p recordcount="${RECORD_COUNT}" -p operationcount="${OPERATION_COUNT}"> "${WORK_DIR}"/ycsb_data_latest/run_workloadb.dat
 echo "Workload C..."
 bin/ycsb.sh load basic -P $WLOAD_DIR/latest/workloadc -p recordcount="${RECORD_COUNT}"> "${WORK_DIR}"/ycsb_data_latest/workloadc.dat
-bin/ycsb.sh run basic -P $WLOAD_DIR/latest/workloadc -p recordcount="${RECORD_COUNT}" -p operationcount="${OPERATION_COUNT}"> "${WORK_DIR}"/ycsb_data/run_workloadc.dat
+bin/ycsb.sh run basic -P $WLOAD_DIR/latest/workloadc -p recordcount="${RECORD_COUNT}" -p operationcount="${OPERATION_COUNT}"> "${WORK_DIR}"/ycsb_data_latest/run_workloadc.dat
 
 # Zipfian
 echo "Workload A..."
 bin/ycsb.sh load basic -P $WLOAD_DIR/zipfian/workloada -p recordcount="${RECORD_COUNT}"> "${WORK_DIR}"/ycsb_data_zipfian/workloada.dat
-bin/ycsb.sh run basic -P $WLOAD_DIR/zipfian/workloada -p recordcount="${RECORD_COUNT}" -p operationcount="${OPERATION_COUNT}"> "${WORK_DIR}"/ycsb_data/run_workloada.dat
+bin/ycsb.sh run basic -P $WLOAD_DIR/zipfian/workloada -p recordcount="${RECORD_COUNT}" -p operationcount="${OPERATION_COUNT}"> "${WORK_DIR}"/ycsb_data_zipfian/run_workloada.dat
 echo "Workload B..."
 bin/ycsb.sh load basic -P $WLOAD_DIR/zipfian/workloadb -p recordcount="${RECORD_COUNT}"> "${WORK_DIR}"/ycsb_data_zipfian/workloadb.dat
-bin/ycsb.sh run basic -P $WLOAD_DIR/zipfian/workloadb -p recordcount="${RECORD_COUNT}" -p operationcount="${OPERATION_COUNT}"> "${WORK_DIR}"/ycsb_data/run_workloadb.dat
+bin/ycsb.sh run basic -P $WLOAD_DIR/zipfian/workloadb -p recordcount="${RECORD_COUNT}" -p operationcount="${OPERATION_COUNT}"> "${WORK_DIR}"/ycsb_data_zipfian/run_workloadb.dat
 echo "Workload C..."
 bin/ycsb.sh load basic -P $WLOAD_DIR/zipfian/workloadc -p recordcount="${RECORD_COUNT}"> "${WORK_DIR}"/ycsb_data_zipfian/workloadc.dat
-bin/ycsb.sh run basic -P $WLOAD_DIR/zipfian/workloadc -p recordcount="${RECORD_COUNT}" -p operationcount="${OPERATION_COUNT}"> "${WORK_DIR}"/ycsb_data/run_workloadc.dat
+bin/ycsb.sh run basic -P $WLOAD_DIR/zipfian/workloadc -p recordcount="${RECORD_COUNT}" -p operationcount="${OPERATION_COUNT}"> "${WORK_DIR}"/ycsb_data_zipfian/run_workloadc.dat
 
 # Different Record Sizes
 SIZES="512B 2kB 8kB 32kB 128kB"

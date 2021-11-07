@@ -7,15 +7,11 @@ mkdir $LOGS
 set -x
 
 NODES="4 8 16 32 64"
-# Veritas (Kafka) uses 64 clients
-DRIVERS=4
-THREADS=16
+DRIVERS=8
+THREADS=256
 
 for N in $NODES; do
-    sudo ./unset_ovs_veritas.sh
-    ./kill_containers_veritas.sh
-    ./start_containers_veritas.sh $(($N+1))
-    sudo ./set_ovs_veritas.sh
+    ./restart_cluster.sh $(($N+1))
     ./start_veritas_kafka.sh $(($N+1))
     
     ADDRS="192.168.20.2:1990"
