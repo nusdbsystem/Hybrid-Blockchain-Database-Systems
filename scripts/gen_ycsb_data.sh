@@ -99,7 +99,7 @@ SIZES="512B 2kB 8kB 32kB 128kB"
 for SIZE in $SIZES; do
   mkdir -p "${WORK_DIR}"/ycsb_data_$SIZE
   bin/ycsb.sh load basic -P $WLOAD_DIR/sizes/workloada_$SIZE -p recordcount="${RECORD_COUNT}"> "${WORK_DIR}"/ycsb_data_$SIZE/workloada.dat
-  bin/ycsb.sh run basic -P $WLOAD_DIR/uniform/workloada_$SIZE -p recordcount="${RECORD_COUNT}" -p operationcount="${OPERATION_COUNT}"> "${WORK_DIR}"/ycsb_data_$SIZE/run_workloada.dat
+  bin/ycsb.sh run basic -P $WLOAD_DIR/sizes/workloada_$SIZE -p recordcount="${RECORD_COUNT}" -p operationcount="${OPERATION_COUNT}"> "${WORK_DIR}"/ycsb_data_$SIZE/run_workloada.dat
 done
 
 # shellcheck disable=SC2164
