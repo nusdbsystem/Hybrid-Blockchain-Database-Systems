@@ -16,5 +16,6 @@ RUN wget https://download.redis.io/releases/redis-6.0.9.tar.gz && tar -xzf redis
 RUN wget https://archive.apache.org/dist/kafka/2.7.0/kafka_2.12-2.7.0.tgz && tar -xzf kafka_2.12-2.7.0.tgz
 RUN wget https://github.com/RedBeardLab/rediSQL/releases/download/v1.1.1/RediSQL_v1.1.1_9b110f__release.so && mv RediSQL_v1.1.1_9b110f__release.so redisql.so && chmod u+x redisql.so
 COPY bin /bin
+ADD config.toml /
 RUN echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
 CMD ["bash", "service ssh start"]
