@@ -26,3 +26,10 @@ git apply scripts/veritas-redisql.patch
 cd bin
 go build -o veritas-kafka-redisql ../cmd/veritas-redisql/main.go
 git checkout ../veritas/server.go
+
+# build Veritas Kafka + Transaction Delay
+cd ..
+git apply scripts/veritas-txdelay.patch
+cd bin
+go build -o veritas-kafka-txdelay ../cmd/veritas/main.go
+git checkout ../cmd/veritas/main.go ../veritas/config.go ../veritas/server.go

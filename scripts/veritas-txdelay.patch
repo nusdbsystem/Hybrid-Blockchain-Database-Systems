@@ -1,0 +1,42 @@
+diff --git a/cmd/veritas/main.go b/cmd/veritas/main.go
+index 717959c..3798f56 100644
+--- a/cmd/veritas/main.go
++++ b/cmd/veritas/main.go
+@@ -28,6 +28,7 @@ var (
+ 	redisDb    = kingpin.Flag("redis-db", "redis db number").Required().Int()
+ 	redisPwd   = kingpin.Flag("redis-pwd", "redis password").String()
+ 	ledgerPath = kingpin.Flag("ledger-path", "ledger path").Required().String()
++	txDelay    = kingpin.Flag("tx-delay", "transaction delay").Int()
+ )
+ 
+ func check(err error) {
+@@ -61,6 +62,7 @@ func main() {
+ 		Topic:     *kafkaTopic,
+ 		Parties:   pm,
+ 		BlockSize: *blockSize,
++		TxDelay:   *txDelay,
+ 	})
+ 	pbv.RegisterNodeServer(s, svr)
+ 	lis, err := net.Listen("tcp", *addr)
+diff --git a/veritas/config.go b/veritas/config.go
+index d38a1c6..fdaf78e 100644
+--- a/veritas/config.go
++++ b/veritas/config.go
+@@ -5,4 +5,5 @@ type Config struct {
+ 	Topic     string
+ 	Parties   map[string]struct{}
+ 	BlockSize int
++	TxDelay   int
+ }
+diff --git a/veritas/server.go b/veritas/server.go
+index a5188ca..2393ef0 100644
+--- a/veritas/server.go
++++ b/veritas/server.go
+@@ -290,6 +290,7 @@ func (s *server) Set(ctx context.Context, req *pbv.SetRequest) (*pbv.SetResponse
+ 	s.locker.Lock(req.GetKey())
+ 	defer s.locker.Unlock(req.GetKey())
+ 
++	time.Sleep(time.Duration(s.config.TxDelay) * time.Millisecond)
+ 	sets := []*pbv.SetRequest{{
+ 		Signature: req.GetSignature(),
+ 		Key:       req.GetKey(),
