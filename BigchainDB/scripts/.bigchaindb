@@ -1,0 +1,49 @@
+{
+    "database": {
+        "backend": "localmongodb",
+        "ca_cert": null,
+        "certfile": null,
+        "connection_timeout": 5000,
+        "crlfile": null,
+        "host": "localhost",
+        "keyfile": null,
+        "keyfile_passphrase": null,
+        "login": null,
+        "max_tries": 3,
+        "name": "bigchain",
+        "password": null,
+        "port": 27017,
+        "replicaset": null,
+        "ssl": false
+    },
+    "log": {
+        "datefmt_console": "%Y-%m-%d %H:%M:%S",
+        "datefmt_logfile": "%Y-%m-%d %H:%M:%S",
+        "error_file": "/root/bigchaindb-errors.log",
+        "file": "/root/bigchaindb.log",
+        "fmt_console": "[%(asctime)s] [%(levelname)s] (%(name)s) %(message)s (%(processName)-10s - pid: %(process)d)",
+        "fmt_logfile": "[%(asctime)s] [%(levelname)s] (%(name)s) %(message)s (%(processName)-10s - pid: %(process)d)",
+        "granular_levels": {},
+        "level_console": "info",
+        "level_logfile": "info"
+    },
+    "server": {
+        "bind": "0.0.0.0:9984",
+        "loglevel": "info",
+        "workers": 4
+    },
+    "tendermint": {
+        "host": "localhost",
+        "port": 26657,
+        "version": "v0.31.5"
+    },
+    "wsserver": {
+        "advertised_host": "0.0.0.0",
+        "advertised_port": 9985,
+        "advertised_scheme": "ws",
+        "host": "0.0.0.0",
+        "port": 9985,
+        "scheme": "ws"
+    }
+}
+
