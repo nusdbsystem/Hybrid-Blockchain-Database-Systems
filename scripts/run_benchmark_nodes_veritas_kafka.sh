@@ -11,7 +11,7 @@ DRIVERS=8
 THREADS=256
 
 for N in $NODES; do
-    ./restart_cluster.sh $(($N+1))
+    ./restart_cluster_veritas.sh $(($N+1))
     ./start_veritas_kafka.sh $(($N+1))
     
     ADDRS="192.168.20.2:1990"

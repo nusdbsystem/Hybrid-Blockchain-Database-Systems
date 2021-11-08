@@ -14,7 +14,7 @@ PREFIX="192.168.20."
 
 # Redis KV
 for W in $WORKLOADS; do
-    ./restart_cluster.sh
+    ./restart_cluster_veritas.sh
     ./start_veritas_kafka.sh
     sleep 10
     ../bin/veritas-kafka-bench --load-path=temp/ycsb_data/$W.dat --run-path=temp/ycsb_data/run_$W.dat --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=192.168.20.2:1990,192.168.20.3:1990,192.168.20.4:1990,192.168.20.5:1990 --tso-addr=:7070 2>&1 | tee $LOGS/veritas-rediskv-$W.txt
@@ -30,7 +30,7 @@ done
 
 # Redis SQL
 for W in $WORKLOADS; do
-    ./restart_cluster.sh
+    ./restart_cluster_veritas.sh
     ./start_veritas_kafka_redisql.sh
     sleep 10
     ../bin/veritas-kafka-bench --load-path=temp/ycsb_data/$W.dat --run-path=temp/ycsb_data/run_$W.dat --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=192.168.20.2:1990,192.168.20.3:1990,192.168.20.4:1990,192.168.20.5:1990 --tso-addr=:7070 2>&1 | tee $LOGS/veritas-redisql-$W.txt

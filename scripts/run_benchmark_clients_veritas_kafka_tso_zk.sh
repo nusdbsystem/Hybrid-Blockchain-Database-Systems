@@ -10,7 +10,7 @@ DRIVERS=8
 THREADS="4 8 16 32 64 128 192 256"
 
 for TH in $THREADS; do
-    ./restart_cluster.sh
+    ./restart_cluster_veritas.sh
     ./start_veritas_kafka_tso_zk.sh    
     ../bin/veritas-kafka-zk-bench --load-path=temp/ycsb_data/workloada.dat --run-path=temp/ycsb_data/run_workloada.dat --ndrivers=$DRIVERS --nthreads=$TH --veritas-addrs=192.168.20.2:1990,192.168.20.3:1990,192.168.20.4:1990,192.168.20.5:1990 --tso-addr=192.168.20.6:2181 2>&1 | tee $LOGS/veritas-clients-$TH.txt
     # copy logs
@@ -23,4 +23,4 @@ for TH in $THREADS; do
     scp -o StrictHostKeyChecking=no root@192.168.20.$I:/kafka_2.12-2.7.0/zookeeper.log $SLOGS/
     scp -o StrictHostKeyChecking=no root@192.168.20.$I:/kafka_2.12-2.7.0/kafka.log $SLOGS/
 done
-./restart_cluster.sh
+./restart_cluster_veritas.sh

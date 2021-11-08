@@ -73,14 +73,14 @@ def edit_config() -> None:
                 'addr_book_strict = false',
                 tm_config_toml
             )
-    s1 = re.sub(
+    s2 = re.sub(
                 'size = 5000',
                 'size = 20000',
-                tm_config_toml
+                s1
             )
 
     with open(TM_CONFIG_FILE, 'w') as f:
-        f.write(s1)
+        f.write(s2)
 
     return None
 

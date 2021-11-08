@@ -5,7 +5,7 @@ if [ $EUID -ne 0 ]; then
 	exit 1
 fi
 
-N=5
+N=4
 if [ $# -gt 0 ]; then
 	N=$1
 else
@@ -13,7 +13,7 @@ else
 	echo -e "\tDefault: $N containers"
 fi
 
-PREFIX="veritas"
+PREFIX="bigchaindb"
 
 for idx in `seq 1 $N`; do
 	idx2=$(($idx+1))

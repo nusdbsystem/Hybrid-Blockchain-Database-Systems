@@ -44,5 +44,5 @@ done
 rm validators.txt power.txt ids*.txt ips*.txt
 
 for idx in `seq 2 $END_IDX`; do
-	ssh -o StrictHostKeyChecking=no root@192.168.1.$idx "killall -9 tendermint; sleep 1; /usr/local/bin/tendermint node --p2p.laddr 'tcp://0.0.0.0:26656' --proxy_app='tcp://0.0.0.0:26658' --consensus.create_empty_blocks=false --p2p.pex=false > tendermint.log 2>&1 &"
+	ssh -o StrictHostKeyChecking=no root@$PREFIX$idx "killall -9 tendermint; sleep 1; /usr/local/bin/tendermint node --p2p.laddr 'tcp://0.0.0.0:26656' --proxy_app='tcp://0.0.0.0:26658' --consensus.create_empty_blocks=false --p2p.pex=false > tendermint.log 2>&1 &"
 done

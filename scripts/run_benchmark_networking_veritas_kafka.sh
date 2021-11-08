@@ -16,7 +16,7 @@ for BW in $BWS; do
     for RTT in $RTTS; do
 	    LOGSD="$LOGS/logs-$BW-$RTT"
 	    mkdir $LOGSD
-        ./restart_cluster.sh
+        ./restart_cluster_veritas.sh
         if [[ "$BW" != "NoLimit" ]]; then
             sudo ./set_ovs_bs_limit.sh $BW 1
         fi

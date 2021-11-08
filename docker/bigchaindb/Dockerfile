@@ -10,7 +10,7 @@ COPY bigchaindb-2.2.2 /usr/src/app/
 WORKDIR /usr/src/app
 
 RUN apk --update add sudo bash \
-    && apk --update add python3 openssl ca-certificates git \
+    && apk --update add python3 openssl ca-certificates git openssh iperf iproute2 \
     && apk --update add --virtual build-dependencies python3-dev \
         libffi-dev openssl-dev build-base jq \
     && apk add --no-cache libstdc++ dpkg gnupg \
@@ -18,6 +18,11 @@ RUN apk --update add sudo bash \
     && pip3 install -e . \
     && apk del build-dependencies \
     && rm -f /var/cache/apk/*
+
+RUN /usr/bin/ssh-keygen -A
+RUN echo 'root:dummy_passwd' | chpasswd
+ADD id_rsa.pub /
+RUN mkdir -p /root/.ssh/; cat /id_rsa.pub >> /root/.ssh/authorized_keys
 
 # Install mongodb and monit
 RUN apk --update add mongodb monit
@@ -45,10 +50,9 @@ ENV BIGCHAINDB_WSSERVER_ADVERTISED_HOST 0.0.0.0
 ENV BIGCHAINDB_WSSERVER_ADVERTISED_SCHEME ws
 ENV BIGCHAINDB_TENDERMINT_PORT 26657
 
-VOLUME /data/db /data/configdb /tendermint
+# VOLUME /data/db /data/configdb /tendermint
 
 EXPOSE 27017 28017 9984 9985 26656 26657 26658
 
 WORKDIR $HOME
-ENTRYPOINT ["/usr/src/app/pkg/scripts/all-in-one.bash"]
-
+# ENTRYPOINT ["/usr/src/app/pkg/scripts/all-in-one.bash"]
