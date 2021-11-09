@@ -106,3 +106,7 @@ Then repeat all the steps of BigchainDB.
 ## License
 
 MIT License
+
+## Authors
+
+Zerui Ge, Dumitrel Loghin, Tianwen Wang, Pingcheng Ruan, Beng Chin Ooi 
