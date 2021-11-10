@@ -29,7 +29,7 @@ def readFile(filepath, outQueue):
 def sendTxn(lineQueue, latQueue, driver):
     while lineQueue.empty() == False:
         start = time.time()
-        line = lineQueue.get()
+        line = lineQueue.get(timeout=1)
         args = line.split(' ', 3)
         if "INSERT" in line or "UPDATE" in line:
             data = {
@@ -55,12 +55,12 @@ def sendTxn(lineQueue, latQueue, driver):
             latQueue.put(end-start)
 
 print("Start loading init data...")
-loadQueue = queue.Queue(maxsize=10000)
+loadQueue = queue.Queue(maxsize=100000)
 tLoadRead = threading.Thread(target=readFile, args=(loadFile, loadQueue,))
 tLoadRead.start()
 time.sleep(5)
 loadThreadList = []
-for i in range(256):
+for i in range(4):
     t = threading.Thread(target=sendTxn, args=(loadQueue, None, bdbs[i%len(bdbs)],))
     loadThreadList.append(t)
     t.start()
@@ -69,11 +69,13 @@ for t in loadThreadList:
     t.join()
 
 print("Start running experiments...")
-runQueue = queue.Queue(maxsize=10000)
-latencyQueue = queue.Queue(maxsize=10000)
+runQueue = queue.Queue(maxsize=100000)
+latencyQueue = queue.Queue(maxsize=100000)
 
-tRunRead = threading.Thread(target=readFile, args=(runFile, runQueue,))
-tRunRead.start()
+#tRunRead = threading.Thread(target=readFile, args=(runFile, runQueue,))
+#tRunRead.start()
+#time.sleep(5)
+readFile(runFile, runQueue)
 time.sleep(5)
 
 runThreadList = []
@@ -95,12 +97,14 @@ def getLatency(latQueue):
 tLatency = threading.Thread(target=getLatency, args=(latencyQueue,))
 tLatency.start()
 
-tRunRead.join()
+print("Before join...")
+# tRunRead.join()
 for t in runThreadList:
     t.join()
 
 end = time.time()
 
+print("Before latency join...")
 tLatency.join()
 
 print('Throughput: {} txn/s'.format(200000/(end-start)))

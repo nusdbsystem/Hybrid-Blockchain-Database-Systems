@@ -1,0 +1,22 @@
+diff --git a/cmd/veritas/main.go b/cmd/veritas/main.go
+index 717959c..d0017f3 100644
+--- a/cmd/veritas/main.go
++++ b/cmd/veritas/main.go
+@@ -7,6 +7,8 @@ import (
+ 	"os/signal"
+ 	"strings"
+ 
++	"github.com/pkg/profile"
++
+ 	"google.golang.org/grpc"
+ 	"gopkg.in/alecthomas/kingpin.v2"
+ 
+@@ -37,6 +39,8 @@ func check(err error) {
+ }
+ 
+ func main() {
++	defer profile.Start(profile.CPUProfile, profile.NoShutdownHook, profile.ProfilePath("/tmp")).Stop()
++
+ 	kingpin.Parse()
+ 
+ 	r, err := dbconn.NewRedisConn(*redisAddr, *redisPwd, *redisDb)

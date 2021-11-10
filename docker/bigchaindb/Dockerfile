@@ -1,5 +1,3 @@
-# Taken from https://github.com/bigchaindb/bigchaindb/blob/master/Dockerfile-all-in-one
-# Credits: BigchainDB Authors
 FROM alpine:3.9
 LABEL maintainer "contact@ipdb.global"
 
@@ -9,20 +7,23 @@ ENV HOME /root
 COPY bigchaindb-2.2.2 /usr/src/app/
 WORKDIR /usr/src/app
 
-RUN apk --update add sudo bash \
-    && apk --update add python3 openssl ca-certificates git openssh iperf iproute2 \
+RUN apk --update add sudo bash vim openssh iproute2 iperf \
+    && apk --update add python3 openssl ca-certificates git \
     && apk --update add --virtual build-dependencies python3-dev \
         libffi-dev openssl-dev build-base jq \
     && apk add --no-cache libstdc++ dpkg gnupg \
     && pip3 install --upgrade pip cffi \
-    && pip3 install -e . \
+    && pip install -e . \
     && apk del build-dependencies \
     && rm -f /var/cache/apk/*
 
-RUN /usr/bin/ssh-keygen -A
-RUN echo 'root:dummy_passwd' | chpasswd
+RUN ssh-keygen -f /etc/ssh/ssh_host_rsa_key -N ""
+RUN ssh-keygen -t rsa -N "" -f /root/.ssh/id_rsa && cd /root/.ssh && cp id_rsa.pub authorized_keys
 ADD id_rsa.pub /
-RUN mkdir -p /root/.ssh/; cat /id_rsa.pub >> /root/.ssh/authorized_keys
+RUN cat /id_rsa.pub >> ~/.ssh/authorized_keys
+RUN echo "StrictHostKeyChecking no" > /root/.ssh/config
+RUN echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
+RUN echo "root:newpass" | chpasswd
 
 # Install mongodb and monit
 RUN apk --update add mongodb monit
@@ -56,3 +57,4 @@ EXPOSE 27017 28017 9984 9985 26656 26657 26658
 
 WORKDIR $HOME
 # ENTRYPOINT ["/usr/src/app/pkg/scripts/all-in-one.bash"]
+
