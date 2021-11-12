@@ -58,8 +58,8 @@ def edit_config() -> None:
     with open(TM_CONFIG_FILE, 'w') as f:
         f.write(
             re.sub(
-                r'^persistent_peers\s*=\s*".*"',
-                r'persistent_peers="{pp}"'.format(pp=persistent_peers),
+                r'^persistent-peers\s*=\s*".*"',
+                r'persistent-peers="{pp}"'.format(pp=persistent_peers),
                 tm_config_toml,
                 flags=re.MULTILINE
             )
@@ -69,18 +69,41 @@ def edit_config() -> None:
         tm_config_toml = f.read()
 
     s1 = re.sub(
-                'addr_book_strict = true',
-                'addr_book_strict = false',
+                'addr-book-strict = true',
+                'addr-book-strict = false',
                 tm_config_toml
             )
     s2 = re.sub(
                 'size = 5000',
-                'size = 20000',
+                'size = 100000',
                 s1
+            )
+    s3 = re.sub(
+                'max-packet-msg-payload-size = 1400',
+                'max-packet-msg-payload-size = 4096',
+                s2
+            )
+
+    s4 = re.sub(
+                'send-rate = 5120000',
+                'send-rate = 20000000',
+                s3
+            )
+
+    s5 = re.sub(
+                'recv-rate = 5120000',
+                'recv-rate = 20000000',
+                s4
+            )
+            
+    s4 = re.sub(
+               'log_level = "main:info,state:info,\*:error"',
+               'log_level = "*:info"',
+               s3
             )
 
     with open(TM_CONFIG_FILE, 'w') as f:
-        f.write(s2)
+        f.write(s5)
 
     return None
 

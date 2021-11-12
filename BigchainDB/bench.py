@@ -60,7 +60,7 @@ tLoadRead = threading.Thread(target=readFile, args=(loadFile, loadQueue,))
 tLoadRead.start()
 time.sleep(5)
 loadThreadList = []
-for i in range(4):
+for i in range(32):
     t = threading.Thread(target=sendTxn, args=(loadQueue, None, bdbs[i%len(bdbs)],))
     loadThreadList.append(t)
     t.start()

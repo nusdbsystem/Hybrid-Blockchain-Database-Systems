@@ -53,7 +53,7 @@ message SetRequest {
 }
 
 message SetResponse {
-    // Empty.
+    string txid = 1;
 }
 
 message BatchSetRequest {
