@@ -7,8 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/patrickmn/go-cache"
-
 	"github.com/go-redis/redis/v8"
 	"github.com/golang/protobuf/proto"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
@@ -35,8 +33,6 @@ type server struct {
 	buffer map[int64]*BlockPurpose
 
 	msgCh chan *pbv.SharedLog
-
-	getCache *cache.Cache
 }
 
 type BlockPurpose struct {
@@ -51,18 +47,17 @@ func NewServer(redisCli *redis.Client, consumer *kafka.Consumer, producer *kafka
 		log.Fatalf("Create ledger failed: %v", err)
 	}
 	s := &server{
-		ctx:      ctx,
-		cancel:   cancel,
-		l:        l,
-		config:   config,
-		cli:      redisCli,
-		puller:   consumer,
-		pusher:   producer,
-		locker:   &keylocker.KMutex{},
-		mu:       &sync.RWMutex{},
-		buffer:   make(map[int64]*BlockPurpose),
-		getCache: cache.New(5*time.Minute, 10*time.Minute),
-		msgCh:    make(chan *pbv.SharedLog, 10000),
+		ctx:    ctx,
+		cancel: cancel,
+		l:      l,
+		config: config,
+		cli:    redisCli,
+		puller: consumer,
+		pusher: producer,
+		locker: &keylocker.KMutex{},
+		mu:     &sync.RWMutex{},
+		buffer: make(map[int64]*BlockPurpose),
+		msgCh:  make(chan *pbv.SharedLog, 10000),
 	}
 	if err := s.puller.Subscribe(config.Topic, nil); err != nil {
 		log.Fatalf("Subscribe topic %v failed: %v", config.Topic, err)
@@ -179,9 +174,6 @@ func (s *server) applyLoop() {
 					if err := s.cli.Set(s.ctx, t.GetKey(), entry, 0).Err(); err != nil {
 						log.Fatalf("Commit log %v redis set failed: %v", blkBuf.blk.Txs[0].GetSeq(), err)
 					}
-					if _, ok := s.getCache.Get(t.Key); ok {
-						s.getCache.Set(t.Key, t.Value, cache.DefaultExpiration)
-					}
 					if err := s.l.Append([]byte(t.GetKey()), []byte(t.GetValue()+"-"+fmt.Sprintf("%v", t.GetVersion()))); err != nil {
 						log.Fatalf("Append to ledger failed: %v", err)
 					}
@@ -269,9 +261,6 @@ func (s *server) batchLoop() {
 }
 
 func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse, error) {
-	if v, ok := s.getCache.Get(req.Key); ok {
-		return &pbv.GetResponse{Value: v.(string)}, nil
-	}
 	res, err := s.cli.Get(ctx, req.GetKey()).Result()
 	if err != nil {
 		return nil, err
@@ -280,8 +269,6 @@ func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse
 	if err != nil {
 		return nil, err
 	}
-
-	s.getCache.Set(req.Key, v.Val, cache.DefaultExpiration)
 
 	return &pbv.GetResponse{Value: v.Val}, nil
 }
