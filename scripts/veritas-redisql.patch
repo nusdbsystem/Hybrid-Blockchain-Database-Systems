@@ -1,19 +1,18 @@
 diff --git a/veritas/server.go b/veritas/server.go
-index a5188ca..01c0bb9 100644
+index aeea349..b2f6dc5 100644
 --- a/veritas/server.go
 +++ b/veritas/server.go
-@@ -7,9 +7,9 @@ import (
+@@ -7,8 +7,8 @@ import (
  	"sync"
  	"time"
  
-+	"github.com/mediocregopher/radix/v3"
- 	"github.com/patrickmn/go-cache"
- 
 -	"github.com/go-redis/redis/v8"
  	"github.com/golang/protobuf/proto"
++	"github.com/mediocregopher/radix/v3"
  	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
  
-@@ -25,7 +25,7 @@ type server struct {
+ 	pbv "hybrid/proto/veritas"
+@@ -23,7 +23,7 @@ type server struct {
  
  	l *ledger.LogLedger
  
@@ -22,7 +21,7 @@ index a5188ca..01c0bb9 100644
  
  	puller *kafka.Consumer
  	pusher *kafka.Producer
-@@ -44,12 +44,52 @@ type BlockPurpose struct {
+@@ -40,8 +40,51 @@ type BlockPurpose struct {
  	approved map[string]struct{}
  }
  
@@ -57,11 +56,9 @@ index a5188ca..01c0bb9 100644
 +
 +func NewServer(redisCli *radix.Pool, consumer *kafka.Consumer, producer *kafka.Producer, ledgerPath string, config *Config) *server {
  	ctx, cancel := context.WithCancel(context.Background())
- 	l, err := ledger.NewLedger(ledgerPath, true)
- 	if err != nil {
- 		log.Fatalf("Create ledger failed: %v", err)
- 	}
++
 +	// create RediSQL DB
++	redisCli.Do(radix.Cmd(nil, "DEL", "VERITAS"))
 +	if err := redisCli.Do(radix.Cmd(nil, "REDISQL.CREATE_DB", "VERITAS")); err != nil {
 +		panic(err)
 +	}
@@ -73,23 +70,22 @@ index a5188ca..01c0bb9 100644
 +	)); err != nil {
 +		panic(err)
 +	}
- 	s := &server{
- 		ctx:      ctx,
- 		cancel:   cancel,
-@@ -117,10 +157,8 @@ func (s *server) applyLoop() {
++
+ 	l, err := ledger.NewLedger(ledgerPath, true)
+ 	if err != nil {
+ 		log.Fatalf("Create ledger failed: %v", err)
+@@ -112,8 +155,8 @@ func (s *server) applyLoop() {
  			LOOP:
  				for _, sl := range blk.Txs {
  					for _, t := range sl.Sets {
 -						res, err := s.cli.Get(s.ctx, t.GetKey()).Result()
 -						if err == redis.Nil {
--							continue
--						} else if err != nil {
 +						res, err := rediSQLGet(s.cli, t.GetKey())
-+						if err != nil {
++						if err == nil {
+ 							continue
+ 						} else if err != nil {
  							log.Fatalf("Commit log %v get failed: %v", blk.Txs[0].GetSeq(), err)
- 						}
- 						v, err := Decode(res)
-@@ -176,7 +214,7 @@ func (s *server) applyLoop() {
+@@ -173,7 +216,7 @@ func (s *server) applyLoop() {
  					if err != nil {
  						log.Fatalf("Commit log %v encode failed: %v", blkBuf.blk.Txs[0].GetSeq(), err)
  					}
@@ -97,11 +93,11 @@ index a5188ca..01c0bb9 100644
 +					if err := rediSQLSet(s.cli, t.GetKey(), entry); err != nil {
  						log.Fatalf("Commit log %v redis set failed: %v", blkBuf.blk.Txs[0].GetSeq(), err)
  					}
- 					if _, ok := s.getCache.Get(t.Key); ok {
-@@ -272,7 +310,7 @@ func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse
- 	if v, ok := s.getCache.Get(req.Key); ok {
- 		return &pbv.GetResponse{Value: v.(string)}, nil
- 	}
+ 					if err := s.l.Append([]byte(t.GetKey()), []byte(t.GetValue()+"-"+fmt.Sprintf("%v", t.GetVersion()))); err != nil {
+@@ -263,7 +306,7 @@ func (s *server) batchLoop() {
+ }
+ 
+ func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse, error) {
 -	res, err := s.cli.Get(ctx, req.GetKey()).Result()
 +	res, err := rediSQLGet(s.cli, req.GetKey())
  	if err != nil {
