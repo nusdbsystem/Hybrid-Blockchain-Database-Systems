@@ -150,8 +150,10 @@ func (s *server) applyLoop() {
 					s.mu.Unlock()
 				} else {
 					s.mu.Lock()
+					ntx := len(blk.Txs[0].Sets)
 					delete(s.buffer, blk.Txs[0].Seq)
 					s.mu.Unlock()
+					log.Printf("Abort transaction %d\n", ntx)
 					break
 				}
 			}
