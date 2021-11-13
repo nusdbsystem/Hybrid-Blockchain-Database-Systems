@@ -74,7 +74,7 @@ func main() {
 		}
 		avaLatency = float64(all) / (1000 * float64(reqNum.Load()))
 	}()
-	for i := 0; i < *driverConcurrency; i++ {
+	for i := 0; i < 500; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
