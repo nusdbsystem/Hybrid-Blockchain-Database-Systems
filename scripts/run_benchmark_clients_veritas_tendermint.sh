@@ -19,6 +19,7 @@ for TH in $THREADS; do
     for I in `seq 2 5`; do
 	    IDX=$(($I-1))
 	    scp -o StrictHostKeyChecking=no root@192.168.20.$I:/veritas-tm-$IDX.log $SLOGS/
+	    scp -o StrictHostKeyChecking=no root@192.168.20.$I:/root/tendermint.log $SLOGS/tendermint-$IDX.log
     done    
 done
 ./restart_cluster_veritas.sh
