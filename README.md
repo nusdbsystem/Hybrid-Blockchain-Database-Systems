@@ -103,6 +103,22 @@ bigchaindb start --experimental-parallel-validation > /dev/null 2>&1 &
 
 Then repeat all the steps of BigchainDB.
 
+### Aborted Transaction
+
+The number of aborted transactions is reported by Veritas (Kafka) in its server log, such as:
+
+```
+2021/11/13 13:57:20 Abort transaction 1
+```
+
+By counting the number of such messages, one can get the total number of aborted transactions:
+
+```
+cat logs-distribution-veritas-kafka-.../veritas-latest-logs/veritas-* | grep Abort | wc -l
+```
+
+There are no aborted transactions in Veritas (TM) and BlockchainDB.
+
 ## License
 
 MIT License

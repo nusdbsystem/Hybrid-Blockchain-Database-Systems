@@ -31,6 +31,9 @@ for idx in `seq 2 $END_IDX`; do
 	echo "," >> power.txt
 	echo "default" >> power.txt
 done
+for idx in `seq 2 $END_IDX`; do
+	ssh -o StrictHostKeyChecking=no root@$PREFIX$idx "killall -9 tendermint"
+done
 VALIDATORS=`tail +2 validators.txt | tr -d '\n' | base64 | tr -d '\n'`
 POWERS=`tail +2 power.txt | tr -d '\n'`
 
