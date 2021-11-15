@@ -18,6 +18,66 @@ index 717959c..3798f56 100644
  	})
  	pbv.RegisterNodeServer(s, svr)
  	lis, err := net.Listen("tcp", *addr)
+diff --git a/cmd/veritastm/main.go b/cmd/veritastm/main.go
+index feab348..ea75cd3 100644
+--- a/cmd/veritastm/main.go
++++ b/cmd/veritastm/main.go
+@@ -7,6 +7,8 @@ import (
+ 	"os/signal"
+ 	"strings"
+ 
++	"github.com/pkg/profile"
++
+ 	"google.golang.org/grpc"
+ 	"gopkg.in/alecthomas/kingpin.v2"
+ 
+@@ -28,6 +30,7 @@ var (
+ 	ledgerPath = kingpin.Flag("ledger-path", "ledger path").Required().String()
+ 	tmSocket   = kingpin.Flag("tendermint-socket", "tendermint socket").Required().String()
+ 	abciSocket = kingpin.Flag("abci-socket", "abci socket").Required().String()
++	txDelay    = kingpin.Flag("tx-delay", "transaction delay").Int()
+ )
+ 
+ func check(err error) {
+@@ -37,6 +40,8 @@ func check(err error) {
+ }
+ 
+ func main() {
++	defer profile.Start(profile.CPUProfile, profile.NoShutdownHook, profile.ProfilePath("/tmp")).Stop()
++
+ 	kingpin.Parse()
+ 
+ 	r, err := dbconn.NewRedisConn(*redisAddr, *redisPwd, *redisDb)
+@@ -57,6 +62,7 @@ func main() {
+ 		BlockSize:   *blockSize,
+ 		LedgerPath:  *ledgerPath,
+ 		ABCIRPCAddr: *abciSocket,
++		TxDelay:     *txDelay,
+ 	})
+ 	pbv.RegisterNodeServer(s, svr)
+ 	lis, err := net.Listen("tcp", *addr)
+diff --git a/veritas/benchmark/ycsbbench/main.go b/veritas/benchmark/ycsbbench/main.go
+index 1006f2a..d2e3d7a 100644
+--- a/veritas/benchmark/ycsbbench/main.go
++++ b/veritas/benchmark/ycsbbench/main.go
+@@ -81,7 +81,7 @@ func main() {
+ 		go func() {
+ 			defer wg.Done()
+ 			for kv := range loadBuf {
+-				clis[0].Set(context.Background(), kv[0], kv[1])
++				clis[0].Set(context.Background(), kv[0], kv[1], false)
+ 			}
+ 		}()
+ 	}
+@@ -130,7 +130,7 @@ func main() {
+ 						latencyCh <- time.Since(start)
+ 					case benchmark.SetOp:
+ 						start := time.Now()
+-						clis[seq].Set(context.Background(), op.Key, op.Val)
++						clis[seq].Set(context.Background(), op.Key, op.Val, true)
+ 						latencyCh <- time.Since(start)
+ 					default:
+ 						panic(fmt.Sprintf("invalid operation: %v", op.ReqType))
 diff --git a/veritas/config.go b/veritas/config.go
 index d38a1c6..fdaf78e 100644
 --- a/veritas/config.go
@@ -28,15 +88,109 @@ index d38a1c6..fdaf78e 100644
  	BlockSize int
 +	TxDelay   int
  }
+diff --git a/veritas/driver/driver.go b/veritas/driver/driver.go
+index a91d6ff..eafc849 100644
+--- a/veritas/driver/driver.go
++++ b/veritas/driver/driver.go
+@@ -56,13 +56,17 @@ func (d *Driver) Get(ctx context.Context, key string) (string, error) {
+ 	return res.GetValue(), nil
+ }
+ 
+-func (d *Driver) Set(ctx context.Context, key, value string) error {
++func (d *Driver) Set(ctx context.Context, key, value string, txdelay bool) error {
+ 	ts, err := d.tsCli.TS()
+ 	if err != nil {
+ 		return err
+ 	}
++	signature := "none"
++	if txdelay {
++		signature = "txdelay"
++	}
+ 	if _, err := d.dbCli.Set(ctx, &pbv.SetRequest{
+-		Signature: d.signature,
++		Signature: signature,
+ 		Key:       key,
+ 		Value:     value,
+ 		Version:   ts,
 diff --git a/veritas/server.go b/veritas/server.go
-index a5188ca..2393ef0 100644
+index aeea349..8bb3bf8 100644
 --- a/veritas/server.go
 +++ b/veritas/server.go
-@@ -290,6 +290,7 @@ func (s *server) Set(ctx context.Context, req *pbv.SetRequest) (*pbv.SetResponse
+@@ -279,6 +279,10 @@ func (s *server) Set(ctx context.Context, req *pbv.SetRequest) (*pbv.SetResponse
  	s.locker.Lock(req.GetKey())
  	defer s.locker.Unlock(req.GetKey())
  
-+	time.Sleep(time.Duration(s.config.TxDelay) * time.Millisecond)
++	if req.Signature == "txdelay" {
++		time.Sleep(time.Duration(s.config.TxDelay) * time.Millisecond)
++	}
++
  	sets := []*pbv.SetRequest{{
  		Signature: req.GetSignature(),
  		Key:       req.GetKey(),
+diff --git a/veritastm/benchmark/main.go b/veritastm/benchmark/main.go
+index 0b0b1b9..91ee048 100644
+--- a/veritastm/benchmark/main.go
++++ b/veritastm/benchmark/main.go
+@@ -79,7 +79,7 @@ func main() {
+ 		go func() {
+ 			defer wg.Done()
+ 			for kv := range loadBuf {
+-				clis[0].Set(context.Background(), kv[0], kv[1])
++				clis[0].Set(context.Background(), kv[0], kv[1], false)
+ 			}
+ 		}()
+ 	}
+@@ -130,7 +130,7 @@ func main() {
+ 						latencyCh <- time.Since(start)
+ 					case veritastm.SetOp:
+ 						start := time.Now()
+-						clis[seq].Set(context.Background(), op.Key, op.Val)
++						clis[seq].Set(context.Background(), op.Key, op.Val, true)
+ 						latencyCh <- time.Since(start)
+ 					default:
+ 						panic(fmt.Sprintf("invalid operation: %v", op.ReqType))
+diff --git a/veritastm/config.go b/veritastm/config.go
+index c031145..37bd1ab 100644
+--- a/veritastm/config.go
++++ b/veritastm/config.go
+@@ -6,4 +6,5 @@ type Config struct {
+ 	BlockSize   int
+ 	LedgerPath  string
+ 	ABCIRPCAddr string
++	TxDelay     int
+ }
+diff --git a/veritastm/driver.go b/veritastm/driver.go
+index 058bb59..b7fefc3 100644
+--- a/veritastm/driver.go
++++ b/veritastm/driver.go
+@@ -39,9 +39,13 @@ func (d *Driver) Get(ctx context.Context, key string) (string, error) {
+ 	return res.GetValue(), nil
+ }
+ 
+-func (d *Driver) Set(ctx context.Context, key, value string) (string, error) {
++func (d *Driver) Set(ctx context.Context, key, value string, txdelay bool) (string, error) {
++	signature := "none"
++	if txdelay {
++		signature = "txdelay"
++	}
+ 	res, err := d.dbCli.Set(ctx, &pbv.SetRequest{
+-		Signature: d.signature,
++		Signature: signature,
+ 		Key:       key,
+ 		Value:     value,
+ 	})
+diff --git a/veritastm/server.go b/veritastm/server.go
+index 45fb3ab..10d174c 100644
+--- a/veritastm/server.go
++++ b/veritastm/server.go
+@@ -75,6 +75,10 @@ func (s *server) Set(ctx context.Context, req *pbv.SetRequest) (*pbv.SetResponse
+ 	v := []byte(ts)
+ 	tx := append(k, append([]byte("="), v...)...)
+ 
++	if req.Signature == "txdelay" {
++		time.Sleep(time.Duration(s.config.TxDelay) * time.Millisecond)
++	}
++
+ 	res, err := s.abciCli.BroadcastTxCommit(s.ctx, tx)
+ 	if err != nil {
+ 		fmt.Printf("Error in Set: %v\n", err)

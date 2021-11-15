@@ -32,7 +32,10 @@ cd ..
 git apply scripts/veritas-txdelay.patch
 cd bin
 go build -o veritas-kafka-txdelay ../cmd/veritas/main.go
-git checkout ../cmd/veritas/main.go ../veritas/config.go ../veritas/server.go
+go build -o veritas-kafka-bench-txdelay ../veritas/benchmark/ycsbbench/main.go
+go build -o veritas-tendermint-txdelay ../cmd/veritastm/main.go
+go build -o veritas-tendermint-bench-txdelay ../veritastm/benchmark/main.go
+git checkout ../cmd/veritas/main.go ../cmd/veritastm/main.go ../veritas/benchmark/ycsbbench/main.go ../veritas/config.go ../veritas/driver/driver.go ../veritas/server.go ../veritastm/benchmark/main.go ../veritastm/config.go ../veritastm/driver.go ../veritastm/server.go
 
 # build Veritas Tendermint + MongoDB
 cd ..
