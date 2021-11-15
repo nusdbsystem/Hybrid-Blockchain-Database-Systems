@@ -20,7 +20,7 @@ for TH in $THREADS; do
 	IDX=$(($I-1))
 	scp -o StrictHostKeyChecking=no root@192.168.20.$I:/veritas-$IDX.log $SLOGS/
     done
-    scp -o StrictHostKeyChecking=no root@192.168.20.$I:/kafka_2.12-2.7.0/zookeeper.log $SLOGS/
-    scp -o StrictHostKeyChecking=no root@192.168.20.$I:/kafka_2.12-2.7.0/kafka.log $SLOGS/
+    scp -o StrictHostKeyChecking=no root@192.168.20.6:/kafka_2.12-2.7.0/zookeeper.log $SLOGS/
+    scp -o StrictHostKeyChecking=no root@192.168.20.6:/kafka_2.12-2.7.0/kafka.log $SLOGS/
 done
 ./restart_cluster_veritas.sh

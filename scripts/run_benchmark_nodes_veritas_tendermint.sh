@@ -6,7 +6,7 @@ mkdir $LOGS
 
 set -x
 
-NODES="4 8 16 32 64"
+NODES="4 8 16 32"
 DRIVERS=8
 THREADS=256
 
