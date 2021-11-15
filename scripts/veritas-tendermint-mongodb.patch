@@ -1,0 +1,130 @@
+diff --git a/veritastm/ledgerapp.go b/veritastm/ledgerapp.go
+index 8b8510c..8ea4944 100644
+--- a/veritastm/ledgerapp.go
++++ b/veritastm/ledgerapp.go
+@@ -2,23 +2,22 @@ package veritastm
+ 
+ import (
+ 	"bytes"
+-	"context"
+ 	"fmt"
+ 	"hybrid/veritas/ledger"
+ 	"log"
+ 
+-	"github.com/go-redis/redis/v8"
+ 	abcitypes "github.com/tendermint/tendermint/abci/types"
++	"go.mongodb.org/mongo-driver/mongo"
+ )
+ 
+ type LedgerApp struct {
+ 	ledger *ledger.LogLedger
+-	db     *redis.Client
++	db     *mongo.Client
+ }
+ 
+ var _ abcitypes.Application = (*LedgerApp)(nil)
+ 
+-func NewLedgerApp(config *Config, rcli *redis.Client) *LedgerApp {
++func NewLedgerApp(config *Config, mcli *mongo.Client) *LedgerApp {
+ 	// create ledger
+ 	l, err := ledger.NewLedger(config.LedgerPath, true)
+ 	if err != nil {
+@@ -26,7 +25,7 @@ func NewLedgerApp(config *Config, rcli *redis.Client) *LedgerApp {
+ 	}
+ 	return &LedgerApp{
+ 		ledger: l,
+-		db:     rcli,
++		db:     mcli,
+ 	}
+ }
+ 
+@@ -40,7 +39,7 @@ func (l *LedgerApp) DeliverTx(req abcitypes.RequestDeliverTx) abcitypes.Response
+ 	parts := bytes.Split(req.Tx, []byte("="))
+ 	key, val := parts[0], parts[1]
+ 	l.ledger.Append(key, val)
+-	err := l.db.Set(context.Background(), string(key), string(val), 0).Err()
++	err := MongoSet(l.db, string(key), string(val))
+ 	if err != nil {
+ 		fmt.Printf("Error in Set DeliverTx: %v\n", err)
+ 	}
+diff --git a/veritastm/server.go b/veritastm/server.go
+index 45fb3ab..73e0508 100644
+--- a/veritastm/server.go
++++ b/veritastm/server.go
+@@ -5,9 +5,10 @@ import (
+ 	"fmt"
+ 	"time"
+ 
+-	"github.com/go-redis/redis/v8"
+ 	"github.com/pkg/errors"
+ 	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
++	"go.mongodb.org/mongo-driver/bson"
++	"go.mongodb.org/mongo-driver/mongo"
+ 
+ 	pbv "hybrid/proto/veritas"
+ )
+@@ -19,8 +20,8 @@ type server struct {
+ 
+ 	Ledger *LedgerApp
+ 
+-	redisCli *redis.Client
+-	abciCli  *rpchttp.HTTP
++	mcli    *mongo.Client
++	abciCli *rpchttp.HTTP
+ 
+ 	signature string
+ }
+@@ -30,11 +31,34 @@ type BlockPurpose struct {
+ 	approved map[string]struct{}
+ }
+ 
+-func NewServer(rcli *redis.Client, config *Config) *server {
++func MongoGet(cli *mongo.Client, key string) (string, error) {
++	collection := cli.Database("veritas").Collection("kv")
++	result := struct {
++		key string
++		val string
++	}{}
++	filter := bson.M{key: ""}
++	err := collection.FindOne(context.Background(), filter).Decode(&result)
++	if err != nil {
++		return "", err
++	}
++	return result.val, nil
++}
++
++func MongoSet(cli *mongo.Client, key string, val string) error {
++	collection := cli.Database("veritas").Collection("kv")
++	_, err := collection.InsertOne(context.Background(), bson.M{key: val})
++	if err != nil {
++		return err
++	}
++	return nil
++}
++
++func NewServer(mcli *mongo.Client, config *Config) *server {
+ 	ctx, cancel := context.WithCancel(context.Background())
+ 
+ 	// ledger app
+-	lapp := NewLedgerApp(config, rcli)
++	lapp := NewLedgerApp(config, mcli)
+ 
+ 	// ABCI Client
+ 	var abciClient *rpchttp.HTTP
+@@ -50,14 +74,14 @@ func NewServer(rcli *redis.Client, config *Config) *server {
+ 		Ledger:    lapp,
+ 		abciCli:   abciClient,
+ 		config:    config,
+-		redisCli:  rcli,
++		mcli:      mcli,
+ 		signature: config.Signature,
+ 	}
+ 	return s
+ }
+ 
+ func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse, error) {
+-	res, err := s.redisCli.Get(ctx, req.GetKey()).Result()
++	res, err := MongoGet(s.mcli, req.Key)
+ 	if err != nil {
+ 		return nil, err
+ 	}

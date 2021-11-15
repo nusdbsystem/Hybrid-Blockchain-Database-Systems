@@ -33,3 +33,10 @@ git apply scripts/veritas-txdelay.patch
 cd bin
 go build -o veritas-kafka-txdelay ../cmd/veritas/main.go
 git checkout ../cmd/veritas/main.go ../veritas/config.go ../veritas/server.go
+
+# build Veritas Tendermint + MongoDB
+cd ..
+git apply scripts/veritas-tendermint-mongodb.patch
+cd bin
+go build -o veritas-tendermint-mongodb ../cmd/veritastm-mongodb/main.go
+git checkout ../veritastm/ledgerapp.go ../veritastm/server.go
