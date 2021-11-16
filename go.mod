@@ -5,10 +5,14 @@ go 1.15
 require (
 	github.com/Workiva/go-datastructures v1.0.53 // indirect
 	github.com/adlio/schema v1.1.14 // indirect
+	github.com/allegro/bigcache v1.2.1 // indirect
+	github.com/aristanetworks/goarista v0.0.0-20211115193401-1e4971faf436 // indirect
 	github.com/btcsuite/btcd v0.22.0-beta // indirect
 	github.com/confluentinc/confluent-kafka-go v1.7.0 // indirect
+	github.com/deckarep/golang-set v1.7.1 // indirect
 	github.com/dgraph-io/badger v1.6.2
 	github.com/dgraph-io/badger/v3 v3.2103.2
+	github.com/ethereum/go-ethereum v1.8.23
 	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/go-kit/kit v0.12.0 // indirect
 	github.com/go-redis/redis/v8 v8.11.4
@@ -26,7 +30,8 @@ require (
 	github.com/oasisprotocol/curve25519-voi v0.0.0-20210609091139-0a56a4bca00b // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1
-	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
+	github.com/pkg/profile v1.2.1
+	github.com/rjeczalik/notify v0.9.2 // indirect
 	github.com/rs/cors v1.8.0 // indirect
 	github.com/rs/zerolog v1.26.0 // indirect
 	github.com/sasha-s/go-deadlock v0.2.1-0.20190427202633-1595213edefa // indirect
@@ -45,7 +50,6 @@ require (
 	google.golang.org/grpc v1.42.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
-	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.7.0
 	pgregory.net/rapid v0.4.7 // indirect
 )
