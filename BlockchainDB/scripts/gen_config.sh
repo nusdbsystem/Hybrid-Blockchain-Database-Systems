@@ -1,15 +1,17 @@
 #!/usr/bin/env bash
 set -ex
 
+
 shardIDs=${1:-1}
 replicaIDs=${2:-4}
 
 echo "Usage: ./scripts/gen_config.sh 4 1"
 echo "Generate config files, shards: ${shardIDs}, replicas: ${replicaIDs}"
-dir=$(pwd)
-echo $dir
-tomlDir="$dir/config.nodes.${shardIDs}.${replicaIDs}"
-shardDir="$dir/config.eth.${shardIDs}.${replicaIDs}"
+cd `dirname ${BASH_SOURCE-$0}`
+. eth/env.sh
+cd -
+tomlDir="${ETH_CONFIG}/config.nodes.${shardIDs}.${replicaIDs}"
+shardDir="${ETH_CONFIG}/config.eth.${shardIDs}.${replicaIDs}"
 rm -rf ${tomlDir}/*
 mkdir -p ${tomlDir}
 

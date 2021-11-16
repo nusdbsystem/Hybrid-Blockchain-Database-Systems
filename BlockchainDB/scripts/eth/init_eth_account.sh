@@ -9,7 +9,8 @@ nodeIDs=${2:-4}
 
 cd `dirname ${BASH_SOURCE-$0}`
 . env.sh
-genesisDir=${ETH_CONFIG}.${shardIDs}.${nodeIDs}
+cd -
+genesisDir="${ETH_CONFIG}/config.eth.${shardIDs}.${nodeIDs}"
 
 for (( j=1; j<=${shardIDs}; j++ ))
 do

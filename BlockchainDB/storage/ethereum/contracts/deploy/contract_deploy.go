@@ -24,7 +24,7 @@ func main() {
 	// ethnode := "http://localhost:7545"
 
 	//config from file
-	configFile := flag.String("config", "config.eth.1.4/shard_1", "The path to the config file")
+	configFile := flag.String("config", "config/config.eth.1.4/shard_1", "The path to the config file")
 	flag.Parse()
 	var conf config.Options
 	err := config.ReadConfig(&conf, *configFile)

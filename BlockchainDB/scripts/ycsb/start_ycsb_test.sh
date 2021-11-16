@@ -12,7 +12,7 @@ nthreads=$(( ${clients} / ${ndrivers} ))
 dir=$(pwd)
 echo $dir
 
-bin="$dir/benchmark/ycsb/ycsbtest"
+bin="$dir/../../.bin/benchmark_bcdb"
 defaultAddrs="127.0.0.1:50001"
 loadPath="$dir/temp/${distribution}/workload${workload}.dat"
 runPath="$dir/temp/${distribution}/run_workload${workload}.dat"

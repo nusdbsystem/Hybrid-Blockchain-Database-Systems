@@ -3,15 +3,16 @@
 
 shardIDs=${1:-1}
 nodeIDs=${2:-4}
+dir=$(dirname "$0")
+echo $dir
 
 cd `dirname ${BASH_SOURCE-$0}`
 . env.sh
 cd -
 
-dir=$(dirname "$0")
-echo $dir
-bin="${dir}/../../storage/ethereum/contracts/deploy/deyploycontract"
-configDir="${dir}/../../config.eth.${shardIDs}.${nodeIDs}"
+
+bin="${ETH_BIN}/deploy_contract"
+configDir="config/config.eth.${shardIDs}.${nodeIDs}"
 ls ${configDir}
 
 if [ ! -f ${bin} ]; then

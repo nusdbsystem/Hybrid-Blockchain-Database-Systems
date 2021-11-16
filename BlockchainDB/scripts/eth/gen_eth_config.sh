@@ -10,7 +10,8 @@ cd `dirname ${BASH_SOURCE-$0}`
 . env.sh
 
 rm -rf ${ETH_DATA}*
-genesisDir=${ETH_CONFIG}.${shardIDs}.${nodeIDs}
+mkdir -p ${ETH_CONFIG}
+genesisDir="${ETH_CONFIG}/config.eth.${shardIDs}.${nodeIDs}"
 genesisTemplate=${ETH_HOME}/networks/CustomGenesis.template
 mkdir -p $genesisDir
 

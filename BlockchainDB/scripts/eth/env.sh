@@ -1,6 +1,6 @@
-WORKSPACE=$HOME/go/src/github.com/EinWTW/BlockchainDB
-ETH_BIN=$HOME/go/src/github.com/ethereum/go-ethereum/build/bin
-ETH_CONFIG=$WORKSPACE/config.eth
+WORKSPACE=$HOME/go/src/github.com/nusdbsystem/Hybrid-Blockchain-Database-Systems/BlockchainDB
+ETH_CONFIG=$WORKSPACE/config
+ETH_BIN=$WORKSPACE/.bin
 ETH_HOME=$WORKSPACE/storage/ethereum
 ETH_DATA=$HOME/Data/eth
 

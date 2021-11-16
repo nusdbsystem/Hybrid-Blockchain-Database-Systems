@@ -6,16 +6,20 @@ set -ex
 # pkill -f "bcdbnode"
 # kill -9 $(ps -ef|grep "geth"|grep -v "grep"|awk '{print $2}')
 # sleep 5
-
-dir=$(dirname "$0")
+#dir=$(dirname "$0")
 
 echo "Start blockchaindb server nodes, Please input server node size(default 4)"
 shardIDs=${1:-1}
 replicaIDs=${2:-4}
+dir=$(dirname "$0")
+echo $dir
 
+cd `dirname ${BASH_SOURCE-$0}`
+. eth/env.sh
+cd -
 
-bin="$dir/../cmd/bcdbnode/bcdbnode"
-tomlDir="$dir/../config.nodes.${shardIDs}.${replicaIDs}"
+bin="${ETH_BIN}/bcdbnode"
+tomlDir="config/config.nodes.${shardIDs}.${replicaIDs}"
 mkdir -p nodelog
 if [ ! -f ${bin} ]; then
     echo "Binary file ${bin} not found!"

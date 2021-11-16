@@ -12,12 +12,12 @@ all: download build ethnet install verify
 fast: build ethnet install verify
 
 clean:
-	@rm -fv $(binaries)
+	@rm -rfv .bin
 
-build: clean $(binaries)
-	
-$(binaries):
-	@go build -o ./.bin/ $(GCFLAGS) ./$(dir $@)
+build: clean
+	@go build -o ./.bin/bcdbnode $(GCFLAGS) ./cmd/bcdbnode
+	@go build -o ./.bin/benchmark_bcdb $(GCFLAGS) ./benchmark/ycsb
+	@go build -o ./.bin/deploy_contract $(GCFLAGS) ./storage/ethereum/contracts/deploy
 
 download:
 	@/bin/bash scripts/ycsb/gen_ycsb_data.sh
