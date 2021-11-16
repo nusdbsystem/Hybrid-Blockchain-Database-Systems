@@ -67,14 +67,13 @@ Note that Veritas Kafka also needs a node for Kafka.
 We use the same ``veritas`` docker images. Then, we run the following scripts:
 
 ```
-./run_benchmark_clients_tendermint.sh
-./run_benchmark_nodes_tendermint.sh
-./run_benchmark_distribution_tendermint.sh
-./run_benchmark_workload_tendermint.sh
-./run_benchmark_blksize_tendermint.sh
-./run_benchmark_txsize_tendermint.sh
-./run_benchmark_txdelay_tendermint.sh
-./run_benchmark_networking_tendermint.sh
+./run_benchmark_clients_veritas_tendermint.sh
+./run_benchmark_nodes_veritas_tendermint.sh
+./run_benchmark_distribution_veritas_tendermint.sh
+./run_benchmark_workload_veritas_tendermint.sh
+./run_benchmark_txsize_veritas_tendermint.sh
+./run_benchmark_txdelay_veritas_tendermint.sh
+./run_benchmark_networking_veritas_tendermint.sh
 ```
 
 ### BigchainDB
@@ -82,14 +81,14 @@ We use the same ``veritas`` docker images. Then, we run the following scripts:
 We use ``bigchaindb`` docker images. Then, we run the following scripts:
 
 ```
-./run_benchmark_clients_tendermint.sh
-./run_benchmark_nodes_tendermint.sh
-./run_benchmark_distribution_tendermint.sh
-./run_benchmark_workload_tendermint.sh
-./run_benchmark_blksize_tendermint.sh
-./run_benchmark_txsize_tendermint.sh
-./run_benchmark_txdelay_tendermint.sh
-./run_benchmark_networking_tendermint.sh
+./run_benchmark_clients_bigchaindb.sh
+./run_benchmark_nodes_bigchaindb.sh
+./run_benchmark_distribution_bigchaindb.sh
+./run_benchmark_workload_bigchaindb.sh
+./run_benchmark_blksize_bigchaindb.sh
+./run_benchmark_txsize_bigchaindb.sh
+./run_benchmark_txdelay_bigchaindb.sh
+./run_benchmark_networking_bigchaindb.sh
 ```
 
 ### BigchainDB Parallel Validation
@@ -102,6 +101,7 @@ bigchaindb start --experimental-parallel-validation > /dev/null 2>&1 &
 ```
 
 Then repeat all the steps of BigchainDB.
+
 
 ### Aborted Transaction
 
