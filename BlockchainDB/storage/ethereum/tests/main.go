@@ -8,22 +8,24 @@ import (
 	"os"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"hybrid/BlockchainDB/bcdbnode/config"
 	ClientSDK "hybrid/BlockchainDB/storage/ethereum/clientSDK"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 func main() {
+
 	//ganache
 	// ethnode := "http://localhost:7545"
 	// hexaddress := "0xa5385Dbde6EA7bEa767213db23B9A6D39b912a33" //contract address
-	// hexkey := "98670003f6f38d426a6b76cd7143926b9af17391a5ff76f8ee14f162511d6814"
+	// hexkey := ""
 
 	//local eth_1_1
-	// ethnode := "/home/tianwen/Data/eth_1_1/geth.ipc"
-	// hexaddress := "0x0803521274Fb66b54Ef6CF22A801713B1299b5cD" //"0x8c60fa428050904a19da95a07e8eb3e382bd2329"
-	// hexkey := "5c01c3481aadd0a1d0828c61e32b2af82724b844de1b06673fa246df61d1a887"
+	// ethnode := "/Data/eth_1_1/geth.ipc"
+	// hexaddress := "0x0803521274Fb66b54Ef6CF22A801713B1299b5cD"
+	// hexkey := ""
 	//redisAddr := "127.0.0.1:60001"
 
 	//config from file
