@@ -40,12 +40,13 @@ POWERS=`tail +2 power.txt | tr -d '\n'`
 for idx in `seq 2 $END_IDX`; do
 	IDS=`tail +2 ids_$idx.txt | tr -d '\n'`
 	IPS=`tail +2 ips_$idx.txt | tr -d '\n'`
-	scp -o StrictHostKeyChecking=no tendermint_config.py root@$PREFIX$idx:/usr/src/app/scripts/
-	ssh -o StrictHostKeyChecking=no root@$PREFIX$idx "cd /usr/src/app/scripts && ./tendermint_config.py root $GENESIS generate $VALIDATORS $POWERS $IDS $IPS"
+	scp -o StrictHostKeyChecking=no tendermint_config_v1.py root@$PREFIX$idx:/usr/src/app/scripts/
+	ssh -o StrictHostKeyChecking=no root@$PREFIX$idx "cd /usr/src/app/scripts && ./tendermint_config_v1.py root $GENESIS generate $VALIDATORS $POWERS $IDS $IPS"
 done
 
 rm validators.txt power.txt ids*.txt ips*.txt
 
 for idx in `seq 2 $END_IDX`; do
-	ssh -o StrictHostKeyChecking=no root@$PREFIX$idx "killall -9 tendermint; sleep 1; /usr/local/bin/tendermint node --p2p.laddr 'tcp://0.0.0.0:26656' --proxy_app='tcp://0.0.0.0:26658' --consensus.create_empty_blocks=false --p2p.pex=false > tendermint.log 2>&1 &"
+	ssh -o StrictHostKeyChecking=no root@$PREFIX$idx "killall -9 tendermint; sleep 1; /usr/local/bin/tendermint node --p2p.laddr 'tcp://0.0.0.0:26656' --proxy_app='tcp://0.0.0.0:26658' --p2p.pex=false > tendermint.log 2>&1 &"
 done
+# --consensus.create_empty_blocks=false --p2p.pex=false
