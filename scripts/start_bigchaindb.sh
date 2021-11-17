@@ -11,12 +11,27 @@ fi
 END_IDX=$(($N+1))
 PREFIX="192.168.20."
 
+TMCONFIGFILE="../BigchainDB/config.toml"
+if ! [ -f "$TMCONFIGFILE" ]; then
+	echo "BigchainDB Tendermint config file not found!"
+	exit 1
+fi
+
 set -x
+
+for idx in `seq 2 $END_IDX`; do
+	ssh -o StrictHostKeyChecking=no root@$PREFIX$idx "cd /usr/src/app/scripts && ./start-all.sh"	
+	scp -o StrictHostKeyChecking=no $TMCONFIGFILE root@$PREFIX$idx:/root/.tendermint/config/
+	sleep 5
+	ssh -o StrictHostKeyChecking=no root@$PREFIX$idx "killall -9 tendermint; sleep 1; /usr/local/bin/tendermint node --p2p.laddr 'tcp://192.168.20.$idx:26656' --proxy_app='tcp://0.0.0.0:26658' --p2p.pex=false > tendermint.log 2>&1 &"
+done
+
+exit 0
 
 for idx in `seq 2 $END_IDX`; do
 	ssh -o StrictHostKeyChecking=no root@$PREFIX$idx "cd /usr/src/app/scripts && ./start-all.sh"
 	sleep 5
-	ssh -o StrictHostKeyChecking=no root@$PREFIX$idx "killall -9 tendermint; rm -r .tendermint; /usr/local/bin/tendermint init"
+	# ssh -o StrictHostKeyChecking=no root@$PREFIX$idx "killall -9 tendermint; rm -r .tendermint; /usr/local/bin/tendermint init"
 	for jdx in `seq 2 $END_IDX`; do
 		if [ $idx -ne $jdx ]; then
 			echo "," >> ids_$jdx.txt
@@ -47,6 +62,6 @@ done
 rm validators.txt power.txt ids*.txt ips*.txt
 
 for idx in `seq 2 $END_IDX`; do
-	ssh -o StrictHostKeyChecking=no root@$PREFIX$idx "killall -9 tendermint; sleep 1; /usr/local/bin/tendermint node --p2p.laddr 'tcp://0.0.0.0:26656' --proxy_app='tcp://0.0.0.0:26658' --p2p.pex=false > tendermint.log 2>&1 &"
+	ssh -o StrictHostKeyChecking=no root@$PREFIX$idx "killall -9 tendermint; sleep 1; /usr/local/bin/tendermint node --p2p.laddr 'tcp://192.168.20.$idx:26656' --proxy_app='tcp://0.0.0.0:26658' --p2p.pex=false > tendermint.log 2>&1 &"
 done
 # --consensus.create_empty_blocks=false --p2p.pex=false
