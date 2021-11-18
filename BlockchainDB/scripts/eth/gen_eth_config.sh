@@ -53,7 +53,7 @@ sed -i "s/AllocSigners/${allocSigners}/" ${genesisFile}
 
 echo "Generate genesis file  ${genesisFile}"
 
-echo "eth-node = \"${HOME}/Data/eth_${shardIDs}_1/geth.ipc\"" > ${genesisDir}/shard_${j}.toml
+echo "eth-node = \"${HOME}/Data/eth_${j}_1/geth.ipc\"" > ${genesisDir}/shard_${j}.toml
 echo "eth-boot-signer-address = \"${shardsigner}\"" >> ${genesisDir}/shard_${j}.toml
 hexkey=$(jq -r '.crypto.ciphertext' <<< cat ${HOME}/Data/eth_${j}_1/keystore/UTC*)
 echo "eth-hexkey = \"${hexkey}\"" >> ${genesisDir}/shard_${j}.toml

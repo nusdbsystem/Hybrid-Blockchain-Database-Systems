@@ -5,8 +5,9 @@ if ! [ -d "../../BlockchainDB/.bin" ]; then
     exit 1
 fi
 
-rm -rf .bin
+rm -rf .bin .scripts
 cp -r ../../BlockchainDB/.bin .	
+
 
 if ! [ -f "id_rsa.pub" ]; then
     if ! [ -f "$HOME/.ssh/id_rsa.pub" ]; then
@@ -17,3 +18,5 @@ if ! [ -f "id_rsa.pub" ]; then
 fi
 
 docker build -f Dockerfile -t blockchaindb .
+
+rm -rf .bin .scripts id_rsa.pub

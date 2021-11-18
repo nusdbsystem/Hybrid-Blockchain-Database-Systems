@@ -6,7 +6,14 @@ shardIDs=${1:-1}
 
 docker ps |grep shard
 # docker rm -f $(sudo -S docker ps -aq  --filter ancestor=redis)
-# docker ps |grep shard
+idx=1
+for id in `docker ps | grep "redis-shard" | cut -d ' ' -f 1`; do
+	echo "redis-shard$idx"
+	idx=$(($idx+1))
+	docker kill $id
+	docker rm $id
+done
+
 
 for (( c=1; c<=${shardIDs}; c++ ))
 do
