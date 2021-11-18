@@ -14,7 +14,7 @@ ndrivers=${size}
 
 dir=$(pwd)
 echo $dir
-bin="$dir/../blockchaindb/.bin/benchmark_bcdb"
+bin="$dir/../BlockchainDB/.bin/benchmark_bcdb"
 defaultAddrs="192.168.20.2:50001"
 nthreads=$(( ${clients} / ${ndrivers} ))
 

@@ -15,7 +15,7 @@ nthreads=$(( ${clients} / ${ndrivers} ))
 
 dir=$(pwd)
 echo $dir
-bin="$dir/../blockchaindb/.bin/benchmark_bcdb"
+bin="$dir/../BlockchainDB/.bin/benchmark_bcdb"
 defaultAddrs="192.168.20.2:50001"
 loadPath="$dir/../temp/${distribution}/workload${workload}.dat"
 runPath="$dir/../temp/${distribution}/run_workload${workload}.dat"

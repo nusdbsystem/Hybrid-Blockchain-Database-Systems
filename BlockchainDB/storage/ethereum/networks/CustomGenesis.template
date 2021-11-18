@@ -9,12 +9,12 @@
     "constantinopleBlock": 0,
     "petersburgBlock": 0,
     "clique": {
-      "period": 5,
+      "period": PeriodX,
       "epoch": 30000
     }
   },
   "difficulty": "1",
-  "gasLimit": "10000000",
+  "gasLimit": "GasLimitX",
   "extradata": "ExtraData",
   "alloc": {
     AllocSigners

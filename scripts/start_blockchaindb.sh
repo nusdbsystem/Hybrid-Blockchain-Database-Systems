@@ -4,6 +4,8 @@ set -ex
 # Test on one shard only
 shardId=1
 nodes=${1:-4}
+period=${2:-5}
+gaslimit=${3:-10000000}
 chainIdByShard=$((1000 + ${shardId}))
 bootnode=1
 PREFIX="192.168.20."
@@ -44,6 +46,8 @@ for (( i=1; i<=${nodes}; i++ )); do
 done
 extraData="0x0000000000000000000000000000000000000000000000000000000000000000${signers}0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
 sed -i "s/ChainIdByShard/${chainIdByShard}/" ${genesisFile}
+sed -i "s/PeriodX/${period}/" ${genesisFile}
+sed -i "s/GasLimitX/${gaslimit}/" ${genesisFile}
 sed -i "s/ExtraData/${extraData}/" ${genesisFile}
 sed -i "s/AllocSigners/${allocSigners}/" ${genesisFile}
 echo "Generate genesis file  ${genesisFile}"
