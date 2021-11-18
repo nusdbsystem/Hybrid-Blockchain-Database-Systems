@@ -56,15 +56,16 @@ def sendTxn(lineQueue, latQueue, driver):
 
 print("Start loading init data...")
 loadQueue = queue.Queue(maxsize=100000)
-tLoadRead = threading.Thread(target=readFile, args=(loadFile, loadQueue,))
-tLoadRead.start()
-time.sleep(5)
+readFile(loadFile, loadQueue)
+#tLoadRead = threading.Thread(target=readFile, args=(loadFile, loadQueue,))
+#tLoadRead.start()
+#time.sleep(5)
 loadThreadList = []
 for i in range(32):
     t = threading.Thread(target=sendTxn, args=(loadQueue, None, bdbs[i%len(bdbs)],))
     loadThreadList.append(t)
     t.start()
-tLoadRead.join()
+#tLoadRead.join()
 for t in loadThreadList:
     t.join()
 
@@ -88,24 +89,28 @@ start = time.time()
 for t in runThreadList:
     t.start()
 time.sleep(1)
-
-allLatency = []
-def getLatency(latQueue):
-    while latQueue.empty() == False:
-        ts = latQueue.get()*3
-        allLatency.append(ts)
-tLatency = threading.Thread(target=getLatency, args=(latencyQueue,))
-tLatency.start()
-
-print("Before join...")
-# tRunRead.join()
 for t in runThreadList:
     t.join()
 
 end = time.time()
 
-print("Before latency join...")
-tLatency.join()
+#allLatency = []
+#def getLatency(latQueue):
+lat = 0
+num = 0
+while latencyQueue.empty() == False:
+    ts = latencyQueue.get()
+    lat = lat + ts
+    num = num + 1
 
-print('Throughput: {} txn/s'.format(200000/(end-start)))
-print('Latency: {} ms'.format(sum(allLatency)/len(allLatency)*1000))
+#        allLatency.append(ts)
+#tLatency = threading.Thread(target=getLatency, args=(latencyQueue,))
+#tLatency.start()
+
+# print("Before join...")
+# tRunRead.join()
+#for t in runThreadList:
+#    t.join()
+
+print('Throughput: {} txn/s'.format(100000/(end-start)))
+print('Latency: {} ms'.format(lat/num*1000))
