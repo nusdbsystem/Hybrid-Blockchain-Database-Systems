@@ -2,7 +2,7 @@
 
 dir=$(dirname "$0")
 echo ${dir}
-echo $(pwd)
+
 if ! [ -d "${dir}/../../BlockchainDB/.bin" ]; then
     echo "Please build the binaries first! (cd BlockchainDB && make build)"
     exit 1
