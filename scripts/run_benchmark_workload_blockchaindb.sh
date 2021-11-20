@@ -41,8 +41,8 @@ nDISTRIBUTIONS="a b c"
 
 for TH in $nDISTRIBUTIONS; do
     echo "Test start with node size: ${size}, client size: ${clients}, workload${TH}"
-    loadPath="$dir/../temp/${distribution}/workload${TH}.dat"
-    runPath="$dir/../temp/${distribution}/run_workload${TH}.dat"
+    loadPath="$dir/temp/${distribution}/workload${TH}.dat"
+    runPath="$dir/temp/${distribution}/run_workload${TH}.dat"
     ./restart_cluster_blockchaindb.sh
     ./start_blockchaindb.sh        
     sleep 6

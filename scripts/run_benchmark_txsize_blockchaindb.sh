@@ -41,8 +41,8 @@ nTXSIZES="ycsb_data_512B ycsb_data_2kB ycsb_data_8kB ycsb_data_32kB ycsb_data_12
 
 for TH in $nTXSIZES; do
     echo "Test start with node size: ${size}, client size: ${clients}, workload${workload}, TxSize: ${TH}"
-    loadPath="$dir/../temp/${TH}/workload${workload}.dat"
-    runPath="$dir/../temp/${TH}/run_workload${workload}.dat"
+    loadPath="$dir/temp/${TH}/workload${workload}.dat"
+    runPath="$dir/temp/${TH}/run_workload${workload}.dat"
     ./restart_cluster_blockchaindb.sh
     ./start_blockchaindb.sh        
     sleep 6

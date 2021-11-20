@@ -41,8 +41,8 @@ nDISTRIBUTIONS="ycsb_data ycsb_data_latest ycsb_data_zipfian"
 
 for TH in $nDISTRIBUTIONS; do
     echo "Test start with node size: ${size}, client size: ${clients}, workload${workload}, distribution: ${TH}"
-    loadPath="$dir/../temp/${TH}/workload${workload}.dat"
-    runPath="$dir/../temp/${TH}/run_workload${workload}.dat"
+    loadPath="$dir/temp/${TH}/workload${workload}.dat"
+    runPath="$dir/temp/${TH}/run_workload${workload}.dat"
     ./restart_cluster_blockchaindb.sh
     ./start_blockchaindb.sh        
     sleep 6
