@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TSTAMP=`date +%F-%H-%M-%S`
-LOGSD="logs-clients-blockchaindb-$TSTAMP"
+LOGSD="logs-nodes-blockchaindb-$TSTAMP"
 mkdir $LOGSD
 
 set -x
