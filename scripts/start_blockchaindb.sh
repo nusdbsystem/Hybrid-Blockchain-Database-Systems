@@ -83,8 +83,7 @@ ssh -o StrictHostKeyChecking=no root@${PREFIX}${IPX} "/usr/local/go/bin/geth --d
 echo "Sleep 2s to wait for bootnode start..."
 sleep 2
 # start peernode
-enode=`ssh -o StrictHostKeyChecking=no root@${PREFIX}${IPX} "/usr/local/go/bin/geth attach /Data/eth_${shardId}_${bootnode}/geth.ipc --exec admin.nodeInfo.enode  "`
-enodeAddr=echo ${enode}| tr -d '"'
+enodeAddr=`ssh -o StrictHostKeyChecking=no root@${PREFIX}${IPX} "/usr/local/go/bin/geth attach /Data/eth_${shardId}_${bootnode}/geth.ipc --exec admin.nodeInfo.enode  " | tr -d '"' `
 for (( j=2; j<=${nodes}; j++ )); do
 	IPX=$((${j}+1))
 	ssh -o StrictHostKeyChecking=no root@${PREFIX}${IPX} "/usr/local/go/bin/geth --datadir=/Data/eth_${shardId}_${j} \
@@ -101,6 +100,7 @@ sleep 2
 # check bootnode admin peers
 IPX=$((${bootnode}+1))
 ssh -o StrictHostKeyChecking=no root@${PREFIX}${IPX} "/usr/local/go/bin/geth attach /Data/eth_${shardId}_${bootnode}/geth.ipc --exec net.peerCount"
+ssh -o StrictHostKeyChecking=no root@${PREFIX}${IPX} "service redis-server start; ss -an | grep 6379"
 
 
 #4
@@ -108,8 +108,7 @@ echo "##################### 4.deploy KVContract to eth network ##########"
 # Deploy to shard 1
 IPX=$((${bootnode}+1))
 scp -o StrictHostKeyChecking=no ${genesisDir}/shard_${shardId}.toml root@${PREFIX}${IPX}:/root/BlockchainDB/config/
-contractAddr=`ssh -o StrictHostKeyChecking=no root@${PREFIX}${IPX} "/root/BlockchainDB/bin/deploy_contract --config=/BlockchainDB/config/shard_${shardId}"`
-echo ${contractAddr} | tee -a ${genesisDir}/*.toml
+ssh -o StrictHostKeyChecking=no root@${PREFIX}${IPX} "/root/BlockchainDB/bin/deploy_contract --config=/BlockchainDB/config/shard_${shardId}"  | tee -a ${genesisDir}/*.toml
 echo "Deploy contract to bcdbnode$c wtih ${genesisDir}/shard_${shardId}.toml"
 
 
@@ -138,6 +137,7 @@ for (( c=1; c<=${nodes}; c++ )); do
 		echo "shard-partition-key = \"eth${j}-\"" >> ${tomlFile}
 		echo "shard-type = \"ethereum\"" >> ${tomlFile}
 		echo "redis-address = \"${PREFIX}2:6379\"" >> ${tomlFile}
+		# echo "redis-address = \"${PREFIX}$((2 + ${nodes})):6379\"" >> ${tomlFile}
 		(cat "${genesisDir}/shard_${j}.toml"; echo) >> ${tomlFile}
 		echo '' >> ${tomlFile}
 		done

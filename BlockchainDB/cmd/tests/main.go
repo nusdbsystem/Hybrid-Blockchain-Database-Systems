@@ -6,12 +6,17 @@ import (
 	"sync"
 	"time"
 
-	"google.golang.org/grpc"
 	pbv "hybrid/BlockchainDB/proto/blockchaindb"
+
+	"google.golang.org/grpc"
 )
 
 func main() {
-	addr := "127.0.0.1:50001"
+	//local testing mode
+	//addr := "127.0.0.1:50001"
+
+	// ovs multi_node testing mode
+	addr := "192.168.20.2:50001"
 	key := "tianwen" + time.Now().Format("20060102150405")
 	value := "66666666666666666666666666"
 
@@ -62,7 +67,7 @@ func main() {
 			}
 			verify, err := cli.Verify(context.Background(), &pbv.VerifyRequest{Opt: lastopt, Key: lastkey})
 			if err != nil {
-				//fmt.Println(err)
+				fmt.Println(err)
 			}
 			if verify != nil && verify.Success {
 				fmt.Println("Last tx verify done.")
