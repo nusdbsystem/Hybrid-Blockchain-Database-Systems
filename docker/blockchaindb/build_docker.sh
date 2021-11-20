@@ -1,22 +1,25 @@
 #!/bin/bash
 
-if ! [ -d "../../BlockchainDB/.bin" ]; then
+dir=$(dirname "$0")
+echo ${dir}
+echo $(pwd)
+if ! [ -d "${dir}/../../BlockchainDB/.bin" ]; then
     echo "Please build the binaries first! (cd BlockchainDB && make build)"
     exit 1
 fi
 
-rm -rf .bin .scripts
-cp -r ../../BlockchainDB/.bin .	
+rm -rf ${dir}/.bin ${dir}/.scripts
+cp -r ${dir}/../../BlockchainDB/.bin ${dir}/	
 
 
-if ! [ -f "id_rsa.pub" ]; then
+if ! [ -f "${dir}/id_rsa.pub" ]; then
     if ! [ -f "$HOME/.ssh/id_rsa.pub" ]; then
         echo "You do not have a public SSH key. Please generate one! (ssh-keygen)"
         exit 1
     fi
-    cp $HOME/.ssh/id_rsa.pub .
+    cp $HOME/.ssh/id_rsa.pub ${dir}/
 fi
 
-docker build -f Dockerfile -t blockchaindb .
+docker build -f ${dir}/Dockerfile -t blockchaindb ${dir}/
 
-rm -rf .bin .scripts id_rsa.pub
+rm -rf ${dir}/.bin ${dir}/.scripts ${dir}/id_rsa.pub
