@@ -15,9 +15,13 @@ clean:
 	@rm -rfv .bin
 
 build: clean
+	@go mod download
 	@go build -o ./.bin/bcdbnode $(GCFLAGS) ./cmd/bcdbnode
 	@go build -o ./.bin/benchmark_bcdb $(GCFLAGS) ./benchmark/ycsb
 	@go build -o ./.bin/deploy_contract $(GCFLAGS) ./storage/ethereum/contracts/deploy
+
+docker:
+	@/bin/bash ../docker/blockchaindb/build_docker.sh
 
 download:
 	@/bin/bash scripts/ycsb/gen_ycsb_data.sh

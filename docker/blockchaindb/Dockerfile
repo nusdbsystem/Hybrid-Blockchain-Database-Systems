@@ -42,7 +42,7 @@ RUN mkdir -p ${HOME}/BlockchainDB/scripts/
 RUN mkdir -p ${HOME}/BlockchainDB/config/
 RUN mkdir -p ${HOME}/BlockchainDB/logs/
 RUN mkdir -p ${HOME}/BlockchainDB/bin/
-COPY .scripts ${HOME}/BlockchainDB/scripts
+# COPY .scripts ${HOME}/BlockchainDB/scripts
 COPY .bin ${HOME}/BlockchainDB/bin
 WORKDIR ${HOME}/BlockchainDB
 

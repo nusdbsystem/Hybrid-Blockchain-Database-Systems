@@ -23,7 +23,11 @@ runPath="$dir/../temp/${distribution}/run_workload${workload}.dat"
 if [ ! -f ${bin} ]; then
     echo "Binary file ${bin} not found!"
     echo "Hint: "
-    echo " Please build binaries by run command: make build "
+    echo " Please build binaries by run command: "
+    echo " cd ../BlockchainDB"
+    echo " make build "
+    echo " make docker (if never build blockchaindb image before)"
+    echo " cd -"
     echo "exit 1 "
     exit 1
 fi
