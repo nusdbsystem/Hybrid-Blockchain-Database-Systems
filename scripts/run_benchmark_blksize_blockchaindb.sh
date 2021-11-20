@@ -47,7 +47,7 @@ for GAS in $nGASLIMITS; do
         ./restart_cluster_blockchaindb.sh
         ./start_blockchaindb.sh ${size} ${TH} ${GAS}
         sleep 6
-        $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} 2>&1 | tee $LOGSD/blockchaindb-blk-duration-${GAS}-${TH}.txt
+        $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/blockchaindb-blk-duration-${GAS}-${TH}.txt 2>&1
     done
 done
-./restart_cluster_blockchaindb.sh
+

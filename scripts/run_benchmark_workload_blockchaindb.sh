@@ -46,6 +46,6 @@ for TH in $nDISTRIBUTIONS; do
     ./restart_cluster_blockchaindb.sh
     ./start_blockchaindb.sh        
     sleep 6
-    $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} 2>&1 | tee $LOGSD/blockchaindb-workload-$TH.txt
+    $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/blockchaindb-workload-$TH.txt 2>&1
 done
-./restart_cluster_blockchaindb.sh
+

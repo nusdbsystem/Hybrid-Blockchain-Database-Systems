@@ -51,6 +51,6 @@ for TH in $nNODES; do
     ./restart_cluster_blockchaindb.sh ${TH}
     ./start_blockchaindb.sh ${TH}      
     sleep 10
-    $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} 2>&1 | tee $LOGSD/blockchaindb-nodes-$TH.txt
+    $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/blockchaindb-nodes-$TH.txt 2>&1 
 done
-./restart_cluster_blockchaindb.sh
+
