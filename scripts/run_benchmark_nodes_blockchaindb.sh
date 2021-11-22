@@ -40,6 +40,8 @@ nNODES="4 8 16 32 64"
 
 for TH in $nNODES; do
     size=${TH}
+    # init
+    defaultAddrs="192.168.20.2:50001"
     for (( c=2; c<=${size}; c++ ))
     do 
     defaultAddrs="${defaultAddrs},192.168.20.$((1+ ${c})):50001"
