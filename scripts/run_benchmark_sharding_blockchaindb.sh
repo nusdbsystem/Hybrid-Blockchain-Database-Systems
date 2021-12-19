@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TSTAMP=`date +%F-%H-%M-%S`
-LOGSD="logs-nodes-blockchaindb-$TSTAMP"
+LOGSD="logs-sharding-blockchaindb-$TSTAMP"
 mkdir $LOGSD
 
 set -x
@@ -52,6 +52,6 @@ for TH in $nSHARDS; do
     ./start_blockchaindb.sh ${TH} ${size}      
     
     sleep 10
-    $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/blockchaindb-nodes-$TH.txt 2>&1 
+    $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/blockchaindb-sharding-$TH.txt 2>&1 
 done
 
