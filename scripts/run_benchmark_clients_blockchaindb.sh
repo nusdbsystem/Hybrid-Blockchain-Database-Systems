@@ -10,6 +10,7 @@ size=${1:-4}
 clients=${2:-256} 
 workload=${3:-a}
 distribution=${4:-ycsb_data}
+shards=${5:-1}
 ndrivers=${size}
 
 dir=$(pwd)

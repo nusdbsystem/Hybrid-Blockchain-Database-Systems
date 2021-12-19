@@ -10,6 +10,7 @@ size=${1:-4}
 clients=${2:-256} 
 workload=${3:-a}
 distribution=${4:-ycsb_data}
+shards=${5:-1}
 ndrivers=${size}
 
 dir=$(pwd)
@@ -45,7 +46,7 @@ for TH in $nTXSIZES; do
     loadPath="$dir/temp/${TH}/workload${workload}.dat"
     runPath="$dir/temp/${TH}/run_workload${workload}.dat"
     ./restart_cluster_blockchaindb.sh 
-    ./start_blockchaindb.sh ${size} ${DURATION} ${GAS}       
+    ./start_blockchaindb.sh ${shards} ${size} ${DURATION} ${GAS}       
     sleep 10
     $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/blockchaindb-txsize-$TH.txt 2>&1
 done

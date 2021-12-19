@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TSTAMP=`date +%F-%H-%M-%S`
-LOGSD="logs-blksize-blockchaindb-$TSTAMP"
+LOGSD="logs-nodes-blockchaindb-$TSTAMP"
 mkdir $LOGSD
 
 set -x
@@ -10,10 +10,9 @@ size=${1:-4}
 clients=${2:-256} 
 workload=${3:-a}
 distribution=${4:-ycsb_data}
-shards=${5:-1}
 ndrivers=${size}
 nthreads=$(( ${clients} / ${ndrivers} ))
-    
+
 dir=$(pwd)
 echo $dir
 bin="$dir/../BlockchainDB/.bin/benchmark_bcdb"
@@ -33,22 +32,26 @@ if [ ! -f ${bin} ]; then
     exit 1
 fi
 
-for (( c=2; c<=${size}; c++ ))
-do 
-defaultAddrs="${defaultAddrs},192.168.20.$((1+ ${c})):50001"
-done
+
 echo "start test with bcdbnode addrs: ${defaultAddrs}"
 
 
-nDURATIONS="1 5 10 15"
-nGASLIMITS="10000000 100000000"
-for GAS in $nGASLIMITS; do
-    for TH in $nDURATIONS; do
-        echo "Test start with node size: ${size}, client size: ${clients}, workload${workload}"
-        ./restart_cluster_blockchaindb.sh
-        ./start_blockchaindb.sh ${shards} ${size} ${TH} ${GAS}
-        sleep 6
-        $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/blockchaindb-blk-duration-${GAS}-${TH}.txt 2>&1
+nSHARDS="1 2 4 8 16"
+
+for TH in $nSHARDS; do
+    shardnodes=$((${size} * ${TH}))
+    # init
+    defaultAddrs="192.168.20.2:50001"
+    for (( c=2; c<=${shardnodes}; c++ ))
+    do 
+    defaultAddrs="${defaultAddrs},192.168.20.$((1+ ${c})):50001"
     done
+
+    echo "Test start with node size: ${size}, client size: ${clients}, workload${workload}"
+    ./restart_cluster_blockchaindb.sh ${shardnodes}
+    ./start_blockchaindb.sh ${TH} ${size}      
+    
+    sleep 10
+    $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/blockchaindb-nodes-$TH.txt 2>&1 
 done
 
