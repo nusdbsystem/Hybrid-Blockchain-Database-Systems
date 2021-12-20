@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"sync"
 	"time"
@@ -16,11 +17,13 @@ func main() {
 	//addr := "127.0.0.1:50001"
 
 	// ovs multi_node testing mode
-	addr := "192.168.20.2:50001"
+	//addr := "192.168.20.2:50001"
+	addr := flag.String("addr", "192.168.20.2:50001", "bcdb server node address")
+	flag.Parse()
 	key := "tianwen" + time.Now().Format("20060102150405")
 	value := "66666666666666666666666666"
 
-	conn, err := grpc.Dial(addr, grpc.WithInsecure())
+	conn, err := grpc.Dial(*addr, grpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
@@ -68,11 +71,15 @@ func main() {
 			verify, err := cli.Verify(context.Background(), &pbv.VerifyRequest{Opt: lastopt, Key: lastkey})
 			if err != nil {
 				fmt.Println(err)
-			}
-			if verify != nil && verify.Success {
-				fmt.Println("Last tx verify done.")
+			} else {
+				if verify != nil && verify.Success {
+					fmt.Println("Last tx verify success.")
+				} else {
+					fmt.Println("Last tx verify done.")
+				}
 				break
 			}
+
 			time.Sleep(2 * time.Second)
 		}
 	}()

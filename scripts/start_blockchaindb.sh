@@ -171,5 +171,5 @@ echo "##################### Start blockchaindb done! ##########"
 
 #7
 echo "##################### 7.verify test  ##########"
-go run ${dir}/../BlockchainDB/cmd/tests/main.go
+go run ${dir}/../BlockchainDB/cmd/tests/main.go --addr=${PREFIX}$((1 + ${bootnode})):50001
 done
