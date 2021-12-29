@@ -5,6 +5,7 @@ shards=${1:-1}
 nodes=${2:-4}
 period=${3:-5}
 gaslimit=${4:-10000000}
+txdelay=${5:-0}
 PREFIX="192.168.20."
 dir=$(dirname "$0")
 genesisTemplate=${dir}/../BlockchainDB/storage/ethereum/networks/CustomGenesis.template
@@ -136,6 +137,7 @@ for (( c=1; c<=${nodes}; c++ )); do
 	touch ${tomlFile}
 	echo "self-id = ${shardId}_${c}" > ${tomlFile}
 	echo "server-node-addr = \"${PREFIX}${IPX}:50001\"" >> ${tomlFile}
+	echo "delay = ${txdelay}" >> ${tomlFile}
 	echo "shard-type = \"ethereum\"" >> ${tomlFile}
 	echo "shard-number = \"${shards}\"" >> ${tomlFile}
 	(cat "${genesisDir}/node_${c}_${shardId}.toml"; echo) >> ${tomlFile}

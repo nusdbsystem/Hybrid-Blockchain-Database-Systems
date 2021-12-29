@@ -34,7 +34,7 @@ func NewShardingMgr(conf *config.Options) (*ShardingMgr, error) {
 			confs[shard.ID] = shard
 			log.Println("Sucess NewEthereumKVStoreInstance for shard ", shard.ID)
 		case PARTITION_FAB().Shard:
-			// #### disable sharding for ycsb tests ####
+			// #### disable Fabric sharding for ycsb tests ####
 			// fabconn, err := FabClientSDK.NewFabricKVStoreInstance()
 			// if err != nil {
 			// 	log.Println("Failed to NewFabricKVStoreInstance", err)

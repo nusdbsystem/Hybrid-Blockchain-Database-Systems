@@ -40,6 +40,9 @@ echo "start test with bcdbnode addrs: ${defaultAddrs}"
 
 nTXSIZES="ycsb_data_512B ycsb_data_2kB ycsb_data_8kB ycsb_data_32kB ycsb_data_128kB"
 DURATION=5
+# default gas_limit
+#GAS=10000000
+# increase gas_limit for tx_size tests
 GAS=100000000
 for TH in $nTXSIZES; do
     echo "Test start with node size: ${size}, client size: ${clients}, workload${workload}, TxSize: ${TH}"

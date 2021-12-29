@@ -9,6 +9,7 @@ type Options struct {
 	SelfID         string `mapstructure:"self-id"`
 	ServerNodeAddr string `mapstructure:"server-node-addr"`
 	Type           string `mapstructure:"shard-type"`
+	Delay          int    `mapstructure:"delay"`
 	EthNode        string `mapstructure:"eth-node"`
 	EthHexAddr     string `mapstructure:"eth-hexaddr"`
 	EthHexKey      string `mapstructure:"eth-hexkey"`
