@@ -9,6 +9,9 @@ if ! [ -d "${dir}/../../BlockchainDB/.bin" ]; then
 fi
 
 rm -rf ${dir}/.bin ${dir}/.scripts
+cd ${dir}/../../BlockchainDB/
+make build
+cd -
 cp -r ${dir}/../../BlockchainDB/.bin ${dir}/	
 
 

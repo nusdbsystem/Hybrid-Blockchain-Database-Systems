@@ -29,7 +29,6 @@ type Shard struct {
 	EthHexKey    string `mapstructure:"eth-hexkey"`
 	FabNode      string `mapstructure:"fab-node"`
 	FabConfig    string `mapstructure:"fab-config"`
-	RedisAddr    string `mapstructure:"redis-address"`
 }
 
 func ReadConfig(opts interface{}, configfile string) (err error) {

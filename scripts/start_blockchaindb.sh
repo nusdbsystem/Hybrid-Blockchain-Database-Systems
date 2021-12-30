@@ -110,7 +110,6 @@ sleep 2
 # check bootnode admin peers
 IPX=$((${bootnode}+1))
 ssh -o StrictHostKeyChecking=no root@${PREFIX}${IPX} "/usr/local/go/bin/geth attach /Data/eth_${shardId}_1/geth.ipc --exec net.peerCount"
-ssh -o StrictHostKeyChecking=no root@${PREFIX}${IPX} "service redis-server start; ss -an | grep 6379"
 
 
 #4
@@ -150,8 +149,6 @@ for (( c=1; c<=${nodes}; c++ )); do
 		echo "shard-id = ${j}" >> ${tomlFile}
 		echo "shard-partition-key = \"eth${j}-\"" >> ${tomlFile}
 		echo "shard-type = \"ethereum\"" >> ${tomlFile}
-		echo "redis-address = \"${PREFIX}${BOOTID}:6379\"" >> ${tomlFile}
-		# echo "redis-address = \"${PREFIX}$((2 + ${nodes})):6379\"" >> ${tomlFile}
 		(cat "${genesisDir}/shard_${j}.toml"; echo) >> ${tomlFile}
 		# echo '' >> ${tomlFile}
 		done

@@ -26,9 +26,6 @@ download:
 	@/bin/bash scripts/ycsb/gen_ycsb_data.sh
 	@/bin/bash scripts/libs/get_docker_images.sh
 	@go mod download
-
-redisup:
-	@/bin/bash scripts/start_redis_db.sh $(shards)
 	
 ethnet:
 	@/bin/bash scripts/start_eth_network.sh $(shards) $(nodes)

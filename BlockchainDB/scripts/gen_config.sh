@@ -38,7 +38,6 @@ do
 		echo "shard-id = ${j}" >> ${tomlFile}
 		echo "shard-partition-key = \"eth${j}-\"" >> ${tomlFile}
 		echo "shard-type = \"ethereum\"" >> ${tomlFile}
-		echo "redis-address = \"127.0.0.1:$((60000 + ${j}))\"" >> ${tomlFile}
 		(cat "$shardDir/shard_${j}.toml"; echo) >> ${tomlFile}
 		#echo "eth-node = \"http://localhost:$((9000 + ${c} + 1000*${j}))\"" >> ${tomlFile}
 		# echo "eth-node = \"$HOME/Data/eth_${shardIDs}_${c}/geth.ipc\"" >> ${tomlFile}

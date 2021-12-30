@@ -7,13 +7,13 @@ import (
 	"log"
 	"math/big"
 
+	KVStore "hybrid/BlockchainDB/storage/ethereum/contracts/KVStore"
+	TxMgr "hybrid/BlockchainDB/transactionMgr"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	KVStore "hybrid/BlockchainDB/storage/ethereum/contracts/KVStore"
-	"hybrid/BlockchainDB/storage/redis"
-	TxMgr "hybrid/BlockchainDB/transactionMgr"
 )
 
 type EthereumConnector struct {
@@ -21,7 +21,6 @@ type EthereumConnector struct {
 	KV     *KVStore.Store
 	Auth   *bind.TransactOpts
 	Hexkey string
-	Redis  *redis.RedisKV
 	TxMgr  *TxMgr.TransactionMgr
 }
 
@@ -39,80 +38,68 @@ func (ethereumConn *EthereumConnector) Read(ctx context.Context, key string) (st
 		log.Println("error EthereumConnector Read ", err)
 		return "", err
 	}
-	//return string(result.Data()), nil
+
 	return string(result), nil
 }
 
 func (ethereumConn *EthereumConnector) Write(ctx context.Context, key, value string) (string, error) {
 
 	auth, err := ethereumConn.bindTransactOpts(ctx, key)
+	if err != nil {
+		log.Println("error EthereumConnector bindTransactOpts ", err)
+		return "", err
+	}
 	tx, err := ethereumConn.KV.Set(auth, keyToByte32(key), []byte(value))
-	//tx, err := ethereumConn.KV.Set(auth, key, value)
 	if err != nil {
 		log.Println("error EthereumConnector Write ", err)
 		return "", err
 	}
-	txid := tx.Hash().Hex()
-	// Enable verify function
-	if ethereumConn.Redis != nil {
-		err = ethereumConn.Redis.Set([]byte("set_"+key), []byte(txid))
-		if err != nil {
-			log.Println("error store txid for Set opt verification", err)
-		}
-		err = ethereumConn.Redis.Set([]byte("get_"+key), []byte(value))
-		if err != nil {
-			log.Println("error store value for Get opt verification", err)
-		}
-	}
 
-	return txid, nil
+	return tx.Hash().Hex(), nil
 }
 
-func (ethereumConn *EthereumConnector) Verify(ctx context.Context, opt, key string) (bool, error) {
+func (ethereumConn *EthereumConnector) Verify(ctx context.Context, opt, key, tx string) (bool, error) {
 
 	switch opt {
-	case "set": //check transaction status by txid
-		txid, err := ethereumConn.Redis.Get([]byte("set_" + key))
-		if err != nil {
+	case "set": //check TransactionReceipt status by txid
+		if tx != "" {
+			log.Println("verifying tx", tx)
+			// _, isPending, err := ethereumConn.Client.TransactionByHash(context.Background(), txhash)
+			// log.Println("verify tx: isPending ", isPending)
+
+			txhash := common.HexToHash(tx)
+			receipt, err := ethereumConn.Client.TransactionReceipt(context.Background(), txhash)
+			if err != nil {
+				return false, fmt.Errorf("TransactionReceipt %v %v", tx, err)
+			}
+
+			if receipt == nil {
+				return false, fmt.Errorf("TransactionReceipt null %v", txhash)
+			}
+			log.Println("verify receipt status ", receipt.Status)
+			if receipt.Status == 1 {
+				return true, nil
+			} else {
+				return false, nil
+			}
+		} else {
 			return false, fmt.Errorf("txid for set_key not found")
 		}
-		txhash := common.HexToHash(string(txid))
-		log.Println("verifying tx", string(txid))
-		receipt, err := ethereumConn.Client.TransactionReceipt(context.Background(), txhash)
-		if err != nil {
-			return false, fmt.Errorf("TransactionReceipt %v %v", string(txid), err)
-		}
-
-		if receipt == nil {
-			return false, fmt.Errorf("TransactionReceipt null %v", txhash)
-		}
-		log.Println("verify receipt status ", receipt.Status)
-		_, isPending, err := ethereumConn.Client.TransactionByHash(context.Background(), txhash)
-		log.Println("verify tx: isPending ", isPending)
-		if receipt.Status == 1 {
-			return true, nil
-		} else {
-			return false, nil
-		}
 	case "get": //compare value
-		getvalue, err := ethereumConn.Redis.Get([]byte("get_" + key))
-		if err != nil {
-			return false, fmt.Errorf("value for get_key not found")
-		}
-		//auth, err := ethereumConn.bindTransactOpts(ctx, key)   //no bind
-		result, err := ethereumConn.KV.Items(nil, keyToByte32(key)) //Get(auth, []byte(key))
+
+		result, err := ethereumConn.KV.Items(nil, keyToByte32(key))
 		if err != nil {
 			log.Println("error EthereumConnector Read ", err)
 			return false, err
 		}
-		if string(getvalue) == string(result) {
+		if tx == string(result) {
 			return true, nil
 		} else {
 			return false, nil
 		}
 
 	default:
-		return false, fmt.Errorf("Verify operation only support get/set.")
+		return false, fmt.Errorf("Verify operation only support get/set: ", opt)
 
 	}
 

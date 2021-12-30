@@ -12,9 +12,10 @@ import (
 	"google.golang.org/grpc"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/pkg/profile"
 	"hybrid/BlockchainDB/benchmark"
 	pbv "hybrid/BlockchainDB/proto/blockchaindb"
+
+	"github.com/pkg/profile"
 )
 
 var (
@@ -32,6 +33,7 @@ func main() {
 	fmt.Println("Time start: ", time.Now())
 	lastopt := ""
 	lastkey := ""
+	lasttx := ""
 	addrs := strings.Split(*serverAddrs, ",")
 	clis := make([]pbv.BCdbNodeClient, 0)
 	conns := make([]*grpc.ClientConn, 0)
@@ -166,11 +168,12 @@ func main() {
 							//retry/discard
 						}
 						if res != nil {
-							fmt.Println(res.Tx)
+							lasttx = res.Tx
 						}
 						latencyCh <- time.Since(beginOp)
 						lastopt = "set"
 						lastkey = op.Key
+
 					default:
 						panic(fmt.Sprintf("invalid operation: %v", op.ReqType))
 					}
@@ -188,16 +191,17 @@ func main() {
 
 	fmt.Println("Last opt verify is ongoing ... ", lastopt)
 	fmt.Println("Last key verify is ongoing ... ", lastkey)
+	fmt.Println("Last tx verify is ongoing ... ", lasttx)
 	wg3 := sync.WaitGroup{}
 	wg3.Add(1)
 	go func() {
 		defer wg3.Done()
 		for {
-			if lastkey == "" || lastopt == "" {
+			if lastkey == "" || lastopt == "" || lasttx == "" {
 				fmt.Println("No setopt tx to verify .")
 				break
 			}
-			verify, err := clis[1].Verify(context.Background(), &pbv.VerifyRequest{Opt: lastopt, Key: lastkey})
+			verify, err := clis[1].Verify(context.Background(), &pbv.VerifyRequest{Opt: lastopt, Key: lastkey, Tx: lasttx})
 			if err != nil {
 				fmt.Println(err)
 			} else {

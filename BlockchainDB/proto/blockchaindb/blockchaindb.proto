@@ -29,6 +29,7 @@ message SetResponse {
 message VerifyRequest {
     string opt = 1;
     string key = 2;
+    string tx = 3;
 }
 
 message VerifyResponse {

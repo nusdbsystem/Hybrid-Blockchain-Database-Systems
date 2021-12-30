@@ -37,9 +37,9 @@ RUN cp build/bin/geth /usr/local/go/bin/
 RUN geth version
 RUN make devtools
 
-RUN sed -i '/^bind 127\.0\.0\.1 ::1$/s/^/#/' /etc/redis/redis.conf
-RUN sed -i '/protected-mode yes/c protected-mode no' /etc/redis/redis.conf
-RUN service redis-server start
+# RUN sed -i '/^bind 127\.0\.0\.1 ::1$/s/^/#/' /etc/redis/redis.conf
+# RUN sed -i '/protected-mode yes/c protected-mode no' /etc/redis/redis.conf
+# RUN service redis-server start
 
 RUN mkdir -p /Data/
 RUN mkdir -p ${HOME}/BlockchainDB/scripts/

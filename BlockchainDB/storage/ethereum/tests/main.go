@@ -26,7 +26,6 @@ func main() {
 	// ethnode := "/Data/eth_1_1/geth.ipc"
 	// hexaddress := "0x0803521274Fb66b54Ef6CF22A801713B1299b5cD"
 	// hexkey := ""
-	//redisAddr := "127.0.0.1:60001"
 
 	//config from file
 	configFile := flag.String("config", "config/config.nodes.1.4/config_1_1", "The path to the config file")
@@ -40,9 +39,8 @@ func main() {
 	ethnode := conf.Shards[0].EthNode
 	hexkey := conf.Shards[0].EthHexKey
 	hexaddress := conf.Shards[0].EthHexAddr
-	redisAddr := conf.Shards[0].RedisAddr
 
-	ethereumconn, err := ClientSDK.NewEthereumKVStoreInstance(ethnode, hexaddress, hexkey, redisAddr)
+	ethereumconn, err := ClientSDK.NewEthereumKVStoreInstance(ethnode, hexaddress, hexkey)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,7 +60,10 @@ func main() {
 	}
 	fmt.Println(string(result))
 
-	result2, err := ethereumconn.Verify(context.Background(), "set", key)
+	result2, err := ethereumconn.Verify(context.Background(), "set", key, result1)
+	if err != nil {
+		log.Fatal("error ethereumconn.Verify ", err)
+	}
 	fmt.Println(result2)
 
 	os.Exit(0)

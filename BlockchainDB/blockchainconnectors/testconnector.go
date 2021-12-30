@@ -13,6 +13,6 @@ func (t *Testconnector) Write(ctx context.Context, key, value string) (string, e
 	return "", nil
 }
 
-func (t *Testconnector) Verify(ctx context.Context, opt, key string) (bool, error) {
+func (t *Testconnector) Verify(ctx context.Context, opt, key, tx string) (bool, error) {
 	return true, nil
 }
