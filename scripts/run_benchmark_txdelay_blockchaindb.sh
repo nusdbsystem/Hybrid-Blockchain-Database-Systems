@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TSTAMP=`date +%F-%H-%M-%S`
-LOGSD="logs-txsize-blockchaindb-$TSTAMP"
+LOGSD="logs-txdelay-blockchaindb-$TSTAMP"
 mkdir $LOGSD
 
 set -x
