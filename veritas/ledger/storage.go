@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"hash/fnv"
 
 	"github.com/dgraph-io/badger/v3"
 
@@ -13,6 +14,17 @@ import (
 type LogLedger struct {
 	store *badger.DB
 	smt   *merkletree.SparseMerkleTree
+}
+
+var kStatePrefix = []byte{0x10, 0x10}
+var kBlkPrefix = []byte{0x20, 0x20}
+
+func StripPrefix(prefix, keyWithPrefix []byte) []byte {
+	return keyWithPrefix[len(prefix):]
+}
+
+func CompositePrefix(prefix, key []byte) []byte {
+	return append(prefix, key...)
 }
 
 func NewLedger(ledgerPath string, withMerkleTree bool) (*LogLedger, error) {
@@ -34,11 +46,10 @@ func NewLedger(ledgerPath string, withMerkleTree bool) (*LogLedger, error) {
 	if err := db.View(func(txn *badger.Txn) error {
 		it := txn.NewIterator(badger.DefaultIteratorOptions)
 		defer it.Close()
-		prefix := []byte("")
-		for it.Seek(prefix); it.ValidForPrefix(prefix); it.Next() {
+		for it.Seek(kStatePrefix); it.ValidForPrefix(kStatePrefix); it.Next() {
 			item := it.Item()
 			if err := item.Value(func(v []byte) error {
-				if _, err := tree.Update(item.Key(), v); err != nil {
+				if _, err := tree.Update(StripPrefix(kStatePrefix, item.Key()), v); err != nil {
 					return err
 				}
 				return nil
@@ -61,7 +72,7 @@ func (l *LogLedger) Append(key, val []byte) error {
 		}
 	}
 	if err := l.store.Update(func(txn *badger.Txn) error {
-		if err := txn.Set(key, val); err != nil {
+		if err := txn.Set(CompositePrefix(kStatePrefix, key), val); err != nil {
 			return err
 		}
 		return nil
@@ -86,4 +97,22 @@ func (l *LogLedger) ProveKey(key []byte) (merkletree.SparseMerkleProof, error) {
 		return l.smt.Prove(key)
 	}
 	return merkletree.SparseMerkleProof{}, errors.New("no merkle tree")
+}
+
+func (l *LogLedger) AppendBlk(blockData []byte) error {
+	h := fnv.New32a()
+	h.Write([]byte(blockData))
+	blockHash := fmt.Sprint(h.Sum32())
+
+	return l.store.Update(func(txn *badger.Txn) error {
+		if err := txn.Set(CompositePrefix(kBlkPrefix, []byte(blockHash)), blockData); err != nil {
+			return err
+		} else {
+			return nil
+		}
+	})
+}
+
+func (l *LogLedger) Close() error {
+	return l.store.Close()
 }

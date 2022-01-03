@@ -181,6 +181,7 @@ func (s *server) applyLoop() {
 					}
 				}
 			}
+			s.l.AppendBlk(msg.Value) // avoid remarshalling from blkBuf.blk
 			s.mu.Lock()
 			delete(s.buffer, blkBuf.blk.Txs[0].Seq)
 			s.mu.Unlock()
