@@ -49,6 +49,7 @@ for TH in $nSHARDS; do
 
     echo "Test start with node size: ${size}, client size: ${clients}, workload${workload}"
     ./restart_cluster_blockchaindb.sh ${shardnodes}
+    sleep 4
     ./start_blockchaindb.sh ${TH} ${size}      
     
     sleep 10

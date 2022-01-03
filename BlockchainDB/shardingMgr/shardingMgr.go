@@ -14,23 +14,35 @@ import (
 )
 
 type ShardingMgr struct {
+	LocalShard  Connectors.BlockchainConnector
 	Shards      map[string]Connectors.BlockchainConnector
 	Conf        map[string]config.Shard
 	ShardNumber int
 }
 
 func NewShardingMgr(conf *config.Options) (*ShardingMgr, error) {
+	var localconn Connectors.BlockchainConnector
 	shards := make(map[string]Connectors.BlockchainConnector)
 	confs := make(map[string]config.Shard)
 	for _, shard := range conf.Shards {
 		switch shard.Type {
 		case PARTITION_ETH().Shard:
-			ethconn, err := EthClientSDK.NewEthereumKVStoreInstance(conf.EthNode, conf.EthHexAddr, conf.EthHexKey)
-			if err != nil {
-				log.Println("Failed to NewEthereumKVStoreInstance", err)
-				break
+			if strings.HasPrefix(conf.SelfID, shard.ID) {
+				ethconn, err := EthClientSDK.NewEthereumKVStoreInstance(conf.EthNode, conf.EthHexAddr, conf.EthHexKey)
+				if err != nil {
+					log.Println("Failed to NewEthereumKVStoreInstance", err)
+					break
+				}
+				localconn = ethconn
+			} else {
+				ethconn, err := EthClientSDK.NewEthereumKVStoreInstance(shard.EthNode, shard.EthHexAddr, shard.EthHexKey)
+				if err != nil {
+					log.Println("Failed to NewEthereumKVStoreInstance", err)
+					break
+				}
+				shards[shard.ID] = ethconn
 			}
-			shards[shard.ID] = ethconn
+
 			confs[shard.ID] = shard
 			log.Println("Sucess NewEthereumKVStoreInstance for shard ", shard.ID)
 		case PARTITION_FAB().Shard:
@@ -49,7 +61,7 @@ func NewShardingMgr(conf *config.Options) (*ShardingMgr, error) {
 		}
 	}
 
-	return &ShardingMgr{Shards: shards, Conf: confs, ShardNumber: conf.ShardNumber}, nil
+	return &ShardingMgr{LocalShard: localconn, Shards: shards, Conf: confs, ShardNumber: conf.ShardNumber}, nil
 }
 
 func (mgr *ShardingMgr) partitionScheme(key string) string {
@@ -92,8 +104,19 @@ func (mgr *ShardingMgr) Read(ctx context.Context, key string) (string, error) {
 	// default:
 	// 	return "", fmt.Errorf("Error sharding key %s", key)
 	// }
-	partitionkey := mgr.partitionScheme(key)
-	return mgr.Shards[partitionkey].Read(ctx, key)
+	// partitionkey := mgr.partitionScheme(key)
+	// log.Println("ShardingMgr read ", partitionkey)
+	result, err := mgr.LocalShard.Read(ctx, key)
+	if result == "" {
+		for _, shard := range mgr.Shards {
+			result, err = shard.Read(ctx, key)
+			if result != "" {
+				return result, err
+			}
+		}
+	}
+
+	return result, err
 
 }
 
@@ -108,8 +131,9 @@ func (mgr *ShardingMgr) Write(ctx context.Context, key string, value string) (st
 	// default:
 	// 	return fmt.Errorf("Error sharding key %s", key)
 	// }
-	partitionkey := mgr.partitionScheme(key)
-	return mgr.Shards[partitionkey].Write(ctx, key, value)
+	// partitionkey := mgr.partitionScheme(key)
+	// log.Println("ShardingMgr write ", partitionkey)
+	return mgr.LocalShard.Write(ctx, key, value)
 }
 
 func (mgr *ShardingMgr) Verify(ctx context.Context, opt string, key string, tx string) (bool, error) {
@@ -123,6 +147,16 @@ func (mgr *ShardingMgr) Verify(ctx context.Context, opt string, key string, tx s
 	// default:
 	// 	return fmt.Errorf("Error sharding key %s", key)
 	// }
-	partitionkey := mgr.partitionScheme(key)
-	return mgr.Shards[partitionkey].Verify(ctx, opt, key, tx)
+	// partitionkey := mgr.partitionScheme(key)
+	// log.Println("ShardingMgr verify ", partitionkey)
+	result, err := mgr.LocalShard.Verify(ctx, opt, key, tx)
+	if err != nil {
+		for _, shard := range mgr.Shards {
+			result, err = shard.Verify(ctx, opt, key, tx)
+			if err == nil {
+				return result, err
+			}
+		}
+	}
+	return result, err
 }
