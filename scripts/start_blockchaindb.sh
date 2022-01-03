@@ -116,7 +116,7 @@ for (( shardId=1; shardId<=${shards}; shardId++ )); do
 	# Deploy smart contract to each shard
 	IPX=$((${bootnode}+1))
 	scp -o StrictHostKeyChecking=no ${genesisDir}/shard_${shardId}.toml root@${PREFIX}${IPX}:/root/BlockchainDB/config/
-	ssh -o StrictHostKeyChecking=no root@${PREFIX}${IPX} "/root/BlockchainDB/bin/deploy_contract --config=config/shard_${shardId}"  | tee -a ${genesisDir}/*_${shardId}.toml
+	ssh -o StrictHostKeyChecking=no root@${PREFIX}${IPX} "/root/BlockchainDB/bin/deploy_contract --config=/BlockchainDB/config/shard_${shardId}"  | tee -a ${genesisDir}/*_${shardId}.toml
 	echo "Deploy contract to bcdbnode$c wtih ${genesisDir}/shard_${shardId}.toml"
 done
 

@@ -47,5 +47,5 @@ RUN mkdir -p ${HOME}/BlockchainDB/config/
 RUN mkdir -p ${HOME}/BlockchainDB/logs/
 RUN mkdir -p ${HOME}/BlockchainDB/bin/
 COPY .bin ${HOME}/BlockchainDB/bin
-WORKDIR ${HOME}/BlockchainDB
+WORKDIR ${HOME}/BlockchainDB/
 
