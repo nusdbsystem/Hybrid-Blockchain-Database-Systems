@@ -20,6 +20,8 @@ $ cd ../docker/veritas
 $ ./build_docker.sh
 $ cd ../bigchaindb
 $ ./build_docker.sh
+$ cd ../blockchaindb
+$ ./build_docker.sh
 ```
 
 For each system, we run the following set of experiments:
@@ -75,6 +77,23 @@ We use the same ``veritas`` docker images. Then, we run the following scripts:
 ./run_benchmark_txdelay_veritas_tendermint.sh
 ./run_benchmark_networking_veritas_tendermint.sh
 ```
+
+### BlockchainDB
+
+We use ``blockchaindb`` docker images. Then, we run the following scripts:
+
+```
+./run_benchmark_clients_blockchaindb.sh
+./run_benchmark_nodes_blockchaindb.sh
+./run_benchmark_distribution_blockchaindb.sh
+./run_benchmark_workload_blockchaindb.sh
+./run_benchmark_blksize_blockchaindb.sh
+./run_benchmark_txsize_blockchaindb.sh
+./run_benchmark_txdelay_blockchaindb.sh
+./run_benchmark_sharding_blockchaindb.sh
+```
+
+### 
 
 ### BigchainDB
 
