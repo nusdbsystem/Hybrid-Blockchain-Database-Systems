@@ -14,8 +14,6 @@ import (
 
 	"hybrid/BlockchainDB/benchmark"
 	pbv "hybrid/BlockchainDB/proto/blockchaindb"
-
-	"github.com/pkg/profile"
 )
 
 var (
@@ -28,7 +26,7 @@ var (
 
 func main() {
 	kingpin.Parse()
-	defer profile.Start(profile.CPUProfile, profile.NoShutdownHook, profile.ProfilePath("./tmp")).Stop()
+	// defer profile.Start(profile.CPUProfile, profile.NoShutdownHook, profile.ProfilePath("./tmp")).Stop()
 
 	fmt.Println("Time start: ", time.Now())
 	lastopt := ""
@@ -201,7 +199,7 @@ func main() {
 				fmt.Println("No setopt tx to verify .")
 				break
 			}
-			verify, err := clis[1].Verify(context.Background(), &pbv.VerifyRequest{Opt: lastopt, Key: lastkey, Tx: lasttx})
+			verify, err := clis[0].Verify(context.Background(), &pbv.VerifyRequest{Opt: lastopt, Key: lastkey, Tx: lasttx})
 			if err != nil {
 				fmt.Println(err)
 			} else {

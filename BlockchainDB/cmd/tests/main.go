@@ -38,25 +38,6 @@ func main() {
 	}
 	fmt.Println("1.BlockchainDB Set done.")
 
-	counter := 0
-	for {
-		counter += 1
-		res1, err := cli.Get(context.Background(), &pbv.GetRequest{Key: key})
-		if err != nil {
-			fmt.Println(err)
-			break
-		}
-
-		if string(res1.Value) != "" {
-			fmt.Println(string(res1.Value))
-			elapsed := time.Since(start)
-			fmt.Printf("Tx set-get took %s\n", elapsed)
-			break
-		}
-	}
-	fmt.Println("read query round ", counter)
-	fmt.Println("2.Blockchain Get done.")
-
 	lastkey := key
 	lastopt := "set"
 	lasttx := res.Tx
@@ -85,5 +66,16 @@ func main() {
 		}
 	}()
 	wg3.Wait()
-	fmt.Println("3.BlockchainDB verify done.")
+	fmt.Println("2.BlockchainDB verify done.")
+
+	res1, err := cli.Get(context.Background(), &pbv.GetRequest{Key: key})
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(string(res1.Value))
+
+	}
+	elapsed := time.Since(start)
+	fmt.Printf("Tx set-get took %s\n", elapsed)
+	fmt.Println("3.Blockchain Get done.")
 }

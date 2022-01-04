@@ -167,8 +167,8 @@ for (( shardId=1; shardId<=${shards}; shardId++ )); do
 done
 
 #7
-for (( shardId=1; shardId<=${shards}; shardId++ )); do
-	bootnode=$((1 +(${shardId} - 1) * ${nodes} ))
-	echo "##################### 7.verify test  ##########"
-	go run ${dir}/../BlockchainDB/cmd/tests/main.go --addr=${PREFIX}$((1 + ${bootnode})):50001
-done
+# for (( shardId=1; shardId<=${shards}; shardId++ )); do
+# 	bootnode=$((1 +(${shardId} - 1) * ${nodes} ))
+# 	echo "##################### 7.verify test  ##########"
+# 	go run ${dir}/../BlockchainDB/cmd/tests/main.go --addr=${PREFIX}$((1 + ${bootnode})):50001
+# done

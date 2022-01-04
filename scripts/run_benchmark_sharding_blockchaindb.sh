@@ -10,8 +10,6 @@ size=${1:-4}
 clients=${2:-256} 
 workload=${3:-a}
 distribution=${4:-ycsb_data}
-ndrivers=${size}
-nthreads=$(( ${clients} / ${ndrivers} ))
 
 dir=$(pwd)
 echo $dir
@@ -40,6 +38,8 @@ nSHARDS="1 2 4 8 16"
 
 for TH in $nSHARDS; do
     shardnodes=$((${size} * ${TH}))
+    ndrivers=${shardnodes}
+    nthreads=$(( ${clients} / ${ndrivers} ))
     # init
     defaultAddrs="192.168.20.2:50001"
     for (( c=2; c<=${shardnodes}; c++ ))
