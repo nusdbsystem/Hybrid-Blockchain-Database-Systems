@@ -96,6 +96,14 @@ func main() {
 	)); err != nil {
 		panic(err)
 	}
+	if err := cli.Do(radix.Cmd(
+		nil,
+		"REDISQL.EXEC",
+		"VERITAS",
+		"CREATE INDEX cust_key_ind ON kv(key);",
+	)); err != nil {
+		panic(err)
+	}
 
 	var reqNum int64
 	reqNum = 0
@@ -202,7 +210,7 @@ func main() {
 	wg.Wait()
 	close(latencyCh)
 	wg2.Wait()
-	fmt.Printf("Throughput RediSQL of with %v concurrency to handle %v requests: %v req/s\n",
+	fmt.Printf("Throughput of RediSQL with concurrency %v to handle %v requests: %v req/s\n",
 		*driverConcurrency, reqNum,
 		int64(float64(reqNum)/time.Since(start).Seconds()),
 	)

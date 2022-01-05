@@ -14,6 +14,11 @@ go build -o veritas-kafka-bench ../veritas/benchmark/ycsbbench/main.go
 go build -o veritas-tendermint ../cmd/veritastm/main.go
 go build -o veritas-tendermint-bench ../veritastm/benchmark/main.go
 
+# DB benchmarks
+go build -o db-redis ../cmd/redis/main.go
+go build -o db-redisql ../cmd/redisql/main.go
+go build -o db-mongodb ../cmd/mongodb/main.go
+
 # build Veritas Kafka + ZooKeeper TSO
 cd ..
 git apply scripts/veritas-tso-zk.patch

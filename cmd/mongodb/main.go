@@ -14,8 +14,8 @@ import (
 	"hybrid/dbconn"
 	"hybrid/veritas/benchmark"
 
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var (
@@ -47,22 +47,21 @@ func encodeVal(val string) string {
 
 func MongoGet(cli *mongo.Client, key string) (string, error) {
 	collection := cli.Database("test").Collection("kv")
-	result := struct {
-		key string
-		val string
-	}{}
-	filter := bson.M{key: ""}
+	var result map[string]string
+	filter := bson.M{"key": key}
 	err := collection.FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
+		// fmt.Println(err)
 		return "", err
 	}
-	return result.val, nil
+	return result["val"], nil
 }
 
 func MongoSet(cli *mongo.Client, key string, val string) error {
 	collection := cli.Database("test").Collection("kv")
-	_, err := collection.InsertOne(context.Background(), bson.M{key: val})
+	_, err := collection.InsertOne(context.Background(), bson.M{"key": key, "val": val})
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 	return nil
@@ -72,6 +71,15 @@ func main() {
 	kingpin.Parse()
 
 	cli, err := dbconn.NewMongoConn(context.Background(), *mongoAddr, *mongoPort)
+	check(err)
+
+	mod := mongo.IndexModel{
+		Keys: bson.M{
+			"key": 1, // index in ascending order
+		}, Options: nil,
+	}
+	collection := cli.Database("test").Collection("kv")
+	_, err = collection.Indexes().CreateOne(context.Background(), mod)
 	check(err)
 
 	var reqNum int64
@@ -118,6 +126,7 @@ func main() {
 		}()
 	}
 	wg.Wait()
+	// fmt.Println("Init done.")
 
 	runFile, err := os.Open(*dataRun)
 	if err != nil {
@@ -125,9 +134,9 @@ func main() {
 	}
 	defer runFile.Close()
 	runBuf := make(chan *benchmark.Request, 20*(*driverConcurrency))
-	wg.Add(1)
+	// wg.Add(1)
 	go func() {
-		defer wg.Done()
+		// defer wg.Done()
 		defer close(runBuf)
 		if err := benchmark.LineByLine(runFile, func(line string) error {
 			atomic.AddInt64(&reqNum, 1)
@@ -147,11 +156,14 @@ func main() {
 			panic(err)
 		}
 	}()
-	time.Sleep(5 * time.Second)
+	// wg.Wait()
+	// time.Sleep(5 * time.Second)
+	// fmt.Println("Read file done.")
 
 	var nokey int64
 	nokey = 0
 
+	start := time.Now()
 	for j := 0; j < *driverConcurrency; j++ {
 		wg.Add(1)
 		go func() {
@@ -161,8 +173,10 @@ func main() {
 				case benchmark.GetOp:
 					start := time.Now()
 					_, err := MongoGet(cli, op.Key)
+					// var err error
+					// err = nil
 					latencyCh <- time.Since(start)
-					if err == nil {
+					if err != nil {
 						atomic.AddInt64(&nokey, 1)
 					}
 				case benchmark.SetOp:
@@ -175,15 +189,14 @@ func main() {
 			}
 		}()
 	}
-	start := time.Now()
 	wg.Wait()
+	dtime := time.Since(start).Seconds()
 	close(latencyCh)
 	wg2.Wait()
-	fmt.Printf("Throughput Redis of with %v concurrency to handle %v requests: %v req/s\n",
+	fmt.Printf("Throughput of MongoDB with client concurrency %v handling %v requests: %v req/s\n",
 		*driverConcurrency, reqNum,
-		int64(float64(atomic.LoadInt64(&reqNum))/time.Since(start).Seconds()),
+		int64(float64(atomic.LoadInt64(&reqNum))/dtime),
 	)
 	fmt.Printf("Average latency: %v ms\n", avaLatency)
 	fmt.Printf("Keys not found %d\n", nokey)
 }
-

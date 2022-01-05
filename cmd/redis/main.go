@@ -156,7 +156,7 @@ func main() {
 	wg.Wait()
 	close(latencyCh)
 	wg2.Wait()
-	fmt.Printf("Throughput Redis of with %v concurrency to handle %v requests: %v req/s\n",
+	fmt.Printf("Throughput of Redis with concurrency %v to handle %v requests: %v req/s\n",
 		*driverConcurrency, reqNum,
 		int64(float64(atomic.LoadInt64(&reqNum))/time.Since(start).Seconds()),
 	)
