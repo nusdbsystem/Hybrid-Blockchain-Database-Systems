@@ -90,6 +90,7 @@ We use ``blockchaindb`` docker images. Then, we run the following scripts:
 ./run_benchmark_blksize_blockchaindb.sh
 ./run_benchmark_txsize_blockchaindb.sh
 ./run_benchmark_txdelay_blockchaindb.sh
+./run_benchmark_networking_blockchaindb.sh
 ./run_benchmark_sharding_blockchaindb.sh
 ```
 
