@@ -1,5 +1,115 @@
+diff --git a/scripts/veritas-redisql.patch b/scripts/veritas-redisql.patch
+index e88696d..e69de29 100644
+--- a/scripts/veritas-redisql.patch
++++ b/scripts/veritas-redisql.patch
+@@ -1,105 +0,0 @@
+-diff --git a/veritas/server.go b/veritas/server.go
+-index aeea349..b2f6dc5 100644
+---- a/veritas/server.go
+-+++ b/veritas/server.go
+-@@ -7,8 +7,8 @@ import (
+- 	"sync"
+- 	"time"
+- 
+--	"github.com/go-redis/redis/v8"
+- 	"github.com/golang/protobuf/proto"
+-+	"github.com/mediocregopher/radix/v3"
+- 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+- 
+- 	pbv "hybrid/proto/veritas"
+-@@ -23,7 +23,7 @@ type server struct {
+- 
+- 	l *ledger.LogLedger
+- 
+--	cli *redis.Client
+-+	cli *radix.Pool
+- 
+- 	puller *kafka.Consumer
+- 	pusher *kafka.Producer
+-@@ -40,8 +40,51 @@ type BlockPurpose struct {
+- 	approved map[string]struct{}
+- }
+- 
+--func NewServer(redisCli *redis.Client, consumer *kafka.Consumer, producer *kafka.Producer, ledgerPath string, config *Config) *server {
+-+func rediSQLGet(r *radix.Pool, key string) (string, error) {
+-+	var items []string
+-+	err := r.Do(radix.Cmd(
+-+		&items,
+-+		"REDISQL.EXEC",
+-+		"VERITAS",
+-+		fmt.Sprintf("SELECT kv.value FROM kv WHERE kv.key=\"%s\";", key),
+-+	))
+-+	if err != nil {
+-+		fmt.Printf("Get %v |%s|\n", err, key)
+-+		return "", err
+-+	}
+-+	return items[0], nil
+-+}
+-+
+-+func rediSQLSet(r *radix.Pool, key string, val string) error {
+-+	err := r.Do(radix.Cmd(
+-+		nil,
+-+		"REDISQL.EXEC",
+-+		"VERITAS",
+-+		fmt.Sprintf("INSERT INTO kv VALUES(\"%s\", \"%s\");", key, val),
+-+	))
+-+	if err != nil {
+-+		fmt.Printf("Set %v\n", err)
+-+	}
+-+	return err
+-+}
+-+
+-+func NewServer(redisCli *radix.Pool, consumer *kafka.Consumer, producer *kafka.Producer, ledgerPath string, config *Config) *server {
+- 	ctx, cancel := context.WithCancel(context.Background())
+-+
+-+	// create RediSQL DB
+-+	redisCli.Do(radix.Cmd(nil, "DEL", "VERITAS"))
+-+	if err := redisCli.Do(radix.Cmd(nil, "REDISQL.CREATE_DB", "VERITAS")); err != nil {
+-+		panic(err)
+-+	}
+-+	if err := redisCli.Do(radix.Cmd(
+-+		nil,
+-+		"REDISQL.EXEC",
+-+		"VERITAS",
+-+		"CREATE TABLE IF NOT EXISTS kv(key TEXT, value TEXT);",
+-+	)); err != nil {
+-+		panic(err)
+-+	}
+-+
+- 	l, err := ledger.NewLedger(ledgerPath, true)
+- 	if err != nil {
+- 		log.Fatalf("Create ledger failed: %v", err)
+-@@ -112,8 +155,8 @@ func (s *server) applyLoop() {
+- 			LOOP:
+- 				for _, sl := range blk.Txs {
+- 					for _, t := range sl.Sets {
+--						res, err := s.cli.Get(s.ctx, t.GetKey()).Result()
+--						if err == redis.Nil {
+-+						res, err := rediSQLGet(s.cli, t.GetKey())
+-+						if err == nil {
+- 							continue
+- 						} else if err != nil {
+- 							log.Fatalf("Commit log %v get failed: %v", blk.Txs[0].GetSeq(), err)
+-@@ -173,7 +216,7 @@ func (s *server) applyLoop() {
+- 					if err != nil {
+- 						log.Fatalf("Commit log %v encode failed: %v", blkBuf.blk.Txs[0].GetSeq(), err)
+- 					}
+--					if err := s.cli.Set(s.ctx, t.GetKey(), entry, 0).Err(); err != nil {
+-+					if err := rediSQLSet(s.cli, t.GetKey(), entry); err != nil {
+- 						log.Fatalf("Commit log %v redis set failed: %v", blkBuf.blk.Txs[0].GetSeq(), err)
+- 					}
+- 					if err := s.l.Append([]byte(t.GetKey()), []byte(t.GetValue()+"-"+fmt.Sprintf("%v", t.GetVersion()))); err != nil {
+-@@ -263,7 +306,7 @@ func (s *server) batchLoop() {
+- }
+- 
+- func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse, error) {
+--	res, err := s.cli.Get(ctx, req.GetKey()).Result()
+-+	res, err := rediSQLGet(s.cli, req.GetKey())
+- 	if err != nil {
+- 		return nil, err
+- 	}
 diff --git a/veritas/server.go b/veritas/server.go
-index aeea349..b2f6dc5 100644
+index ce19bf7..72056d8 100644
 --- a/veritas/server.go
 +++ b/veritas/server.go
 @@ -7,8 +7,8 @@ import (
@@ -21,7 +131,7 @@ index aeea349..b2f6dc5 100644
  
  	puller *kafka.Consumer
  	pusher *kafka.Producer
-@@ -40,8 +40,51 @@ type BlockPurpose struct {
+@@ -40,8 +40,60 @@ type BlockPurpose struct {
  	approved map[string]struct{}
  }
  
@@ -70,11 +180,20 @@ index aeea349..b2f6dc5 100644
 +	)); err != nil {
 +		panic(err)
 +	}
++	// create index
++	if err := redisCli.Do(radix.Cmd(
++		nil,
++		"REDISQL.EXEC",
++		"VERITAS",
++		"CREATE INDEX cust_key_ind ON kv(key);",
++	)); err != nil {
++		panic(err)
++	}
 +
  	l, err := ledger.NewLedger(ledgerPath, true)
  	if err != nil {
  		log.Fatalf("Create ledger failed: %v", err)
-@@ -112,8 +155,8 @@ func (s *server) applyLoop() {
+@@ -112,8 +164,8 @@ func (s *server) applyLoop() {
  			LOOP:
  				for _, sl := range blk.Txs {
  					for _, t := range sl.Sets {
@@ -85,7 +204,7 @@ index aeea349..b2f6dc5 100644
  							continue
  						} else if err != nil {
  							log.Fatalf("Commit log %v get failed: %v", blk.Txs[0].GetSeq(), err)
-@@ -173,7 +216,7 @@ func (s *server) applyLoop() {
+@@ -173,7 +225,7 @@ func (s *server) applyLoop() {
  					if err != nil {
  						log.Fatalf("Commit log %v encode failed: %v", blkBuf.blk.Txs[0].GetSeq(), err)
  					}
@@ -94,7 +213,7 @@ index aeea349..b2f6dc5 100644
  						log.Fatalf("Commit log %v redis set failed: %v", blkBuf.blk.Txs[0].GetSeq(), err)
  					}
  					if err := s.l.Append([]byte(t.GetKey()), []byte(t.GetValue()+"-"+fmt.Sprintf("%v", t.GetVersion()))); err != nil {
-@@ -263,7 +306,7 @@ func (s *server) batchLoop() {
+@@ -264,7 +316,7 @@ func (s *server) batchLoop() {
  }
  
  func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse, error) {
