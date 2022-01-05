@@ -16,20 +16,29 @@ for url in urls:
     bdb = BigchainDB(url)
     bdbs.append(bdb)
 
+print("BigchainDB with {} threads and {} servers.".format(threadNum, len(urls)))
+
 def readFile(filepath, outQueue):
     with open(filepath, 'r', encoding='UTF-8') as f:
         line = f.readline()
+        num = 0
         while line is not None and line != '':
             if line.startswith('INSERT') == False and line.startswith('READ') == False and line.startswith('UPDATE') == False:
                 line = f.readline()
                 continue
             outQueue.put(line)
             line = f.readline()
+            num = num + 1
+            if num == 10000:
+                break
 
 def sendTxn(lineQueue, latQueue, driver):
     while lineQueue.empty() == False:
         start = time.time()
-        line = lineQueue.get(timeout=1)
+        try:
+            line = lineQueue.get(block=False, timeout=0)
+        except Empty:
+            continue
         args = line.split(' ', 3)
         if "INSERT" in line or "UPDATE" in line:
             data = {
@@ -60,6 +69,8 @@ readFile(loadFile, loadQueue)
 #tLoadRead = threading.Thread(target=readFile, args=(loadFile, loadQueue,))
 #tLoadRead.start()
 #time.sleep(5)
+num = loadQueue.qsize()
+start = time.time()
 loadThreadList = []
 for i in range(32):
     t = threading.Thread(target=sendTxn, args=(loadQueue, None, bdbs[i%len(bdbs)],))
@@ -68,6 +79,8 @@ for i in range(32):
 #tLoadRead.join()
 for t in loadThreadList:
     t.join()
+end = time.time()
+print("Load throughput {} TPS".format(num/(end - start)))
 
 print("Start running experiments...")
 runQueue = queue.Queue(maxsize=100000)
@@ -112,5 +125,5 @@ while latencyQueue.empty() == False:
 #for t in runThreadList:
 #    t.join()
 
-print('Throughput: {} txn/s'.format(100000/(end-start)))
+print('Throughput: {} txn/s'.format(num/(end-start)))
 print('Latency: {} ms'.format(lat/num*1000))

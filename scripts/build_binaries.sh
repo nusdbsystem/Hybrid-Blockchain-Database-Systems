@@ -6,6 +6,8 @@ cd bin
 
 set -x
 
+go version
+
 go build -o veritas-kafka ../cmd/veritas/main.go
 go build -o veritas-tso ../cmd/tso/main.go
 go build -o veritas-kafka-bench ../veritas/benchmark/ycsbbench/main.go

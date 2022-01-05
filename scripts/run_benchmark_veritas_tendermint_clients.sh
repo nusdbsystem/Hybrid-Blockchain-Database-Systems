@@ -7,7 +7,8 @@ mkdir $LOGS
 set -x
 
 DRIVERS=8
-THREADS="4 8 16 32 64 128 192 256"
+# THREADS="4 8 16 32 64 128 192 256"
+THREADS="256"
 
 for TH in $THREADS; do
     ./restart_cluster_veritas.sh
