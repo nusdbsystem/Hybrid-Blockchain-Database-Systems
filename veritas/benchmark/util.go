@@ -29,7 +29,7 @@ type Request struct {
 
 func LineByLine(r io.Reader, fn func(line string) error) error {
 	br := bufio.NewReader(r)
-	num := 0
+	// num := 0
 	for {
 		line, _, err := br.ReadLine()
 
@@ -49,10 +49,12 @@ func LineByLine(r io.Reader, fn func(line string) error) error {
 		if err := fn(lineStr); err != nil {
 			return err
 		}
+		/*
 		num = num + 1
 		if num >= 10000 {
 			break
 		}
+		*/
 	}
 	return nil
 }
