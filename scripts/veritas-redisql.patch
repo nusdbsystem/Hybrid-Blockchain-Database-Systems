@@ -1,8 +1,12 @@
 diff --git a/veritas/server.go b/veritas/server.go
-index ce19bf7..72056d8 100644
+index ce19bf7..b99c886 100644
 --- a/veritas/server.go
 +++ b/veritas/server.go
-@@ -7,8 +7,8 @@ import (
+@@ -4,11 +4,12 @@ import (
+ 	"context"
+ 	"fmt"
+ 	"log"
++	"strings"
  	"sync"
  	"time"
  
@@ -12,7 +16,7 @@ index ce19bf7..72056d8 100644
  	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
  
  	pbv "hybrid/proto/veritas"
-@@ -23,7 +23,7 @@ type server struct {
+@@ -23,7 +24,7 @@ type server struct {
  
  	l *ledger.LogLedger
  
@@ -21,13 +25,13 @@ index ce19bf7..72056d8 100644
  
  	puller *kafka.Consumer
  	pusher *kafka.Producer
-@@ -40,8 +40,60 @@ type BlockPurpose struct {
+@@ -40,8 +41,72 @@ type BlockPurpose struct {
  	approved map[string]struct{}
  }
  
 -func NewServer(redisCli *redis.Client, consumer *kafka.Consumer, producer *kafka.Producer, ledgerPath string, config *Config) *server {
-+func rediSQLGet(r *radix.Pool, key string) (string, error) {
-+	var items []string
++func rediSQLGet(r *radix.Pool, key string) (string, int64, error) {
++	var items [][]string
 +	err := r.Do(radix.Cmd(
 +		&items,
 +		"REDISQL.EXEC",
@@ -35,13 +39,24 @@ index ce19bf7..72056d8 100644
 +		fmt.Sprintf("SELECT kv.value FROM kv WHERE kv.key=\"%s\";", key),
 +	))
 +	if err != nil {
-+		fmt.Printf("Get %v |%s|\n", err, key)
-+		return "", err
++		// fmt.Printf("In Get *%v* |%s|\n", err, key)
++		if strings.Contains(err.Error(), "message body was: \"DONE\"") {
++			// no record -> no error
++			return "N/A", -1, nil
++		}
++		return "N/A", -1, err
 +	}
-+	return items[0], nil
++	val, err := Decode(strings.Replace(items[0][0], "#", "\"", -1))
++        if err != nil {
++		// fmt.Printf("In Get *%v* |%s|\n", err, items[0][0])
++		return "N/A", -1, err
++        }
++	return val.Val, val.Version, nil
 +}
 +
 +func rediSQLSet(r *radix.Pool, key string, val string) error {
++	val = strings.Replace(val, "\"", "#", -1)
++	// fmt.Printf("In Set |%s|\n", val)
 +	err := r.Do(radix.Cmd(
 +		nil,
 +		"REDISQL.EXEC",
@@ -49,13 +64,14 @@ index ce19bf7..72056d8 100644
 +		fmt.Sprintf("INSERT INTO kv VALUES(\"%s\", \"%s\");", key, val),
 +	))
 +	if err != nil {
-+		fmt.Printf("Set %v\n", err)
++		fmt.Printf("In Set %v\n|%s|\n|%s|\n", err, key, val)
 +	}
 +	return err
 +}
 +
 +func NewServer(redisCli *radix.Pool, consumer *kafka.Consumer, producer *kafka.Producer, ledgerPath string, config *Config) *server {
  	ctx, cancel := context.WithCancel(context.Background())
++	fmt.Println("Starting Veritas + Kafka + RediSQL ...")
 +
 +	// create RediSQL DB
 +	redisCli.Do(radix.Cmd(nil, "DEL", "VERITAS"))
@@ -83,18 +99,29 @@ index ce19bf7..72056d8 100644
  	l, err := ledger.NewLedger(ledgerPath, true)
  	if err != nil {
  		log.Fatalf("Create ledger failed: %v", err)
-@@ -112,8 +164,8 @@ func (s *server) applyLoop() {
+@@ -112,17 +177,13 @@ func (s *server) applyLoop() {
  			LOOP:
  				for _, sl := range blk.Txs {
  					for _, t := range sl.Sets {
 -						res, err := s.cli.Get(s.ctx, t.GetKey()).Result()
 -						if err == redis.Nil {
-+						res, err := rediSQLGet(s.cli, t.GetKey())
++						_, ver, err := rediSQLGet(s.cli, t.GetKey())
 +						if err == nil {
  							continue
- 						} else if err != nil {
+-						} else if err != nil {
++						} else {
  							log.Fatalf("Commit log %v get failed: %v", blk.Txs[0].GetSeq(), err)
-@@ -173,7 +225,7 @@ func (s *server) applyLoop() {
+ 						}
+-						v, err := Decode(res)
+-						if err != nil {
+-							log.Fatalf("Commit log %v decode failed: %v", blk.Txs[0].GetSeq(), err)
+-						}
+-						if v.Version >= t.Version {
++						if ver >= t.Version {
+ 							verifyRes = pbv.MessageType_Abort
+ 							break LOOP
+ 						}
+@@ -173,7 +234,7 @@ func (s *server) applyLoop() {
  					if err != nil {
  						log.Fatalf("Commit log %v encode failed: %v", blkBuf.blk.Txs[0].GetSeq(), err)
  					}
@@ -103,12 +130,22 @@ index ce19bf7..72056d8 100644
  						log.Fatalf("Commit log %v redis set failed: %v", blkBuf.blk.Txs[0].GetSeq(), err)
  					}
  					if err := s.l.Append([]byte(t.GetKey()), []byte(t.GetValue()+"-"+fmt.Sprintf("%v", t.GetVersion()))); err != nil {
-@@ -264,7 +316,7 @@ func (s *server) batchLoop() {
+@@ -264,16 +325,11 @@ func (s *server) batchLoop() {
  }
  
  func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse, error) {
 -	res, err := s.cli.Get(ctx, req.GetKey()).Result()
-+	res, err := rediSQLGet(s.cli, req.GetKey())
++	val, _, err := rediSQLGet(s.cli, req.GetKey())
  	if err != nil {
  		return nil, err
  	}
+-	v, err := Decode(res)
+-	if err != nil {
+-		return nil, err
+-	}
+-
+-	return &pbv.GetResponse{Value: v.Val}, nil
++	return &pbv.GetResponse{Value: val}, nil
+ }
+ 
+ func (s *server) Set(ctx context.Context, req *pbv.SetRequest) (*pbv.SetResponse, error) {

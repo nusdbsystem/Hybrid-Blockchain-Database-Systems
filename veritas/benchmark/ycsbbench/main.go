@@ -25,6 +25,19 @@ var (
 	tsoAddr           = kingpin.Flag("tso-addr", "TSO server address").Required().String()
 )
 
+func encodeVal(val string) string {
+        runes := []rune(val)
+        for i := 0; i < len(runes); i++ {
+                if (runes[i] >= 'a' && runes[i] <= 'z') ||
+                        (runes[i] >= 'A' && runes[i] <= 'Z') ||
+                        (runes[i] >= '0' && runes[i] <= '9') {
+                        continue
+                }
+                runes[i] = '0'
+        }
+        return string(runes)
+}
+
 func main() {
 	kingpin.Parse()
 
@@ -58,7 +71,7 @@ func main() {
 		defer close(loadBuf)
 		if err := benchmark.LineByLine(loadFile, func(line string) error {
 			operands := strings.SplitN(line, " ", 4)
-			loadBuf <- [2]string{operands[2], operands[3]}
+			loadBuf <- [2]string{operands[2], encodeVal(operands[3])}
 			return nil
 		}); err != nil {
 			panic(err)
@@ -107,7 +120,7 @@ func main() {
 				r.ReqType = benchmark.GetOp
 			} else {
 				r.ReqType = benchmark.SetOp
-				r.Val = operands[3]
+				r.Val = encodeVal(operands[3])
 			}
 			runBuf <- r
 			return nil
