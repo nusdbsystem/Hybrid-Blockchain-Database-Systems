@@ -7,8 +7,8 @@ TSTAMP=`date +%F-%H-%M-%S`
 LOGS="logs-networking-bigchaindb-$TSTAMP"
 mkdir $LOGS
 
-THREADS=64
-ADDRS="http://192.168.20.2:9984,http://192.168.20.3:9984,http://192.168.20.4:9984,http://192.168.20.5:9984"
+THREADS=4
+ADDRS="http://192.168.30.2:9984,http://192.168.30.3:9984,http://192.168.30.4:9984,http://192.168.30.5:9984"
 
 cd ..
 RDIR=`pwd`
@@ -19,10 +19,10 @@ set -x
 for BW in $BWS; do    
     for RTT in $RTTS; do
 	LOGSD="$LOGS/logs-$BW-$RTT"
-	mkdir $LOGSD
+	mkdir -p $LOGSD
         ./restart_cluster_bigchaindb.sh
         if [[ "$BW" != "NoLimit" ]]; then
-            sudo ./set_ovs_bs_limit.sh $BW 1
+            sudo ./set_ovs_bw_limit.sh $BW 1
         fi
 	./set_tc.sh $RTT
 	sleep 3

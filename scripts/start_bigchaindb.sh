@@ -1,5 +1,8 @@
 #!/bin/bash
 N=4
+if [ $# -ge 1 ]; then
+	N=$1
+fi
 END_IDX=$(($N+1))
 
 set -x
@@ -7,7 +10,7 @@ set -x
 IPPREFIX="192.168.30"
 
 for idx in `seq 2 $END_IDX`; do
-	ssh -o StrictHostKeyChecking=no root@$IPPREFIX.$idx "cd /usr/src/app/scripts && ./start-all.sh"
+	ssh -o StrictHostKeyChecking=no root@$IPPREFIX.$idx "export LC_CTYPE=C.UTF-8 && export BIGCHAINDB_WSSERVER_HOST=0.0.0.0 && export BIGCHAINDB_SERVER_BIND=0.0.0.0:9984 && export BIGCHAINDB_SERVER_WORKERS=4 && /usr/src/app/scripts/start-all.sh"
 	sleep 5
 	ssh -o StrictHostKeyChecking=no root@$IPPREFIX.$idx "killall -9 tendermint; rm -r .tendermint; /usr/local/bin/tendermint init"
 	for jdx in `seq 2 $END_IDX`; do

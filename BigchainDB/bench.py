@@ -125,5 +125,5 @@ while latencyQueue.empty() == False:
 #for t in runThreadList:
 #    t.join()
 
-print('Throughput: {} txn/s'.format(num/(end-start)))
+print('Throughput of {} txn: {} txn/s'.format(num, num/(end-start)))
 print('Latency: {} ms'.format(lat/num*1000))

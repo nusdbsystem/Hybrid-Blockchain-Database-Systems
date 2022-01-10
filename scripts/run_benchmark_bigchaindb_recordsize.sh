@@ -1,13 +1,16 @@
 #!/bin/bash
 
 TSTAMP=`date +%F-%H-%M-%S`
-LOGS="logs-txsizes-bigchaindb-$TSTAMP"
-mkdir $LOGS
+LOGSD="logs-txsizes-bigchaindb-$TSTAMP"
+mkdir $LOGSD
 
 set -x
 
-THREADS=32
-TXSIZES="512B 2kB 8kB 32kB 128kB"
+THREADS=4
+TXSIZES="512B 2kB 8kB 32kB"
+# TXSIZES="128kB"
+IPPREFIX="192.168.30"
+ADDRS="http://$IPPREFIX.2:9984,http://$IPPREFIX.3:9984,http://$IPPREFIX.4:9984,http://$IPPREFIX.5:9984"
 
 cd ..
 RDIR=`pwd`
@@ -17,6 +20,6 @@ for TXSIZE in $TXSIZES; do
     ./restart_cluster_bigchaindb.sh
     ./start_bigchaindb.sh
     sleep 5
-    timeout 600 python3 $RDIR/BigchainDB/bench.py temp/ycsb_data/workloada.dat temp/ycsb_data/run_workloada.dat http://192.168.20.2:9984,http://192.168.20.3:9984,http://192.168.20.4:9984,http://192.168.20.5:9984 $THREADS 2>&1 | tee $LOGSD/bigchaindb-txsize-$TXSIZE.txt
+    python3 $RDIR/BigchainDB/bench.py temp/ycsb_data_$TXSIZE/workloada.dat temp/ycsb_data_$TXSIZE/run_workloada.dat $ADDRS $THREADS 2>&1 | tee $LOGSD/bigchaindb-txsize-$TXSIZE.txt
 done
 ./stop_bigchaindb.sh

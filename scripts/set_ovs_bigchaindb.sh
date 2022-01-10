@@ -5,6 +5,9 @@ if [ $EUID -ne 0 ]; then
 fi
 
 N=4
+if [ $# -ge 1 ]; then
+	N=$1
+fi
 PREFIX="bigchaindb"
 IPPREFIX="192.168.30"
 

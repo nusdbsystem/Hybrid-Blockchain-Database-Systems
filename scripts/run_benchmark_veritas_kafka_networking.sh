@@ -18,7 +18,7 @@ for BW in $BWS; do
 	    mkdir $LOGSD
         ./restart_cluster_veritas.sh
         if [[ "$BW" != "NoLimit" ]]; then
-            sudo ./set_ovs_bs_limit.sh $BW 1
+            sudo ./set_ovs_bw_limit.sh $BW 1
         fi
 	    ./set_tc.sh $RTT
 	    sleep 3

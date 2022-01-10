@@ -1,13 +1,14 @@
 #!/bin/bash
 
 TSTAMP=`date +%F-%H-%M-%S`
-LOGS="logs-workload-bigchaindb-$TSTAMP"
-mkdir $LOGS
+LOGSD="logs-workload-bigchaindb-$TSTAMP"
+mkdir $LOGSD
 
 set -x
 
-THREADS=32
+THREADS=4
 WORKLOADS="workloada workloadb workloadc"
+IPPREFIX="192.168.30"
 
 cd ..
 RDIR=`pwd`
@@ -17,6 +18,6 @@ for W in $WORKLOADS; do
     ./restart_cluster_bigchaindb.sh
     ./start_bigchaindb.sh
     sleep 5
-    timeout 600 python3 $RDIR/BigchainDB/bench.py temp/ycsb_data/workloada.dat temp/ycsb_data/run_workloada.dat http://192.168.20.2:9984,http://192.168.20.3:9984,http://192.168.20.4:9984,http://192.168.20.5:9984 $THREADS 2>&1 | tee $LOGSD/bigchaindb-workload-$W.txt
+    python3 $RDIR/BigchainDB/bench.py temp/ycsb_data/$W.dat temp/ycsb_data/run_$W.dat http://$IPPREFIX.2:9984,http://$IPPREFIX.3:9984,http://$IPPREFIX.4:9984,http://$IPPREFIX.5:9984 $THREADS 2>&1 | tee $LOGSD/bigchaindb-workload-$W.txt
 done
 ./stop_bigchaindb.sh

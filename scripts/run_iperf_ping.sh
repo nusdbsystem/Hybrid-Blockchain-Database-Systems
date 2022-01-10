@@ -1,7 +1,7 @@
 #!/bin/bash
 
-HOST1="192.168.20.2"
-HOST2="192.168.20.3"
+HOST1="192.168.30.2"
+HOST2="192.168.30.3"
 
 ssh -o StrictHostKeyChecking=no root@$HOST1 "killall -9 iperf"
 sleep 1
