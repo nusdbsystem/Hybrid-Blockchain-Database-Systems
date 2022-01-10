@@ -71,7 +71,7 @@ TMSOCK2="tcp://127.0.0.1:26657"
 for I in `seq 1 $N`; do
 	ADDR="192.168.20.$(($I+1))"
 	ssh -o StrictHostKeyChecking=no root@$ADDR "cd /; redis-server > redis.log 2>&1 &"
-	ssh -o StrictHostKeyChecking=no root@$ADDR "cd /; rm -rf veritas; mkdir -p /veritas/data; nohup /bin/veritas-tendermint-mongodb --signature=node$I --parties=${NODES} --blk-size=100 --addr=:1990 --mongodb-addr=mongodb://127.0.0.1:27017 --ledger-path=veritas$I --tendermint-socket=$TMSOCK1 --abci-socket=$TMSOCK2 > veritas-$I.log 2>&1 &"
+	ssh -o StrictHostKeyChecking=no root@$ADDR "cd /; rm -rf veritas; mkdir -p /veritas/data; nohup /bin/veritas-tendermint-mongodb --signature=node$I --parties=${NODES} --blk-size=100 --addr=:1990 --mongodb-addr=mongodb://127.0.0.1:27017 --ledger-path=veritas$I --tendermint-socket=$TMSOCK1 --abci-socket=$TMSOCK2 > veritas-tm-$I.log 2>&1 &"
 done
 
 # Start Tendermint

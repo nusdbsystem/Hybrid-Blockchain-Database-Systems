@@ -72,7 +72,7 @@ func main() {
 
 	cli, err := dbconn.NewMongoConn(context.Background(), *mongoAddr, *mongoPort)
 	check(err)
-
+	/*
 	mod := mongo.IndexModel{
 		Keys: bson.M{
 			"key": 1, // index in ascending order
@@ -81,9 +81,13 @@ func main() {
 	collection := cli.Database("test").Collection("kv")
 	_, err = collection.Indexes().CreateOne(context.Background(), mod)
 	check(err)
-
+	*/
 	var reqNum int64
 	reqNum = 0
+	var reqNumSet int64
+	reqNumSet = 0
+	var reqNumGet int64
+	reqNumGet = 0
 
 	loadFile, err := os.Open(*dataLoad)
 	if err != nil {
@@ -104,10 +108,14 @@ func main() {
 			panic(err)
 		}
 	}()
-	latencyCh := make(chan time.Duration, 1024)
+	latencyCh := make(chan time.Duration, 100000)
+	latencySetCh := make(chan time.Duration, 100000)
+	latencyGetCh := make(chan time.Duration, 100000)
 	wg2 := sync.WaitGroup{}
 	wg2.Add(1)
 	var avaLatency float64
+	var avgSetLatency float64
+	var avgGetLatency float64
 	go func() {
 		defer wg2.Done()
 		all := int64(0)
@@ -115,6 +123,16 @@ func main() {
 			all += ts.Microseconds()
 		}
 		avaLatency = float64(all) / (1000 * float64(atomic.LoadInt64(&reqNum)))
+		setlat := int64(0)
+		for ts := range latencySetCh {
+                        setlat += ts.Microseconds()
+                }
+                avgSetLatency = float64(setlat) / (1000 * float64(atomic.LoadInt64(&reqNumSet)))
+		getlat := int64(0)
+                for ts := range latencyGetCh {
+                        getlat += ts.Microseconds()
+                }
+                avgGetLatency = float64(getlat) / (1000 * float64(atomic.LoadInt64(&reqNumGet)))
 	}()
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
@@ -175,14 +193,20 @@ func main() {
 					_, err := MongoGet(cli, op.Key)
 					// var err error
 					// err = nil
-					latencyCh <- time.Since(start)
+					dt := time.Since(start)
+					latencyCh <- dt
+					latencyGetCh <- dt
+					atomic.AddInt64(&reqNumGet, 1)
 					if err != nil {
 						atomic.AddInt64(&nokey, 1)
 					}
 				case benchmark.SetOp:
 					start := time.Now()
 					MongoSet(cli, op.Key, op.Val)
-					latencyCh <- time.Since(start)
+					dt := time.Since(start)
+					latencyCh <- dt
+					latencySetCh <- dt
+                                        atomic.AddInt64(&reqNumSet, 1)
 				default:
 					panic(fmt.Sprintf("invalid operation: %v", op.ReqType))
 				}
@@ -192,11 +216,15 @@ func main() {
 	wg.Wait()
 	dtime := time.Since(start).Seconds()
 	close(latencyCh)
+	close(latencyGetCh)
+	close(latencySetCh)
 	wg2.Wait()
 	fmt.Printf("Throughput of MongoDB with client concurrency %v handling %v requests: %v req/s\n",
 		*driverConcurrency, reqNum,
 		int64(float64(atomic.LoadInt64(&reqNum))/dtime),
 	)
 	fmt.Printf("Average latency: %v ms\n", avaLatency)
+	fmt.Printf("Average Get latency: %v ms\n", avgGetLatency)
+	fmt.Printf("Average Set latency: %v ms\n", avgSetLatency)
 	fmt.Printf("Keys not found %d\n", nokey)
 }
