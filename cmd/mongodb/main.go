@@ -72,7 +72,7 @@ func main() {
 
 	cli, err := dbconn.NewMongoConn(context.Background(), *mongoAddr, *mongoPort)
 	check(err)
-	/*
+
 	mod := mongo.IndexModel{
 		Keys: bson.M{
 			"key": 1, // index in ascending order
@@ -81,7 +81,7 @@ func main() {
 	collection := cli.Database("test").Collection("kv")
 	_, err = collection.Indexes().CreateOne(context.Background(), mod)
 	check(err)
-	*/
+
 	var reqNum int64
 	reqNum = 0
 	var reqNumSet int64
