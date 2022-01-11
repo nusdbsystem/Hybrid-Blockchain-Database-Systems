@@ -29,8 +29,8 @@ def readFile(filepath, outQueue):
             outQueue.put(line)
             line = f.readline()
             num = num + 1
-            if num == 10000:
-                break
+#            if num == 10000:
+#                break
 
 def sendTxn(lineQueue, latQueue, driver):
     while lineQueue.empty() == False:
