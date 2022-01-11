@@ -48,7 +48,7 @@ index 8b8510c..8ea4944 100644
  		fmt.Printf("Error in Set DeliverTx: %v\n", err)
  	}
 diff --git a/veritastm/server.go b/veritastm/server.go
-index 45fb3ab..73e0508 100644
+index 45fb3ab..f219949 100644
 --- a/veritastm/server.go
 +++ b/veritastm/server.go
 @@ -5,9 +5,10 @@ import (
@@ -74,24 +74,23 @@ index 45fb3ab..73e0508 100644
  
  	signature string
  }
-@@ -30,11 +31,34 @@ type BlockPurpose struct {
+@@ -30,11 +31,33 @@ type BlockPurpose struct {
  	approved map[string]struct{}
  }
  
 -func NewServer(rcli *redis.Client, config *Config) *server {
 +func MongoGet(cli *mongo.Client, key string) (string, error) {
-+	collection := cli.Database("veritas").Collection("kv")
-+	result := struct {
-+		key string
-+		val string
-+	}{}
-+	filter := bson.M{key: ""}
-+	err := collection.FindOne(context.Background(), filter).Decode(&result)
-+	if err != nil {
-+		return "", err
-+	}
-+	return result.val, nil
++        collection := cli.Database("test").Collection("kv")
++        var result map[string]string
++        filter := bson.M{"key": key}
++        err := collection.FindOne(context.Background(), filter).Decode(&result)
++        if err != nil {
++                // fmt.Println(err)
++                return "", err
++        }
++        return result["val"], nil
 +}
++
 +
 +func MongoSet(cli *mongo.Client, key string, val string) error {
 +	collection := cli.Database("veritas").Collection("kv")
@@ -111,7 +110,7 @@ index 45fb3ab..73e0508 100644
  
  	// ABCI Client
  	var abciClient *rpchttp.HTTP
-@@ -50,14 +74,14 @@ func NewServer(rcli *redis.Client, config *Config) *server {
+@@ -50,14 +73,14 @@ func NewServer(rcli *redis.Client, config *Config) *server {
  		Ledger:    lapp,
  		abciCli:   abciClient,
  		config:    config,
