@@ -39,9 +39,13 @@ defaultAddrs="${defaultAddrs},192.168.20.$((1+ ${c})):50001"
 done
 echo "start test with bcdbnode addrs: ${defaultAddrs}"
 
+# group 1
+#nDURATIONS="1 5 10 15"
+#nGASLIMITS="10000000 100000000"
+# group 2
+nDURATIONS="5"
+nGASLIMITS="100000000 80000000 60000000 40000000 20000000 10000000"
 
-nDURATIONS="1 5 10 15"
-nGASLIMITS="10000000 100000000"
 for GAS in $nGASLIMITS; do
     for TH in $nDURATIONS; do
         echo "Test start with node size: ${size}, client size: ${clients}, workload${workload}"

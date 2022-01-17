@@ -42,7 +42,7 @@ done
 echo "start test with bcdbnode addrs: ${defaultAddrs}"
 
 
-TXDELAYS="10 100 1000 0"
+TXDELAYS="0 10 100 1000"
 
 for TH in $TXDELAYS; do
     echo "Test start with node size: ${size}, client size: ${clients}, workload${workload}, TxSize: ${TH}"

@@ -38,12 +38,15 @@ done
 echo "start test with bcdbnode addrs: ${defaultAddrs}"
 
 
-nTXSIZES="ycsb_data_512B ycsb_data_2kB ycsb_data_8kB ycsb_data_32kB ycsb_data_128kB"
 DURATION=5
-# default gas_limit
+# default gas_limit is 10 000 000, records of "ycsb_data_32kB ycsb_data_128kB" exceed limits
 GAS=10000000
+nTXSIZES="ycsb_data_512B ycsb_data_2kB ycsb_data_8kB"
+
 # increase gas_limit for tx_size tests
 #GAS=100000000
+#nTXSIZES="ycsb_data_512B ycsb_data_2kB ycsb_data_8kB ycsb_data_32kB ycsb_data_128kB"
+
 for TH in $nTXSIZES; do
     echo "Test start with node size: ${size}, client size: ${clients}, workload${workload}, TxSize: ${TH}"
     loadPath="$dir/temp/${TH}/workload${workload}.dat"
