@@ -31,7 +31,7 @@ For each system, we run the following set of experiments:
 - Effect of key access distribution (uniform, latest, zipfian)
 - Effect of different YCSB workloads (WorkloadA, WorkloadB, WorkloadC)
 - Effect of block size
-- Effect of transaction size (value size)
+- Effect of transaction size (record size)
 - Effect of transaction processing time
 - Effect of Networking
 
@@ -40,14 +40,14 @@ For each system, we run the following set of experiments:
 Run the following scripts to reproduce the above-mentioned experiments:
 
 ```
-./run_benchmark_clients_veritas_kafka.sh
-./run_benchmark_nodes_veritas_kafka.sh
-./run_benchmark_distribution_veritas_kafka.sh
-./run_benchmark_workload_veritas_kafka.sh
-./run_benchmark_blksize_veritas_kafka.sh
-./run_benchmark_txsize_veritas_kafka.sh
-./run_benchmark_txdelay_veritas_kafka.sh
-./run_benchmark_networking_veritas_kafka.sh
+./run_benchmark_veritas_kafka_clients.sh
+./run_benchmark_veritas_kafka_nodes.sh
+./run_benchmark_veritas_kafka_distribution.sh
+./run_benchmark_veritas_kafka_workload.sh
+./run_benchmark_veritas_kafka_blocksize.sh
+./run_benchmark_veritas_kafka_recordsize.sh
+./run_benchmark_veritas_kafka_proctime.sh
+./run_benchmark_veritas_kafka_networking.sh
 ```
 
 Each script will generate a folder of the form ``logs-...-<timestamp>``. Check the results recorded in the files of these folders.
@@ -58,24 +58,26 @@ In addition, we run the following experiments for Veritas + Kafka:
 - Effect of Zookeeper TSO
 
 ```
-./run_benchmark_database_veritas_kafka.sh
-./run_benchmark_clients_veritas_kafka_tso_zk.sh
+./run_benchmark_veritas_kafka_database.sh
+./run_benchmark_veritas_kafka_clients_tso_zk.sh
 ```
 
 Note that Veritas Kafka also needs a node for Kafka.
+
+To get the Kafka ops plotted in Figure 8, run ``./get_kafka_ops.sh <logs>`` on the logs obtained after running ``./run_benchmark_veritas_kafka_nodes.sh`` (effect of numbe rof nodes).
 
 ### Veritas + Tendermint
 
 We use the same ``veritas`` docker images. Then, we run the following scripts:
 
 ```
-./run_benchmark_clients_veritas_tendermint.sh
-./run_benchmark_nodes_veritas_tendermint.sh
-./run_benchmark_distribution_veritas_tendermint.sh
-./run_benchmark_workload_veritas_tendermint.sh
-./run_benchmark_txsize_veritas_tendermint.sh
-./run_benchmark_txdelay_veritas_tendermint.sh
-./run_benchmark_networking_veritas_tendermint.sh
+./run_benchmark_veritas_tendermint_clients.sh
+./run_benchmark_veritas_tendermint_nodes.sh
+./run_benchmark_veritas_tendermint_distribution.sh
+./run_benchmark_veritas_tendermint_workload.sh
+./run_benchmark_veritas_tendermint_recordsize.sh
+./run_benchmark_veritas_tendermint_proctime.sh
+./run_benchmark_veritas_tendermint_networking.sh
 ```
 
 ### BlockchainDB
@@ -83,15 +85,15 @@ We use the same ``veritas`` docker images. Then, we run the following scripts:
 We use ``blockchaindb`` docker images. Then, we run the following scripts:
 
 ```
-./run_benchmark_clients_blockchaindb.sh
-./run_benchmark_nodes_blockchaindb.sh
-./run_benchmark_distribution_blockchaindb.sh
-./run_benchmark_workload_blockchaindb.sh
-./run_benchmark_blksize_blockchaindb.sh
-./run_benchmark_txsize_blockchaindb.sh
-./run_benchmark_txdelay_blockchaindb.sh
-./run_benchmark_networking_blockchaindb.sh
-./run_benchmark_sharding_blockchaindb.sh
+./run_benchmark_blockchaindb_clients.sh
+./run_benchmark_blockchaindb_nodes.sh
+./run_benchmark_blockchaindb_distribution.sh
+./run_benchmark_blockchaindb_workload.sh
+./run_benchmark_blockchaindb_blocksize.sh
+./run_benchmark_blockchaindb_recordsize.sh
+./run_benchmark_blockchaindb_proctime.sh
+./run_benchmark_blockchaindb_networking.sh
+./run_benchmark_blockchaindb_sharding.sh
 ```
 
 ### 
@@ -101,14 +103,13 @@ We use ``blockchaindb`` docker images. Then, we run the following scripts:
 We use ``bigchaindb`` docker images. Then, we run the following scripts:
 
 ```
-./run_benchmark_clients_bigchaindb.sh
-./run_benchmark_nodes_bigchaindb.sh
-./run_benchmark_distribution_bigchaindb.sh
-./run_benchmark_workload_bigchaindb.sh
-./run_benchmark_blksize_bigchaindb.sh
-./run_benchmark_txsize_bigchaindb.sh
-./run_benchmark_txdelay_bigchaindb.sh
-./run_benchmark_networking_bigchaindb.sh
+./run_benchmark_bigchaindb_clients.sh
+./run_benchmark_bigchaindb_nodes.sh
+./run_benchmark_bigchaindb_distribution.sh
+./run_benchmark_bigchaindb_workload.sh
+./run_benchmark_bigchaindb_recordsize.sh
+./run_benchmark_bigchaindb_proctime.sh
+./run_benchmark_bigchaindb_networking.sh
 ```
 
 ### BigchainDB Parallel Validation

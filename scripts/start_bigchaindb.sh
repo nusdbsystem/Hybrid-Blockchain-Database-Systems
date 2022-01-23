@@ -1,13 +1,15 @@
 #!/bin/bash
-N=4
+
+. ./env.sh
+
+N=$DEFAULT_NODES
+
+set -x
+
 if [ $# -ge 1 ]; then
 	N=$1
 fi
 END_IDX=$(($N+1))
-
-set -x
-
-IPPREFIX="192.168.30"
 
 for idx in `seq 2 $END_IDX`; do
 	ssh -o StrictHostKeyChecking=no root@$IPPREFIX.$idx "export LC_CTYPE=C.UTF-8 && export BIGCHAINDB_WSSERVER_HOST=0.0.0.0 && export BIGCHAINDB_SERVER_BIND=0.0.0.0:9984 && export BIGCHAINDB_SERVER_WORKERS=4 && /usr/src/app/scripts/start-all.sh"

@@ -1,6 +1,9 @@
 #!/bin/bash
 
-N=5
+. ./env.sh
+
+# +1 nodes for Kafka
+N=$(($DEFAULT_NODES + 1))
 
 if [ $# -gt 0 ]; then
 	N=$1

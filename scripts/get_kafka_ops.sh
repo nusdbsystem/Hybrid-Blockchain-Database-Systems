@@ -1,13 +1,11 @@
 #!/bin/bash
 
-NODES="4 8 16 32 64"
+. ./env.sh
 
 if [ $# -lt 1 ]; then
 	echo "Usage: $0 <logs-nodes-veritas-kafka...>"
 	exit 1
 fi
-
-# set -x
 
 LOGSD=$1
 echo "# Server Nodes	Reads	Writes"

@@ -1,15 +1,17 @@
 #!/bin/bash
+
 if [ $EUID -ne 0 ]; then
 	echo "This script must be run as root!"
 	exit 1
 fi
 
-N=4
+. ./env.sh
+
+N=$DEFAULT_NODES
 if [ $# -ge 1 ]; then
 	N=$1
 fi
 PREFIX="bigchaindb"
-IPPREFIX="192.168.30"
 
 ovs-vsctl add-br ovs-br1
 ifconfig ovs-br1 $IPPREFIX.1 netmask 255.255.255.0 up

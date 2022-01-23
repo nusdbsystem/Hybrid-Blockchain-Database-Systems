@@ -1,16 +1,21 @@
 #!/bin/bash
 
+. ./env.sh
+
+set -x
+
 TSTAMP=`date +%F-%H-%M-%S`
 LOGSD="logs-txsizes-bigchaindb-$TSTAMP"
 mkdir $LOGSD
 
-set -x
+N=$DEFAULT_NODES
+THREADS=$DEFAULT_THREADS_BIGCHAINDB
 
-THREADS=4
-TXSIZES="512B 2kB 8kB 32kB"
-# TXSIZES="128kB"
-IPPREFIX="192.168.30"
-ADDRS="http://$IPPREFIX.2:9984,http://$IPPREFIX.3:9984,http://$IPPREFIX.4:9984,http://$IPPREFIX.5:9984"
+# Generate server addresses. BigchainDB port is 9984
+ADDRS="http://$IPPREFIX.2:9984"
+for IDX in `seq 3 $(($N+1))`; do
+	ADDRS="$ADDRS,http://$IPPREFIX.$IDX:9984"
+done
 
 cd ..
 RDIR=`pwd`
@@ -20,6 +25,8 @@ for TXSIZE in $TXSIZES; do
     ./restart_cluster_bigchaindb.sh
     ./start_bigchaindb.sh
     sleep 5
-    python3 $RDIR/BigchainDB/bench.py temp/ycsb_data_$TXSIZE/workloada.dat temp/ycsb_data_$TXSIZE/run_workloada.dat $ADDRS $THREADS 2>&1 | tee $LOGSD/bigchaindb-txsize-$TXSIZE.txt
+    WORKLOAD_FILE="$DEFAULT_WORKLOAD_PATH"_"$TXSIZE/$DEFAULT_WORKLOAD".dat
+    WORKLOAD_RUN_FILE="$DEFAULT_WORKLOAD_PATH"_"$TXSIZE/run_$DEFAULT_WORKLOAD".dat
+    python3 $RDIR/BigchainDB/bench.py $WORKLOAD_FILE $WORKLOAD_RUN_FILE $ADDRS $THREADS 2>&1 | tee $LOGSD/bigchaindb-txsize-$TXSIZE.txt
 done
 ./stop_bigchaindb.sh

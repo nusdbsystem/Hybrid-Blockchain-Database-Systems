@@ -1,14 +1,23 @@
 #!/bin/bash
 
+. ./env.sh
+
+set -x
+
 TSTAMP=`date +%F-%H-%M-%S`
 LOGSD="logs-txdelay-bigchaindb-$TSTAMP"
 mkdir $LOGSD
 
-set -x
+N=$DEFAULT_NODES
+THREADS=$DEFAULT_THREADS_BIGCHAINDB
+WORKLOAD_FILE="$DEFAULT_WORKLOAD_PATH/$DEFAULT_WORKLOAD".dat
+WORKLOAD_RUN_FILE="$DEFAULT_WORKLOAD_PATH/run_$DEFAULT_WORKLOAD".dat
 
-THREADS=4
-TXDELAYS="0 10 100 1000"
-ADDRS="http://192.168.30.2:9984,http://192.168.30.3:9984,http://192.168.30.4:9984,http://192.168.30.5:9984"
+# Generate server addresses. BigchainDB port is 9984
+ADDRS="http://$IPPREFIX.2:9984"
+for IDX in `seq 3 $(($N+1))`; do
+	ADDRS="$ADDRS,http://$IPPREFIX.$IDX:9984"
+done
 
 cd ..
 RDIR=`pwd`
@@ -16,8 +25,8 @@ cd scripts
 
 for TXD in $TXDELAYS; do
     ./restart_cluster_bigchaindb.sh
-    ./start_bigchaindb.sh 4 $TXD
+    ./start_bigchaindb.sh $N $TXD
     sleep 5
-    python3 $RDIR/BigchainDB/bench.py temp/ycsb_data/workloada.dat temp/ycsb_data/run_workloada.dat $ADDRS $THREADS 2>&1 | tee $LOGSD/bigchaindb-txdelay-$TXD.txt
+    python3 $RDIR/BigchainDB/bench.py $WORKLOAD_FILE $WORKLOAD_RUN_FILE $ADDRS $THREADS 2>&1 | tee $LOGSD/bigchaindb-txdelay-$TXD.txt
 done
 ./stop_bigchaindb.sh

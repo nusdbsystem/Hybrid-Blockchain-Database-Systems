@@ -1,6 +1,8 @@
 #!/bin/bash
 
-N=4
+. ./env.sh
+
+N=$DEFAULT_NODES
 
 if [ $# -gt 0 ]; then
 	N=$1

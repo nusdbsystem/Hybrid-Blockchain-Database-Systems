@@ -1,6 +1,8 @@
 #!/bin/bash
 
-N=5
+. ./env.sh
+
+N=$(($DEFAULT_NODES + 1))
 CDIR=`pwd`
 
 if [ $# -gt 0 ]; then
@@ -10,7 +12,7 @@ else
 	echo -e "\tDefault: $N containers"
 fi
 
-IMGNAME="veritas"
+IMGNAME="veritas:latest"
 PREFIX="veritas"
 
 DFILE=dockers.txt

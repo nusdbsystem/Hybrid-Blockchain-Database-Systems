@@ -3,15 +3,15 @@
 # Run command on multiple nodes
 #
 
-N=4
+. ./env.sh
+
+N=$DEFAULT_NODES
 START=2
 END=$(($START+$N-1))
-PREFIX="192.168.20."
 
 function reset_term_color {
 	echo -e "\e[0m" 
 }
-
 
 if [[ $# -eq 0 ]] ; then
 	echo "usage: $0 <cmd> [<cmd_arg1> ... <cmd_argn> ]"	
@@ -22,7 +22,7 @@ rand=$RANDOM
 hosts=""
 domain=""
 for i in `seq $START $END`; do
-	hosts="$hosts $PREFIX$i"
+	hosts="$hosts $IPPREFIX.$i"
 done
 
 #echo "Running $@ on $hosts"

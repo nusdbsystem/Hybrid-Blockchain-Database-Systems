@@ -5,7 +5,9 @@ if [ $EUID -ne 0 ]; then
 	exit 1
 fi
 
-N=4
+. ./env.sh
+
+N=$DEFAULT_NODES
 if [ $# -gt 0 ]; then
 	N=$1
 else

@@ -1,10 +1,13 @@
 #!/bin/bash
+#
+# Run benchmark (YCSB Workload A) locally on Redis, RediSQL, and MongoDB
+#
 
 if ! [ -x redis-server ]; then
 	echo "Make sure you have redis-server binary in this folder"
 	exit 1
 fi
-if ! [ -f redisql.so  ]; then
+if ! [ -f redisql.so ]; then
         echo "Make sure you have redis-server library in this folder"
         exit 1
 fi
