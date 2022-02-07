@@ -40,8 +40,7 @@ for TH in $THREADS; do
     ./start_bigchaindb.sh        
     sleep 10
     python3 $RDIR/BigchainDB/bench.py $WORKLOAD_FILE $WORKLOAD_RUN_FILE $ADDRS $TH 2>&1 | tee $LOGSD/bigchaindb-clients-$TH.txt
+	copy_logs $LOGSD/logs-bigchaindb-clients-$TH
     ./stop_bigchaindb.sh
-    sleep 3
-    copy_logs $LOGSD/logs-bigchaindb-clients-$TH
 done
 # ./restart_cluster_bigchaindb.sh

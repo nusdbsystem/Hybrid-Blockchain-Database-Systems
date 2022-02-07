@@ -5,7 +5,7 @@ if ! [ -d "../../bin" ]; then
     exit 1
 fi
 
-rm -rd bin
+rm -rf bin
 cp -r ../../bin .	
 
 if ! [ -f "id_rsa.pub" ]; then

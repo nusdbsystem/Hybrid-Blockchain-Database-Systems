@@ -54,17 +54,24 @@ Each script will generate a folder of the form ``logs-...-<timestamp>``. Check t
 
 In addition, we run the following experiments for Veritas + Kafka:
 
-- Effect of the Underlying Database
-- Effect of Zookeeper TSO
+- Effect of Veritas Peer Count on Kafka Operations (Figure 8)
+- Effect of the Underlying Database (Figure 11)
+- Effect of Zookeeper TSO (not included in the paper)
 
 ```
 ./run_benchmark_veritas_kafka_database.sh
 ./run_benchmark_veritas_kafka_clients_tso_zk.sh
 ```
 
-Note that Veritas Kafka also needs a node for Kafka.
+#### Effect of Veritas Peer Count on Kafka Operations
 
-To get the Kafka ops plotted in Figure 8, run ``./get_kafka_ops.sh <logs>`` on the logs obtained after running ``./run_benchmark_veritas_kafka_nodes.sh`` (effect of numbe rof nodes).
+This reuses the logs from running ``./run_benchmark_veritas_kafka_nodes.sh``, which are in the form ``logs-nodes-veritas-<timestamp>``. In particular, we are interested in the following Kafka counters: 
+
+- CURRENT-OFFSET - the current position of a consumer. There are N consumers in total, so we need the sum of these counters to get the number of read operations.
+- LOG-END-OFFSET - the offset of the last message written to the topic. This represents the number of write operations.
+
+Please run ``./get_kafka_ops.sh logs-nodes-veritas-...`` to get the read and write operations for a given log folder. Note that Figure 8 represents the average of 3 such logs (runs).
+
 
 ### Veritas + Tendermint
 
@@ -121,7 +128,25 @@ To run BigchainDB with Parallel Validation (PV), modify lines 16 and 17 of [Bigc
 bigchaindb start --experimental-parallel-validation > /dev/null 2>&1 &
 ```
 
-Then repeat all the steps of BigchainDB.
+Next, re-build the Docker image:
+
+```
+cd docker/bigchaindb
+rm -r bigchaindb-2.2.2/scripts
+./build_docker.sh
+```
+
+Then repeat all the steps of BigchainDB:
+
+```
+./run_benchmark_bigchaindb_clients.sh
+./run_benchmark_bigchaindb_nodes.sh
+./run_benchmark_bigchaindb_distribution.sh
+./run_benchmark_bigchaindb_workload.sh
+./run_benchmark_bigchaindb_recordsize.sh
+./run_benchmark_bigchaindb_proctime.sh
+./run_benchmark_bigchaindb_networking.sh
+```
 
 
 ### Aborted Transaction
