@@ -25,12 +25,15 @@ require (
 	github.com/hashicorp/raft-boltdb v0.0.0-20210422161416-485fa74b0b01
 	github.com/json-iterator/go v1.1.12
 	github.com/libp2p/go-buffer-pool v0.0.2 // indirect
+	github.com/mattn/go-isatty v0.0.14
 	github.com/mediocregopher/radix/v3 v3.8.0
 	github.com/mroth/weightedrand v0.4.1 // indirect
 	github.com/oasisprotocol/curve25519-voi v0.0.0-20210609091139-0a56a4bca00b // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.2.1
+	github.com/relab/gorums v0.5.1-0.20210629194217-9811e4f219ca
+	github.com/relab/hotstuff v0.4.0
 	github.com/rjeczalik/notify v0.9.2 // indirect
 	github.com/rs/cors v1.8.0 // indirect
 	github.com/rs/zerolog v1.26.0 // indirect
@@ -45,10 +48,8 @@ require (
 	github.com/vektra/mockery/v2 v2.9.4 // indirect
 	go.mongodb.org/mongo-driver v1.7.4
 	go.uber.org/atomic v1.9.0
-	golang.org/x/net v0.0.0-20211111160137-58aab5ef257a // indirect
-	golang.org/x/sys v0.0.0-20211111213525-f221eed1c01e // indirect
-	google.golang.org/genproto v0.0.0-20211111162719-482062a4217b // indirect
-	google.golang.org/grpc v1.42.0
+	go.uber.org/zap v1.19.1
+	google.golang.org/grpc v1.43.0
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.7.0
