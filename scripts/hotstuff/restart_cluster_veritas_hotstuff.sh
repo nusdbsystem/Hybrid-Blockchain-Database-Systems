@@ -2,7 +2,7 @@
 
 N=${1:-4}
 
-
+./stop_veritas_hotstuff.sh
 sudo ./unset_ovs_veritas_hotstuff.sh $N
 ./kill_containers_veritas_hotstuff.sh
 sleep 2

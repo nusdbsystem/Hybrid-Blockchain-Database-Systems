@@ -42,10 +42,11 @@ RUN sed -i '/protected-mode yes/c protected-mode no' /etc/redis/redis.conf
 RUN service redis-server start
 
 RUN mkdir -p /Data/
-RUN mkdir -p ${HOME}/VeritasHotstuff/scripts/
+RUN mkdir -p ${HOME}/VeritasHotstuff/keys/
 RUN mkdir -p ${HOME}/VeritasHotstuff/config/
 RUN mkdir -p ${HOME}/VeritasHotstuff/logs/
 RUN mkdir -p ${HOME}/VeritasHotstuff/bin/
 COPY .bin ${HOME}/VeritasHotstuff/bin
 WORKDIR ${HOME}/VeritasHotstuff/
-
+ENV HOTSTUFF_LOG="debug"
+ENV HOTSTUFF_LOG_TYPE="json"

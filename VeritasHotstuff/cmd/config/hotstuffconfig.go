@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/relab/hotstuff"
+	"github.com/EinWTW/hotstuff"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -23,7 +23,7 @@ type Options struct {
 	PeerAddr        string      `mapstructure:"peer-listen"`
 	PmType          string      `mapstructure:"pacemaker"`
 	PrintThroughput bool        `mapstructure:"print-throughput"`
-	Privkey         string
+	Privkey         string      `mapstructure:"privkey"`
 	RateLimit       int         `mapstructure:"rate-limit"`
 	RootCAs         []string    `mapstructure:"root-cas"`
 	SelfID          hotstuff.ID `mapstructure:"self-id"`
@@ -31,6 +31,7 @@ type Options struct {
 	RedisAddr       string      `mapstructure:"self-redis-address"`
 	TLS             bool        `mapstructure:"tls"`
 	ViewTimeout     float64     `mapstructure:"view-timeout"`
+	ConnectTimeout  float64     `mapstructure:"view-timeout"`
 	Replicas        []Replica
 }
 
@@ -39,8 +40,8 @@ type Replica struct {
 	PeerAddr   string `mapstructure:"peer-address"`
 	ClientAddr string `mapstructure:"client-address"`
 	RedisAddr  string `mapstructure:"redis-address"`
-	Pubkey     string
-	Cert       string
+	Pubkey     string `mapstructure:"pubkey"`
+	Cert       string `mapstructure:"cert"`
 }
 
 func ReadConfig(opts interface{}, configfile string) (err error) {

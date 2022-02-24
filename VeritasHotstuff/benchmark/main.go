@@ -13,7 +13,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	benchmark "hybrid/VeritasHotstuff/benchmark/ycsb"
-	pbv "hybrid/VeritasHotstuff/proto/veritas"
+	pbv "hybrid/VeritasHotstuff/proto/veritashs"
 )
 
 var (
@@ -21,12 +21,16 @@ var (
 	dataRun           = kingpin.Flag("run-path", "Path of YCSB operation data").Required().String()
 	driverNum         = kingpin.Flag("ndrivers", "Number of drivers for sending requests").Default("4").Int()
 	driverConcurrency = kingpin.Flag("nthreads", "Number of threads for each driver").Default("10").Int()
-	serverAddrs       = kingpin.Flag("veritas-addrs", "Address of veritas nodes").Required().String()
+	serverAddrs       = kingpin.Flag("server-addrs", "Address of veritas nodes").Required().String()
 )
 
 func main() {
 	kingpin.Parse()
+	// defer profile.Start(profile.CPUProfile, profile.NoShutdownHook, profile.ProfilePath("./tmp")).Stop()
 
+	fmt.Println("Time start: ", time.Now())
+	lastopt := ""
+	lastkey := ""
 	addrs := strings.Split(*serverAddrs, ",")
 	clis := make([]pbv.VeritasNodeClient, 0)
 	conns := make([]*grpc.ClientConn, 0)
@@ -88,16 +92,19 @@ func main() {
 		go func() {
 			defer wg.Done()
 			for kv := range loadBuf {
-				if _, err := clis[0].Set(context.Background(), &pbv.SetRequest{
-					Key:   kv[0],
-					Value: kv[1],
-				}); err != nil {
-					panic(err)
-				}
+				lastkey = kv[0]
+
+				// if _, err := clis[0].Set(context.Background(), &pbv.SetRequest{
+				// 	Key:   kv[0],
+				// 	Value: kv[1],
+				// }); err != nil {
+				// 	panic(err)
+				// }
 			}
 		}()
 	}
 	wg.Wait()
+	fmt.Println("Init Data done " + lastkey)
 
 	runFile, err := os.Open(*dataRun)
 	if err != nil {
@@ -142,18 +149,21 @@ func main() {
 						beginOp := time.Now()
 						if _, err := clis[seq].Get(context.Background(), &pbv.GetRequest{Key: op.Key}); err != nil {
 							// panic(err)
-							fmt.Println(err)
+							fmt.Println("GetOp ", err)
 						}
 						latencyCh <- time.Since(beginOp)
 					case benchmark.SetOp:
 						beginOp := time.Now()
-						if _, err := clis[seq].Set(context.Background(), &pbv.SetRequest{
+						_, err := clis[seq].Set(context.Background(), &pbv.SetRequest{
 							Key:   op.Key,
 							Value: op.Val,
-						}); err != nil {
-							panic(err)
+						})
+						if err != nil {
+							fmt.Println("SetOp ", err)
 						}
 						latencyCh <- time.Since(beginOp)
+						lastopt = "set"
+						lastkey = op.Key
 					default:
 						panic(fmt.Sprintf("invalid operation: %v", op.ReqType))
 					}
@@ -161,15 +171,23 @@ func main() {
 			}(i)
 		}
 	}
+	fmt.Println("get/set opt is ongoing ... ", lastkey)
 	wg.Wait()
+	fmt.Println("wg.Wait() ... ", lastkey)
 	close(latencyCh)
+	fmt.Println("close(latencyCh) ... ", lastkey)
 	wg2.Wait()
+	fmt.Println("wg2.Wait() ... ", lastkey)
+
+	fmt.Println("Last opt verify is ongoing ... ", lastopt)
+	fmt.Println("Last key verify is ongoing ... ", lastkey)
 
 	fmt.Println("#########################################################################")
-	fmt.Printf("Throughput of %v drivers with %v concurrency to handle %v requests: %v req/s\n",
-		*driverNum, *driverConcurrency, reqNum.Load(),
+	fmt.Printf("Experiment: %v servers %v drivers with %v concurrency to handle %v requests(loadpath %v workload %v ) --> Throughput: %v req/s, ",
+		len(addrs), *driverNum, *driverConcurrency, reqNum.Load(), *dataRun, *dataLoad,
 		int64(float64(reqNum.Load())/time.Since(start).Seconds()),
 	)
 	fmt.Printf("Average latency: %v ms\n", avaLatency)
 	fmt.Println("#########################################################################")
+	fmt.Println("Time stop: ", time.Now())
 }

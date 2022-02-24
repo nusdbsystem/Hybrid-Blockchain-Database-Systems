@@ -93,9 +93,8 @@ func main() {
 		go func() {
 			defer wg.Done()
 			for kv := range loadBuf {
-				if kv[0] != "READ" {
-					lastkey = kv[1]
-				}
+				lastkey = kv[0]
+
 				// Only init once
 				// if _, err := clis[0].Set(context.Background(), &pbv.SetRequest{
 				// 	Key:   kv[0],

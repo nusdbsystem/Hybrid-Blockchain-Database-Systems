@@ -10,7 +10,6 @@ nodes=${1:-4}
 clients=${2:-256} 
 workload=${3:-a}
 distribution=${4:-ycsb_data}
-shards=${5:-1}
 nthreads=$(( ${clients} / ${ndrivers} ))
 
 dir=$(pwd)
@@ -52,7 +51,7 @@ for TH in $nNODES; do
     nthreads=$(( ${clients} / ${ndrivers} ))
     ./restart_cluster_veritas_hotstuff.sh ${TH}
     ./start_veritas_hotstuff.sh ${TH}      
-    sleep 10
+    
     $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/veritas_hotstuff-nodes-$TH.txt 2>&1 
 done
 

@@ -3,6 +3,7 @@ module hybrid
 go 1.15
 
 require (
+	github.com/EinWTW/hotstuff v0.2.3-0.20220224090305-51afe7ed9854
 	github.com/Workiva/go-datastructures v1.0.53 // indirect
 	github.com/adlio/schema v1.1.14 // indirect
 	github.com/allegro/bigcache v1.2.1 // indirect
@@ -24,6 +25,7 @@ require (
 	github.com/hashicorp/raft v1.3.2
 	github.com/hashicorp/raft-boltdb v0.0.0-20210422161416-485fa74b0b01
 	github.com/json-iterator/go v1.1.12
+	github.com/kilic/bls12-381 v0.1.1-0.20210208205449-6045b0235e36 // indirect
 	github.com/libp2p/go-buffer-pool v0.0.2 // indirect
 	github.com/mattn/go-isatty v0.0.14
 	github.com/mediocregopher/radix/v3 v3.8.0
@@ -32,8 +34,9 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.2.1
-	github.com/relab/gorums v0.5.1-0.20210629194217-9811e4f219ca
-	github.com/relab/hotstuff v0.4.0
+	github.com/relab/gorums v0.2.3-0.20210213125733-f04667f97266
+	github.com/relab/hotstuff v0.2.2
+	github.com/relab/iago v0.0.0-20211206120654-269f053c74ad // indirect
 	github.com/rjeczalik/notify v0.9.2 // indirect
 	github.com/rs/cors v1.8.0 // indirect
 	github.com/rs/zerolog v1.26.0 // indirect
@@ -46,6 +49,7 @@ require (
 	github.com/tendermint/tendermint v0.35.0
 	github.com/tendermint/tm-db v0.6.4 // indirect
 	github.com/vektra/mockery/v2 v2.9.4 // indirect
+	go-hep.org/x/hep v0.28.6 // indirect
 	go.mongodb.org/mongo-driver v1.7.4
 	go.uber.org/atomic v1.9.0
 	go.uber.org/zap v1.19.1

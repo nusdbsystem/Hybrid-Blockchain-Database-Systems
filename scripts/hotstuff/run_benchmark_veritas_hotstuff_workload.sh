@@ -46,7 +46,7 @@ for TH in $nDISTRIBUTIONS; do
     runPath="$dir/temp/${distribution}/run_workload${TH}.dat"
     ./restart_cluster_veritas_hotstuff.sh
     ./start_veritas_hotstuff.sh        
-    sleep 6
+    
     $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/veritas_hotstuff-workload-$TH.txt 2>&1
 done
 

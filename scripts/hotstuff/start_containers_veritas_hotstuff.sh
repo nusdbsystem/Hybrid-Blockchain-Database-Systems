@@ -2,7 +2,7 @@
 set -ex
 
 nodes=${1:-4}
-shard=${2:-1}
+
 IMGNAME="veritas_hotstuff"
 PREFIX="veritas_hotstuff"
 
@@ -19,7 +19,7 @@ for idx in `seq 1 ${nodes}`; do
 	done
 	docker run -d --publish-all=true --cap-add=SYS_ADMIN --cap-add=NET_ADMIN --security-opt seccomp:unconfined --cpuset-cpus=$CPUIDS --name=$PREFIX$idx $IMGNAME tail -f /dev/null 2>&1 >> $DFILE
 done
-# docker run -d --publish-all=true --cap-add=SYS_ADMIN --cap-add=NET_ADMIN --security-opt seccomp:unconfined --cpuset-cpus=$CPUIDS --name=redis-shard${shard} redis tail -f /dev/null 2>&1 >> $DFILE
+
 while read ID; do
 	docker exec $ID "/usr/sbin/sshd"
 done < $DFILE

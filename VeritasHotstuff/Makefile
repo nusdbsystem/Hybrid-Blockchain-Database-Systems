@@ -1,14 +1,14 @@
 nodes := 4
 clients := 4
 
-.PHONY: all build clean download build init generate install test
+.PHONY: all build clean download build protos init generate install test
 
 all: build init generate install
 
-build:
+build: 
+	@rm -f ./.bin/veritasnode ./.bin/hotstuffserver ./.bin/benchmark_veritashf
 	@go build -o ./.bin/veritasnode $(GCFLAGS) ./cmd/veritas 
-	@go build -o ./.bin/hotstuffserver $(GCFLAGS) ./hotstuffserver 
-	@go build -o ./.bin/hotstuffclient $(GCFLAGS) ./cmd/client/hotstuff
+	@go build -o ./.bin/hotstuffserver $(GCFLAGS) ./cmd/hotstuff 
 	@go build -o ./.bin/benchmark_veritashf $(GCFLAGS) ./benchmark
 
 
@@ -18,6 +18,9 @@ download:
 
 clean:
 	@rm -rfv .bin
+
+protos:
+	protoc --go_out=paths=source_relative:. --go-grpc_out=. ./proto/veritashs/veritashs.proto
 
 init:
 	@/bin/bash scripts/start_redis_db.sh $(nodes)

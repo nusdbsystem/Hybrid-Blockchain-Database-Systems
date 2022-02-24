@@ -7,7 +7,7 @@ import (
 	"os"
 	"os/signal"
 
-	pbv "hybrid/VeritasHotstuff/proto/veritas"
+	pbv "hybrid/VeritasHotstuff/proto/veritashs"
 
 	"hybrid/VeritasHotstuff/cmd/config"
 	"hybrid/VeritasHotstuff/svrnode"
@@ -16,19 +16,13 @@ import (
 	"google.golang.org/grpc"
 )
 
-var (
-// svrAddr   = kingpin.Flag("svr-addr", "server address").Default("0.0.0.0:1997").String()
-// redisAddr = kingpin.Flag("redis-addr", "redis server address").Required().String()
-
-)
-
 func main() {
-	//kingpin.Parse()
-	configFile := flag.String("config", "", "The path to the config file")
-	flag.Parse()
-	// ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
-	// defer cancel()
 
+	configFile := flag.String("config", "", "The path to the config file")
+	//priv := flag.String("privkey", "", "The path to the private key file")
+	flag.Parse()
+
+	fmt.Println(*configFile)
 	var conf config.Options
 	err := config.ReadConfig(&conf, *configFile) //default config file "hotstuff.toml"
 	if err != nil {
@@ -37,7 +31,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	svr, err := svrnode.NewServerNode(&conf)
+	svr, err := svrnode.NewServerNode(&conf, *configFile)
 	if err != nil {
 		//panic(err)
 		fmt.Printf("%v", err)

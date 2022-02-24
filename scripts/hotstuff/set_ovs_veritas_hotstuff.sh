@@ -7,7 +7,6 @@ if [ $EUID -ne 0 ]; then
 fi
 
 N=${1:-4}
-shard=${2:-1}
 PREFIX="veritas_hotstuff"
 NET_PREFIX="192.168.20"
 

@@ -46,7 +46,7 @@ for TH in $nTXSIZES; do
     runPath="$dir/temp/${TH}/run_workload${workload}.dat"
     ./restart_cluster_veritas_hotstuff.sh 
     ./start_veritas_hotstuff.sh       
-    sleep 10
+    
     $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/veritas_hotstuff-txsize-$TH.txt 2>&1
 done
 

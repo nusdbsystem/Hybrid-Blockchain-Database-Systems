@@ -1,12 +1,12 @@
 syntax = "proto3";
 package controller;
 
-option go_package = "proto/veritas";
+option go_package = "proto/veritashs";
 
 service VeritasNode {
     rpc Get (GetRequest) returns (GetResponse);
     rpc Set (SetRequest) returns (SetResponse);
-    rpc BatchSet (BatchSetRequest) returns (BatchSetResponse);
+    
 }
 
 message GetRequest {
@@ -26,10 +26,3 @@ message SetResponse {
     // Empty.
 }
 
-message BatchSetRequest {
-    repeated SetRequest sets = 1;
-}
-
-message BatchSetResponse {
-    // Empty.
-}

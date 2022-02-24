@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 dir=$(dirname "$0")
 echo ${dir}
@@ -8,11 +9,11 @@ if ! [ -d "${dir}/../../VeritasHotstuff/.bin" ]; then
     exit 1
 fi
 
-rm -rf ${dir}/.bin ${dir}/.scripts
+rm -rf ${dir}/.bin
 cd ${dir}/../../VeritasHotstuff/
 make build
 cd -
-cp -r ${dir}/../../BlockchainDB/.bin ${dir}/	
+cp -r ${dir}/../../VeritasHotstuff/.bin ${dir}/	
 
 
 if ! [ -f "${dir}/id_rsa.pub" ]; then
@@ -25,4 +26,4 @@ fi
 
 docker build -f ${dir}/Dockerfile -t veritas_hotstuff ${dir}/
 
-rm -rf ${dir}/.bin ${dir}/.scripts ${dir}/id_rsa.pub
+rm -rf ${dir}/.bin ${dir}/id_rsa.pub

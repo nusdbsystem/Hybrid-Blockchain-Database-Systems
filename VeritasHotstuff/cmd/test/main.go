@@ -3,18 +3,19 @@ package main
 import (
 	"context"
 	"fmt"
+	"time"
 
-	pbv "hybrid/VeritasHotstuff/proto/veritas"
+	pbv "hybrid/VeritasHotstuff/proto/veritashs"
 	"hybrid/VeritasHotstuff/storage"
 
 	"google.golang.org/grpc"
 )
 
 func main() {
-	addr := "127.0.0.1:40071"
-	key := "user1"
-	value := "66666666666666666666666666"
-	redisaddr := "127.0.0.1:30071"
+	addr := "192.168.20.2:50001"
+	key := time.StampMilli       //"user1"
+	value := time.Now().String() //"66666666666666666666666666"
+	redisaddr := "192.168.20.2:6379"
 	rediskv, err := storage.NewRedisKV(redisaddr, "", 1)
 	if err != nil {
 		panic(err)
@@ -28,20 +29,31 @@ func main() {
 	res, err := cli.Set(context.Background(), &pbv.SetRequest{Key: key, Value: value})
 	if err != nil {
 		fmt.Println(err)
+	} else {
+		fmt.Println(res.String())
 	}
 	fmt.Println("Hotstuff Set done.")
-	fmt.Println(res.String())
 
+	// err = rediskv.Set([]byte(key), []byte(value))
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// fmt.Println("rediskv.Set done.")
 	val, err := rediskv.Get([]byte(key))
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(string(val))
+	}
 	fmt.Println("rediskv.Get done.")
-	fmt.Println(string(val), err)
 
 	res1, err := cli.Get(context.Background(), &pbv.GetRequest{Key: key})
 	if err != nil {
 		fmt.Println(err)
+	} else {
+		fmt.Println(res1.Value)
 	}
 	fmt.Println("Hotstuff Get done.")
-	fmt.Println(res1.Value)
 
 	// sets := []*pbv.SetRequest{}
 	// for i := 0; i < 1000; i++ {

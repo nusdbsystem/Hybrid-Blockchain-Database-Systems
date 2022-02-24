@@ -15,10 +15,10 @@ ndrivers=${nodes}
 
 dir=$(pwd)
 echo $dir
-bin="$dir/../VeritasHotstuff/.bin/benchmark_veritashf"
+bin="$dir/../../VeritasHotstuff/.bin/benchmark_veritashf"
 defaultAddrs="192.168.20.2:50001"
-loadPath="$dir/temp/${distribution}/workload${workload}.dat"
-runPath="$dir/temp/${distribution}/run_workload${workload}.dat"
+loadPath="$dir/../temp/${distribution}/workload${workload}.dat"
+runPath="$dir/../temp/${distribution}/run_workload${workload}.dat"
 
 if [ ! -f ${bin} ]; then
     echo "Binary file ${bin} not found!"
@@ -41,15 +41,15 @@ echo "start test with nodes addrs: ${defaultAddrs}"
 
 nCLIENTS="4 8 16 32 64 128 192 256"
 
-for TH in $nCLIENTS; do
+for TH in ${nCLIENTS}; do
     echo "Test start with node size: ${nodes}, client size: ${TH}, workload${workload}"
     nthreads=$(( ${TH} / ${ndrivers} ))
     ./restart_cluster_veritas_hotstuff.sh
     ./start_veritas_hotstuff.sh        
-    sleep 6
+    
     $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/veritas_hotstuff-clients-$TH.txt 2>&1 
 done
 
-echo "Experiments $LOGSD finished!"
-# sudo ./unset_ovs_veritas_hotstuff.sh
-# ./kill_containers_veritas_hotstuff.sh
+echo "Experiments ${LOGSD} finished!"
+
+
