@@ -3,7 +3,7 @@ module hybrid
 go 1.15
 
 require (
-	github.com/EinWTW/hotstuff v0.2.3-0.20220224090305-51afe7ed9854
+	github.com/EinWTW/hotstuff v0.2.3-0.20220224190435-4af51dce14e0
 	github.com/Workiva/go-datastructures v1.0.53 // indirect
 	github.com/adlio/schema v1.1.14 // indirect
 	github.com/allegro/bigcache v1.2.1 // indirect

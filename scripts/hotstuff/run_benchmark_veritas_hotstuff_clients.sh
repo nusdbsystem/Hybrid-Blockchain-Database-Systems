@@ -38,7 +38,7 @@ defaultAddrs="${defaultAddrs},192.168.20.$((1+ ${c})):50001"
 done
 echo "start test with nodes addrs: ${defaultAddrs}"
 
-
+#
 nCLIENTS="4 8 16 32 64 128 192 256"
 
 for TH in ${nCLIENTS}; do

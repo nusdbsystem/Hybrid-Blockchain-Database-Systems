@@ -15,7 +15,7 @@ ndrivers=${nodes}
 
 dir=$(pwd)
 echo $dir
-bin="$dir/../VeritasHotstuff/.bin/benchmark_veritashf"
+bin="$dir/../../VeritasHotstuff/.bin/benchmark_veritashf"
 defaultAddrs="192.168.20.2:50001"
 nthreads=$(( ${clients} / ${ndrivers} ))
 
@@ -42,8 +42,8 @@ nTXSIZES="ycsb_data_512B ycsb_data_2kB ycsb_data_8kB ycsb_data_32kB ycsb_data_12
 
 for TH in $nTXSIZES; do
     echo "Test start with node size: ${nodes}, client size: ${clients}, workload${workload}, TxSize: ${TH}"
-    loadPath="$dir/temp/${TH}/workload${workload}.dat"
-    runPath="$dir/temp/${TH}/run_workload${workload}.dat"
+    loadPath="$dir/../temp/${TH}/workload${workload}.dat"
+    runPath="$dir/../temp/${TH}/run_workload${workload}.dat"
     ./restart_cluster_veritas_hotstuff.sh 
     ./start_veritas_hotstuff.sh       
     

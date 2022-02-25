@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. ./env.sh
+# . ./env.sh
 
 nodes=${1:-4}
 # Nodes

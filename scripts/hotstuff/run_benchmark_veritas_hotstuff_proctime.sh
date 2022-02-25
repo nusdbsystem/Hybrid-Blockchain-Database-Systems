@@ -14,11 +14,11 @@ ndrivers=${nodes}
 
 dir=$(pwd)
 echo $dir
-bin="$dir/../VeritasHotstuff/.bin/benchmark_veritashf"
+bin="$dir/../../VeritasHotstuff/.bin/benchmark_veritashf"
 defaultAddrs="192.168.20.2:50001"
 nthreads=$(( ${clients} / ${ndrivers} ))
-loadPath="$dir/temp/${distribution}/workload${workload}.dat"
-runPath="$dir/temp/${distribution}/run_workload${workload}.dat"
+loadPath="$dir/../temp/${distribution}/workload${workload}.dat"
+runPath="$dir/../temp/${distribution}/run_workload${workload}.dat"
 
 if [ ! -f ${bin} ]; then
     echo "Binary file ${bin} not found!"
@@ -45,7 +45,7 @@ for TH in $TXDELAYS; do
     echo "Test start with node size: ${nodes}, client size: ${clients}, workload${workload}, TxSize: ${TH}"
     ./restart_cluster_veritas_hotstuff.sh 
     ./start_veritas_hotstuff.sh ${nodes} ${TH}      
-    sleep 10
+   
     $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/veritas_hotstuff-txdelay-$TH.txt 2>&1
 done
 

@@ -2,7 +2,8 @@
 set -ex
 
 nodes=${1:-4}
-txdelay=${2:-0}
+delay=${2:-0}
+blksize=${3:-100}
 PREFIX="192.168.20."
 dir=$(dirname "$0")
 tomlDir="$dir/toml.${nodes}"
@@ -30,12 +31,15 @@ echo 'leader-id = 1' >> ${tomlFile}
 echo "root-cas = [\"keys/ca.crt\"]" >> ${tomlFile}
 echo "privkey = \"keys/r${c}.key\"" >> ${tomlFile}
 echo 'rate-limit = 0' >> ${tomlFile}
+echo "tx-delay = ${delay}" >> ${tomlFile}
+# echo "blk-size = ${blksize}" >> ${tomlFile}
 #echo 'benchmark = false' >> ${tomlFile}
 echo 'tls = false' >> ${tomlFile}
-echo 'batch-size = 100' >> ${tomlFile}
+echo "batch-size =  ${blksize}" >> ${tomlFile}
 echo "max-inflight = 10000" >> ${tomlFile}
 echo "view-timeout = 1000" >> ${tomlFile}
 echo "print-commands = true" >> ${tomlFile}
+echo "print-throughput = true" >> ${tomlFile}
 echo "client-listen = \"${PREFIX}${IPX}:20070\"" >> ${tomlFile}
 echo "self-veritas-node = \"${PREFIX}${IPX}:50001\"" >> ${tomlFile}
 echo "self-redis-address = \"${PREFIX}${IPX}:6379\"" >> ${tomlFile}

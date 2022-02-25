@@ -15,11 +15,11 @@ ndrivers=${nodes}
 
 dir=$(pwd)
 echo $dir
-bin="$dir/../VeritasHotstuff/.bin/benchmark_veritashf"
+bin="$dir/../../VeritasHotstuff/.bin/benchmark_veritashf"
 defaultAddrs="192.168.20.2:50001"
 nthreads=$(( ${clients} / ${ndrivers} ))
-loadPath="$dir/temp/${distribution}/workload${workload}.dat"
-runPath="$dir/temp/${distribution}/run_workload${workload}.dat"
+loadPath="$dir/../temp/${distribution}/workload${workload}.dat"
+runPath="$dir/../temp/${distribution}/run_workload${workload}.dat"
 
 if [ ! -f ${bin} ]; then
     echo "Binary file ${bin} not found!"
@@ -44,17 +44,21 @@ RTTS="5ms 10ms 20ms 30ms 40ms 50ms 60ms"
 
 for BW in $BWS; do    
     for RTT in $RTTS; do
-	    LOGSDD="$LOGS/logs-$BW-$RTT"
-	    mkdir $LOGSDD
+	    LOGSDD="${LOGSD}/logs-$BW-$RTT"
+	    mkdir ${LOGSDD}
         echo "Test start with node size: ${nodes}, client size: ${clients}, workload${workload}, TxSize: ${TH}"
         ./restart_cluster_veritas_hotstuff.sh 
         if [[ "$BW" != "NoLimit" ]]; then
             sudo ./set_ovs_bs_limit.sh $BW 1
         fi
-	    ./set_tc.sh $RTT
+	    cd ..
+        ./set_tc.sh $RTT
+        cd -
 	    sleep 3
         ./start_veritas_hotstuff.sh    
-        ./run_iperf_ping.sh 2>&1 | tee $LOGSDD/net.txt 
+        cd ..
+        ./run_iperf_ping.sh 2>&1 | tee ${LOGSDD}/net.txt 
+        cd -
         sleep 3
         $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/veritas_hotstuff--$BW-$RTT.txt 2>&1
     done

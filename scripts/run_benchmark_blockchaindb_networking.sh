@@ -46,7 +46,7 @@ RTTS="5ms 10ms 20ms 30ms 40ms 50ms 60ms"
 
 for BW in $BWS; do    
     for RTT in $RTTS; do
-	    LOGSDD="$LOGS/logs-$BW-$RTT"
+	    LOGSDD="${LOGSD}/logs-$BW-$RTT"
 	    mkdir $LOGSDD
         echo "Test start with node size: ${size}, client size: ${clients}, workload${workload}, TxSize: ${TH}"
         ./restart_cluster_blockchaindb.sh 

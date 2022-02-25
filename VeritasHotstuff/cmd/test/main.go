@@ -33,7 +33,7 @@ func main() {
 		fmt.Println(res.String())
 	}
 	fmt.Println("Hotstuff Set done.")
-
+	time.Sleep(time.Duration(5) * time.Second)
 	// err = rediskv.Set([]byte(key), []byte(value))
 	// if err != nil {
 	// 	fmt.Println(err)
