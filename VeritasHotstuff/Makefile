@@ -3,7 +3,9 @@ clients := 4
 
 .PHONY: all build clean download build protos init generate install test
 
-all: build init generate install
+all: build 
+
+start: init generate install
 
 build: 
 	@rm -f ./.bin/veritasnode ./.bin/hotstuffserver ./.bin/benchmark_veritashf

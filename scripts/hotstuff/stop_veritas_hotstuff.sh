@@ -11,3 +11,5 @@ nodes=${1:-4}
 
 ps -ef | grep veritasnode| wc -l
 pkill -f "veritasnode"
+ps -ef | grep hotstufferver| wc -l
+pkill -f "hotstuffserver"
