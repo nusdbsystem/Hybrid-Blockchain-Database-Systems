@@ -6,66 +6,45 @@ import (
 	"google.golang.org/grpc"
 
 	pbv "hybrid/proto/veritas"
-	"hybrid/tso"
-	"hybrid/veritas/db"
 )
 
 type Driver struct {
 	signature string
 	cc        *grpc.ClientConn
 	dbCli     pbv.NodeClient
-	tsCli     *tso.Client
 }
 
-func Open(serverAddr, tsoAddr, signature string) (*Driver, error) {
+func Open(serverAddr, signature string) (*Driver, error) {
 	cc, err := grpc.Dial(serverAddr, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
 	dbCli := pbv.NewNodeClient(cc)
 
-	tsCli, err := tso.NewClient(tsoAddr)
-	if err != nil {
-		return nil, err
-	}
-
 	return &Driver{
 		signature: signature,
 		cc:        cc,
 		dbCli:     dbCli,
-		tsCli:     tsCli,
 	}, nil
 }
 
-func (d *Driver) Begin() (*db.TransactionDB, error) {
-	ts, err := d.tsCli.TS()
-	if err != nil {
-		return nil, err
-	}
-	return db.NewTransaction(ts, d.dbCli, d.signature), nil
-}
-
-func (d *Driver) Get(ctx context.Context, key string) (string, error) {
+func (d *Driver) Get(ctx context.Context, key string) (string, int64, error) {
 	res, err := d.dbCli.Get(ctx, &pbv.GetRequest{
 		Signature: d.signature,
 		Key:       key,
 	})
 	if err != nil {
-		return "", err
+		return "", -1, err
 	}
-	return res.GetValue(), nil
+	return res.GetValue(), res.GetVersion(), nil
 }
 
-func (d *Driver) Set(ctx context.Context, key, value string) error {
-	ts, err := d.tsCli.TS()
-	if err != nil {
-		return err
-	}
+func (d *Driver) Set(ctx context.Context, key, value string, version int64) error {
 	if _, err := d.dbCli.Set(ctx, &pbv.SetRequest{
 		Signature: d.signature,
 		Key:       key,
 		Value:     value,
-		Version:   ts,
+		Version:   version,
 	}); err != nil {
 		return err
 	}

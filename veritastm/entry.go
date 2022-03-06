@@ -1,4 +1,4 @@
-package veritas
+package veritastm
 
 import (
 	jsoniter "github.com/json-iterator/go"

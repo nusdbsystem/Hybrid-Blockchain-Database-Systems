@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"hybrid/veritas/ledger"
 	"log"
+	"strconv"
 
 	"github.com/go-redis/redis/v8"
 	abcitypes "github.com/tendermint/tendermint/abci/types"
@@ -37,12 +38,47 @@ func (LedgerApp) Info(req abcitypes.RequestInfo) abcitypes.ResponseInfo {
 }
 
 func (l *LedgerApp) DeliverTx(req abcitypes.RequestDeliverTx) abcitypes.ResponseDeliverTx {
+	// first, check MVCC
 	parts := bytes.Split(req.Tx, []byte("="))
-	key, val := parts[0], parts[1]
-	l.ledger.Append(key, val)
-	err := l.db.Set(context.Background(), string(key), string(val), 0).Err()
+	vparts := bytes.Split(parts[1], []byte("#"))
+	key := parts[0]
+	val := vparts[0]
+	ver, err := strconv.ParseInt(string(vparts[1]), 10, 64)
 	if err != nil {
-		fmt.Printf("Error in Set DeliverTx: %v\n", err)
+		fmt.Printf("Error in Set DeliverTx version parseInt: %v\n", err)
+		return abcitypes.ResponseDeliverTx{Code: 1}
+	}
+	res, err := l.db.Get(context.Background(), string(key)).Result()
+	var localVer int64
+	localVer = 0
+	if err != nil {
+		if err != redis.Nil {
+			fmt.Printf("Error in Set DeliverTx DB Get: %v\n", err)
+			return abcitypes.ResponseDeliverTx{Code: 2}
+		}
+	} else {
+		vres, err := Decode(res)
+		if err != nil {
+			fmt.Printf("Error in Set DeliverTx Decode: %v\n", err)
+			return abcitypes.ResponseDeliverTx{Code: 3}
+		}
+		localVer = vres.Version
+	}
+	if localVer > ver {
+		fmt.Printf("Abort tx due to MVCC\n")
+		return abcitypes.ResponseDeliverTx{Code: 4}
+	}
+	// second, append to ledger and set to DB
+	entry, err := Encode(string(val), ver+1)
+	if err != nil {
+		fmt.Printf("Error in Set DeliverTx Encode: %v\n", err)
+		return abcitypes.ResponseDeliverTx{Code: 5}
+	}
+	l.ledger.Append(key, []byte(entry))
+	err = l.db.Set(context.Background(), string(key), string(entry), 0).Err()
+	if err != nil {
+		fmt.Printf("Error in Set DeliverTx DB Set: %v\n", err)
+		return abcitypes.ResponseDeliverTx{Code: 6}
 	}
 	return abcitypes.ResponseDeliverTx{Code: 0}
 }

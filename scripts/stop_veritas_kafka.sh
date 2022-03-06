@@ -12,9 +12,6 @@ else
         echo -e "\tDefault: 5 containers"        
 fi
 
-#TSO
-killall -9 veritas-tso
-
 # Kafka
 KAFKA_ADDR=$IPPREFIX".$(($N+1))"
 RES=`kafkacat -b $KAFKA_ADDR:9092 -L 2>&1`

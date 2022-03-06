@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -21,22 +22,8 @@ var (
 	dataRun           = kingpin.Flag("run-path", "Path of YCSB operation data").Required().String()
 	driverNum         = kingpin.Flag("ndrivers", "Number of drivers for sending requests").Default("4").Int()
 	driverConcurrency = kingpin.Flag("nthreads", "Number of threads for each driver").Default("10").Int()
-	veritasAddrs      = kingpin.Flag("veritas-addrs", "Address of veritas nodes").Required().String()
-	tsoAddr           = kingpin.Flag("tso-addr", "TSO server address").Required().String()
+	veritasAddrs      = kingpin.Flag("veritas-addrs", "Address of Veritas nodes").Required().String()
 )
-
-func encodeVal(val string) string {
-        runes := []rune(val)
-        for i := 0; i < len(runes); i++ {
-                if (runes[i] >= 'a' && runes[i] <= 'z') ||
-                        (runes[i] >= 'A' && runes[i] <= 'Z') ||
-                        (runes[i] >= '0' && runes[i] <= '9') {
-                        continue
-                }
-                runes[i] = '0'
-        }
-        return string(runes)
-}
 
 func main() {
 	kingpin.Parse()
@@ -49,13 +36,14 @@ func main() {
 		}
 	}()
 	for i := 0; i < *driverNum; i++ {
-		cli, err := driver.Open(addrs[i%len(addrs)], *tsoAddr, benchmark.GenRandString(16))
+		cli, err := driver.Open(addrs[i%len(addrs)], benchmark.GenRandString(16))
 		if err != nil {
 			panic(err)
 		}
 		clis = append(clis, cli)
 	}
 
+	fmt.Println("Start loading ...")
 	reqNum := atomic.NewInt64(0)
 
 	loadFile, err := os.Open(*dataLoad)
@@ -63,15 +51,15 @@ func main() {
 		panic(err)
 	}
 	defer loadFile.Close()
-	loadBuf := make(chan [2]string, 10)
+	loadBuf := make(chan [3]string, 10)
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		defer close(loadBuf)
 		if err := benchmark.LineByLine(loadFile, func(line string) error {
-			operands := strings.SplitN(line, " ", 4)
-			loadBuf <- [2]string{operands[2], encodeVal(operands[3])}
+			operands := strings.SplitN(line, " ", 5)
+			loadBuf <- [3]string{operands[2], operands[3], operands[4]}
 			return nil
 		}); err != nil {
 			panic(err)
@@ -94,12 +82,18 @@ func main() {
 		go func() {
 			defer wg.Done()
 			for kv := range loadBuf {
-				clis[0].Set(context.Background(), kv[0], kv[1])
+				ver, err := strconv.ParseInt(kv[2], 10, 64)
+				if err != nil {
+					panic(err)
+				}
+				clis[0].Set(context.Background(), kv[0], kv[1], ver)
 			}
 		}()
 	}
 	wg.Wait()
+	fmt.Println("End loading ...")
 
+	fmt.Println("Start running ...")
 	runFile, err := os.Open(*dataRun)
 	if err != nil {
 		panic(err)
@@ -112,7 +106,11 @@ func main() {
 		defer close(runBuf)
 		if err := benchmark.LineByLine(runFile, func(line string) error {
 			reqNum.Add(1)
-			operands := strings.SplitN(line, " ", 4)
+			operands := strings.SplitN(line, " ", 5)
+			ver, err := strconv.ParseInt(operands[4], 10, 64)
+			if err != nil {
+				panic(err)
+			}
 			r := &benchmark.Request{
 				Key: operands[2],
 			}
@@ -120,7 +118,8 @@ func main() {
 				r.ReqType = benchmark.GetOp
 			} else {
 				r.ReqType = benchmark.SetOp
-				r.Val = encodeVal(operands[3])
+				r.Val = operands[3]
+				r.Version = ver
 			}
 			runBuf <- r
 			return nil
@@ -143,7 +142,7 @@ func main() {
 						latencyCh <- time.Since(start)
 					case benchmark.SetOp:
 						start := time.Now()
-						clis[seq].Set(context.Background(), op.Key, op.Val)
+						clis[seq].Set(context.Background(), op.Key, op.Val, op.Version)
 						latencyCh <- time.Since(start)
 					default:
 						panic(fmt.Sprintf("invalid operation: %v", op.ReqType))

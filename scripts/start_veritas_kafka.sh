@@ -21,9 +21,6 @@ else
         echo -e "\tDefault: $BLKSIZE block size"
 fi
 
-#TSO
-../bin/veritas-tso --addr=":7070" > tso.log 2>&1 &
-
 # Kafka
 KAFKA_ADDR=$IPPREFIX".$(($N+1))"
 ssh -o StrictHostKeyChecking=no root@$KAFKA_ADDR "cd /kafka_2.12-2.7.0/config && echo 'advertised.listeners=PLAINTEXT://$KAFKA_ADDR:9092' >> server.properties"

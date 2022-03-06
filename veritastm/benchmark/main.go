@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"hybrid/veritastm"
 	"os"
@@ -43,20 +44,21 @@ func main() {
 
 	fmt.Println("Start loading ...")
 	reqNum := atomic.NewInt64(0)
+
 	loadFile, err := os.Open(*dataLoad)
 	if err != nil {
 		panic(err)
 	}
 	defer loadFile.Close()
-	loadBuf := make(chan [2]string, 10)
+	loadBuf := make(chan [3]string, 10)
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		defer close(loadBuf)
 		if err := veritastm.LineByLine(loadFile, func(line string) error {
-			operands := strings.SplitN(line, " ", 4)
-			loadBuf <- [2]string{operands[2], operands[3]}
+			operands := strings.SplitN(line, " ", 5)
+			loadBuf <- [3]string{operands[2], operands[3], operands[4]}
 			return nil
 		}); err != nil {
 			panic(err)
@@ -74,12 +76,16 @@ func main() {
 		}
 		avaLatency = float64(all) / (1000 * float64(reqNum.Load()))
 	}()
-	for i := 0; i < 500; i++ {
+	for i := 0; i < 100; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			for kv := range loadBuf {
-				clis[0].Set(context.Background(), kv[0], kv[1])
+				ver, err := strconv.ParseInt(kv[2], 10, 64)
+				if err != nil {
+					panic(err)
+				}
+				clis[0].Set(context.Background(), kv[0], kv[1], ver)
 			}
 		}()
 	}
@@ -99,7 +105,11 @@ func main() {
 		defer close(runBuf)
 		if err := veritastm.LineByLine(runFile, func(line string) error {
 			reqNum.Add(1)
-			operands := strings.SplitN(line, " ", 4)
+			operands := strings.SplitN(line, " ", 5)
+			ver, err := strconv.ParseInt(operands[4], 10, 64)
+			if err != nil {
+				panic(err)
+			}
 			r := &veritastm.Request{
 				Key: operands[2],
 			}
@@ -108,6 +118,7 @@ func main() {
 			} else {
 				r.ReqType = veritastm.SetOp
 				r.Val = operands[3]
+				r.Version = ver
 			}
 			runBuf <- r
 			return nil
@@ -130,7 +141,7 @@ func main() {
 						latencyCh <- time.Since(start)
 					case veritastm.SetOp:
 						start := time.Now()
-						clis[seq].Set(context.Background(), op.Key, op.Val)
+						clis[seq].Set(context.Background(), op.Key, op.Val, op.Version)
 						latencyCh <- time.Since(start)
 					default:
 						panic(fmt.Sprintf("invalid operation: %v", op.ReqType))

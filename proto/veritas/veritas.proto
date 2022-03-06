@@ -6,18 +6,20 @@ option go_package = "proto/veritas";
 service Node {
     rpc Get (GetRequest) returns (GetResponse);
     rpc Set (SetRequest) returns (SetResponse);
-    rpc Verify(VerifyRequest) returns (VerifyResponse);
-    rpc BatchSet (BatchSetRequest) returns (BatchSetResponse);
+    rpc Verify(VerifyRequest) returns (VerifyResponse);    
 }
 
 message VerifyRequest {
-    string key = 1;
+    string signature = 1;
+    string key = 2;
 }
 
 message VerifyResponse {
-    bytes root_digest = 1;
-    repeated bytes side_nodes = 2;
-    bytes non_membership_leaf_data = 3;
+    string value = 1;
+    int64 version = 2;
+    bytes root_digest = 3;
+    repeated bytes side_nodes = 4;
+    bytes non_membership_leaf_data = 5;
 }
 
 enum MessageType {
@@ -30,10 +32,11 @@ message SharedLog {
     repeated SetRequest sets = 2;
 }
 
-message Block {
+message Block {    
     repeated SharedLog txs = 1;
     MessageType type = 2;
     string signature = 3;
+    string blkId = 4;
 }
 
 message GetRequest {
@@ -43,6 +46,7 @@ message GetRequest {
 
 message GetResponse {
     string value = 1;
+    int64 version = 2;
 }
 
 message SetRequest {
@@ -54,13 +58,4 @@ message SetRequest {
 
 message SetResponse {
     string txid = 1;
-}
-
-message BatchSetRequest {
-    string signature = 1;
-    repeated SetRequest sets = 2;
-}
-
-message BatchSetResponse {
-    // Empty.
 }

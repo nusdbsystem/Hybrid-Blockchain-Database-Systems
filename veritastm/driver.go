@@ -39,11 +39,12 @@ func (d *Driver) Get(ctx context.Context, key string) (string, error) {
 	return res.GetValue(), nil
 }
 
-func (d *Driver) Set(ctx context.Context, key, value string) (string, error) {
+func (d *Driver) Set(ctx context.Context, key, value string, version int64) (string, error) {
 	res, err := d.dbCli.Set(ctx, &pbv.SetRequest{
 		Signature: d.signature,
 		Key:       key,
 		Value:     value,
+		Version:   version,
 	})
 
 	if err != nil {

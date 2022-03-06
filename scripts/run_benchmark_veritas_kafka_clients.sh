@@ -22,7 +22,7 @@ done
 for TH in $THREADS; do
     ./restart_cluster_veritas.sh
     ./start_veritas_kafka.sh    
-    ../bin/veritas-kafka-bench --load-path=$WORKLOAD_FILE --run-path=$WORKLOAD_RUN_FILE --ndrivers=$DRIVERS --nthreads=$TH --veritas-addrs=$ADDRS --tso-addr=:7070 2>&1 | tee $LOGS/veritas-clients-$TH.txt
+    ../bin/veritas-kafka-bench --load-path=$WORKLOAD_FILE --run-path=$WORKLOAD_RUN_FILE --ndrivers=$DRIVERS --nthreads=$TH --veritas-addrs=$ADDRS 2>&1 | tee $LOGS/veritas-clients-$TH.txt
     # copy logs
     SLOGS="$LOGS/veritas-clients-$TH-logs"
     mkdir -p $SLOGS

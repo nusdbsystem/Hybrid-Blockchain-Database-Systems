@@ -2,17 +2,17 @@ package veritas
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"log"
-	"sync"
 	"time"
+
+	"go.uber.org/atomic"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/golang/protobuf/proto"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 
 	pbv "hybrid/proto/veritas"
-	"hybrid/veritas/keylocker"
 	"hybrid/veritas/ledger"
 )
 
@@ -20,19 +20,12 @@ type server struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 	config *Config
-
-	l *ledger.LogLedger
-
-	cli *redis.Client
-
+	l      *ledger.LogLedger
+	blkcnt *atomic.Int64
+	cli    *redis.Client
 	puller *kafka.Consumer
 	pusher *kafka.Producer
-	locker keylocker.KLocker
-
-	mu     *sync.RWMutex
-	buffer map[int64]*BlockPurpose
-
-	msgCh chan *pbv.SharedLog
+	msgCh  chan *pbv.SharedLog
 }
 
 type BlockPurpose struct {
@@ -50,13 +43,11 @@ func NewServer(redisCli *redis.Client, consumer *kafka.Consumer, producer *kafka
 		ctx:    ctx,
 		cancel: cancel,
 		l:      l,
+		blkcnt: atomic.NewInt64(0),
 		config: config,
 		cli:    redisCli,
 		puller: consumer,
 		pusher: producer,
-		locker: &keylocker.KMutex{},
-		mu:     &sync.RWMutex{},
-		buffer: make(map[int64]*BlockPurpose),
 		msgCh:  make(chan *pbv.SharedLog, 10000),
 	}
 	if err := s.puller.Subscribe(config.Topic, nil); err != nil {
@@ -65,6 +56,35 @@ func NewServer(redisCli *redis.Client, consumer *kafka.Consumer, producer *kafka
 	go s.applyLoop()
 	go s.batchLoop()
 	return s
+}
+
+func (s *server) verifyAndCommit(msg *kafka.Message, block pbv.Block) {
+	for _, sl := range block.Txs {
+		for _, t := range sl.Sets {
+			res, err := s.cli.Get(s.ctx, t.GetKey()).Result()
+			if err != nil && err != redis.Nil {
+				log.Fatalf("Commit log %v DB get failed: %v", block.GetBlkId(), err)
+			}
+			if err == nil {
+				v, err := Decode(res)
+				if err != nil {
+					log.Fatalf("Commit log %v decode failed: %v", block.GetBlkId(), err)
+				}
+				if v.Version > t.Version {
+					log.Printf("Abort transaction in block %v for key %s local version %d request version %d\n", block.GetBlkId(), t.GetKey(), v.Version, t.Version)
+					continue
+				}
+			}
+			entry, err := Encode(t.GetValue(), t.GetVersion()+1)
+			if err != nil {
+				log.Fatalf("Commit log %v encode failed: %v", block.GetBlkId(), err)
+			}
+			if err := s.cli.Set(s.ctx, t.GetKey(), entry, 0).Err(); err != nil {
+				log.Fatalf("Commit log %v redis set failed: %v", block.GetBlkId(), err)
+			}
+		}
+	}
+	s.l.AppendBlk(msg.Value) // avoid remarshalling from blkBuf.blk
 }
 
 func (s *server) applyLoop() {
@@ -84,113 +104,27 @@ func (s *server) applyLoop() {
 		}
 		switch blk.GetType() {
 		case pbv.MessageType_Approve:
-			if blk.Signature == s.config.Signature {
-				break
-			}
-			s.mu.RLock()
-			_, ok := s.buffer[blk.Txs[0].Seq]
-			s.mu.RUnlock()
-			if !ok {
-				if _, o := s.config.Parties[blk.Signature]; !o {
-					break
-				}
-				s.mu.Lock()
-				s.buffer[blk.Txs[0].Seq] = &BlockPurpose{
-					blk:      &blk,
-					approved: make(map[string]struct{}),
-				}
-				s.mu.Unlock()
-			}
-			s.mu.Lock()
-			s.buffer[blk.Txs[0].Seq].approved[blk.Signature] = struct{}{}
-			s.mu.Unlock()
-			s.mu.RLock()
-			_, ok = s.buffer[blk.Txs[0].Seq].approved[s.config.Signature]
-			s.mu.RUnlock()
-			if !ok {
-				verifyRes := pbv.MessageType_Approve
-			LOOP:
-				for _, sl := range blk.Txs {
-					for _, t := range sl.Sets {
-						res, err := s.cli.Get(s.ctx, t.GetKey()).Result()
-						if err == redis.Nil {
-							continue
-						} else if err != nil {
-							log.Fatalf("Commit log %v get failed: %v", blk.Txs[0].GetSeq(), err)
-						}
-						v, err := Decode(res)
-						if err != nil {
-							log.Fatalf("Commit log %v decode failed: %v", blk.Txs[0].GetSeq(), err)
-						}
-						if v.Version >= t.Version {
-							verifyRes = pbv.MessageType_Abort
-							break LOOP
-						}
-					}
-				}
-				go func() {
-					approveLog, err := proto.Marshal(&pbv.Block{
-						Txs:       blk.Txs,
-						Type:      verifyRes,
-						Signature: s.config.Signature,
-					})
-					if err != nil {
-						log.Fatalf("Approve log %v failed: %v", blk.Txs[0].GetSeq(), err)
-					}
-					if err := s.pusher.Produce(&kafka.Message{
-						TopicPartition: kafka.TopicPartition{Topic: &s.config.Topic, Partition: kafka.PartitionAny},
-						Value:          approveLog,
-					}, nil); err != nil {
-						log.Fatalf("%s produce approve %v failded: %v", s.config.Signature, blk.Txs[0].Seq, err)
-					}
-				}()
-				if verifyRes == pbv.MessageType_Approve {
-					s.mu.Lock()
-					s.buffer[blk.Txs[0].Seq].approved[s.config.Signature] = struct{}{}
-					s.mu.Unlock()
-				} else {
-					s.mu.Lock()
-					ntx := len(blk.Txs[0].Sets)
-					delete(s.buffer, blk.Txs[0].Seq)
-					s.mu.Unlock()
-					log.Printf("Abort transaction %d\n", ntx)
-					break
-				}
-			}
-			s.mu.RLock()
-			approveLen := len(s.buffer[blk.Txs[0].Seq].approved)
-			s.mu.RUnlock()
-			if approveLen != len(s.config.Parties) {
-				break
-			}
-			var blkBuf *BlockPurpose
-			s.mu.RLock()
-			blkBuf = s.buffer[blk.Txs[0].Seq]
-			s.mu.RUnlock()
-			for _, sl := range blkBuf.blk.Txs {
-				for _, t := range sl.Sets {
-					entry, err := Encode(t.GetValue(), t.GetVersion())
-					if err != nil {
-						log.Fatalf("Commit log %v encode failed: %v", blkBuf.blk.Txs[0].GetSeq(), err)
-					}
-					if err := s.cli.Set(s.ctx, t.GetKey(), entry, 0).Err(); err != nil {
-						log.Fatalf("Commit log %v redis set failed: %v", blkBuf.blk.Txs[0].GetSeq(), err)
-					}
-					if err := s.l.Append([]byte(t.GetKey()), []byte(t.GetValue()+"-"+fmt.Sprintf("%v", t.GetVersion()))); err != nil {
-						log.Fatalf("Append to ledger failed: %v", err)
-					}
-				}
-			}
-			s.l.AppendBlk(msg.Value) // avoid remarshalling from blkBuf.blk
-			s.mu.Lock()
-			delete(s.buffer, blkBuf.blk.Txs[0].Seq)
-			s.mu.Unlock()
-		case pbv.MessageType_Abort:
-			delete(s.buffer, blk.Txs[0].Seq)
+			s.verifyAndCommit(msg, blk)
 		default:
 			log.Fatalf("Invalid shared log type: %v", blk.GetType())
 		}
 	}
+}
+
+func (s *server) sendBlock(block *pbv.Block) {
+	block.BlkId = s.config.Signature + "_" + string(s.blkcnt.Load())
+	blkLog, err := proto.Marshal(block)
+	if err != nil {
+		log.Fatalf("Block log failed: %v", err)
+	}
+	if err := s.pusher.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{Topic: &s.config.Topic, Partition: kafka.PartitionAny},
+		Value:          blkLog,
+	}, nil); err != nil {
+		log.Fatalf("%s produce block log failded: %v", s.config.Signature, err)
+	}
+	// empty block for next round
+	block.Txs = make([]*pbv.SharedLog, 0)
 }
 
 func (s *server) batchLoop() {
@@ -208,56 +142,12 @@ func (s *server) batchLoop() {
 			return
 		case <-t.C:
 			if len(block.Txs) > 0 {
-				blkLog, err := proto.Marshal(block)
-				if err != nil {
-					log.Fatalf("Block log failed: %v", err)
-				}
-				if err := s.pusher.Produce(&kafka.Message{
-					TopicPartition: kafka.TopicPartition{Topic: &s.config.Topic, Partition: kafka.PartitionAny},
-					Value:          blkLog,
-				}, nil); err != nil {
-					log.Fatalf("%s produce block log failded: %v", s.config.Signature, err)
-				}
-				blockTmp := &pbv.Block{
-					Txs:       make([]*pbv.SharedLog, len(block.Txs)),
-					Type:      block.Type,
-					Signature: block.Signature,
-				}
-				copy(blockTmp.Txs, block.Txs)
-				s.mu.Lock()
-				s.buffer[blockTmp.Txs[0].Seq] = &BlockPurpose{
-					blk:      blockTmp,
-					approved: map[string]struct{}{s.config.Signature: {}},
-				}
-				s.mu.Unlock()
-				block.Txs = make([]*pbv.SharedLog, 0)
+				s.sendBlock(block)
 			}
 		case txn := <-s.msgCh:
 			block.Txs = append(block.Txs, txn)
 			if len(block.Txs) >= s.config.BlockSize {
-				blkLog, err := proto.Marshal(block)
-				if err != nil {
-					log.Fatalf("Block log failed: %v", err)
-				}
-				if err := s.pusher.Produce(&kafka.Message{
-					TopicPartition: kafka.TopicPartition{Topic: &s.config.Topic, Partition: kafka.PartitionAny},
-					Value:          blkLog,
-				}, nil); err != nil {
-					log.Fatalf("%s produce block log failded: %v", s.config.Signature, err)
-				}
-				blockTmp := &pbv.Block{
-					Txs:       make([]*pbv.SharedLog, len(block.Txs)),
-					Type:      block.Type,
-					Signature: block.Signature,
-				}
-				copy(blockTmp.Txs, block.Txs)
-				s.mu.Lock()
-				s.buffer[blockTmp.Txs[0].Seq] = &BlockPurpose{
-					blk:      blockTmp,
-					approved: map[string]struct{}{s.config.Signature: {}},
-				}
-				s.mu.Unlock()
-				block.Txs = make([]*pbv.SharedLog, 0)
+				s.sendBlock(block)
 			}
 		}
 	}
@@ -273,13 +163,20 @@ func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse
 		return nil, err
 	}
 
-	return &pbv.GetResponse{Value: v.Val}, nil
+	return &pbv.GetResponse{Value: v.Val, Version: v.Version}, nil
 }
 
 func (s *server) Set(ctx context.Context, req *pbv.SetRequest) (*pbv.SetResponse, error) {
-	s.locker.Lock(req.GetKey())
-	defer s.locker.Unlock(req.GetKey())
-
+	// check version
+	getReq := &pbv.GetRequest{
+		Signature: req.GetSignature(),
+		Key:       req.GetKey(),
+	}
+	record, _ := s.Get(ctx, getReq)
+	if record != nil && record.Version > req.GetVersion() {
+		return &pbv.SetResponse{}, errors.New("Rejected (wrong version)")
+	}
+	// prepare request
 	sets := []*pbv.SetRequest{{
 		Signature: req.GetSignature(),
 		Key:       req.GetKey(),
@@ -303,22 +200,4 @@ func (s *server) Verify(ctx context.Context, req *pbv.VerifyRequest) (*pbv.Verif
 		SideNodes:             proof.SideNodes,
 		NonMembershipLeafData: proof.NonMembershipLeafData,
 	}, nil
-}
-
-func (s *server) BatchSet(ctx context.Context, req *pbv.BatchSetRequest) (*pbv.BatchSetResponse, error) {
-	for _, r := range req.GetSets() {
-		s.locker.Lock(r.GetKey())
-	}
-	defer func() {
-		for _, r := range req.GetSets() {
-			s.locker.Unlock(r.GetKey())
-		}
-	}()
-
-	s.msgCh <- &pbv.SharedLog{
-		Seq:  req.GetSets()[0].GetVersion(),
-		Sets: req.GetSets(),
-	}
-
-	return &pbv.BatchSetResponse{}, nil
 }

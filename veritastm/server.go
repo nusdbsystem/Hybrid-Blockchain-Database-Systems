@@ -66,16 +66,22 @@ func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse
 }
 
 func (s *server) Set(ctx context.Context, req *pbv.SetRequest) (*pbv.SetResponse, error) {
+	// check version
+	getReq := &pbv.GetRequest{
+		Signature: req.GetSignature(),
+		Key:       req.GetKey(),
+	}
+	record, _ := s.Get(ctx, getReq)
+	if record != nil && record.Version > req.GetVersion() {
+		return &pbv.SetResponse{}, errors.New("Rejected (wrong version)")
+	}
 	// send transaction to ledger and wait for it to be committed
+	// Format: key=value#version#signature+timestamp
 	// append node signature and timestamp to make it unique
 	t := time.Now().Unix()
-	ts := fmt.Sprintf("%s=%s%d", req.GetValue(), s.signature, t)
+	tx := fmt.Sprintf("%s=%s#%d#%s%d", req.GetKey(), req.GetValue(), req.GetVersion(), s.signature, t)
 
-	k := []byte(req.GetKey())
-	v := []byte(ts)
-	tx := append(k, append([]byte("="), v...)...)
-
-	res, err := s.abciCli.BroadcastTxCommit(s.ctx, tx)
+	res, err := s.abciCli.BroadcastTxCommit(s.ctx, []byte(tx))
 	if err != nil {
 		fmt.Printf("Error in Set: %v\n", err)
 		return nil, err
@@ -85,14 +91,6 @@ func (s *server) Set(ctx context.Context, req *pbv.SetRequest) (*pbv.SetResponse
 		fmt.Println("Error in Set: BroadcastTxCommit transaction failed")
 		return nil, errors.Wrap(err, "BroadcastTxCommit transaction failed")
 	}
-
-	/*
-		res, err := s.abciCli.BroadcastTxSync(s.ctx, tx)
-		if err != nil {
-			fmt.Printf("Error in Set: %v\n", err)
-			return nil, err
-		}
-	*/
 
 	return &pbv.SetResponse{
 		Txid: res.Hash.String(),
@@ -112,9 +110,4 @@ func (s *server) Verify(ctx context.Context, req *pbv.VerifyRequest) (*pbv.Verif
 		}, nil
 	*/
 	return nil, nil
-}
-
-func (s *server) BatchSet(ctx context.Context, req *pbv.BatchSetRequest) (*pbv.BatchSetResponse, error) {
-	// not implemented
-	return &pbv.BatchSetResponse{}, nil
 }

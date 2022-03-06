@@ -25,6 +25,7 @@ type Request struct {
 	ReqType RequestType
 	Key     string
 	Val     string
+	Version int64
 }
 
 func LineByLine(r io.Reader, fn func(line string) error) error {
@@ -50,10 +51,10 @@ func LineByLine(r io.Reader, fn func(line string) error) error {
 			return err
 		}
 		/*
-		num = num + 1
-		if num >= 10000 {
-			break
-		}
+			num = num + 1
+			if num >= 10000 {
+				break
+			}
 		*/
 	}
 	return nil
