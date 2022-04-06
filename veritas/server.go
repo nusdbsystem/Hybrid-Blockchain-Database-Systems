@@ -3,6 +3,7 @@ package veritas
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -43,7 +44,7 @@ func NewServer(redisCli *redis.Client, consumer *kafka.Consumer, producer *kafka
 		ctx:    ctx,
 		cancel: cancel,
 		l:      l,
-		blkcnt: atomic.NewInt64(0),
+		blkcnt: atomic.NewInt64(-1),
 		config: config,
 		cli:    redisCli,
 		puller: consumer,
@@ -112,7 +113,7 @@ func (s *server) applyLoop() {
 }
 
 func (s *server) sendBlock(block *pbv.Block) {
-	block.BlkId = s.config.Signature + "_" + string(s.blkcnt.Load())
+	block.BlkId = fmt.Sprintf("%s_%d", s.config.Signature, s.blkcnt.Inc())
 	blkLog, err := proto.Marshal(block)
 	if err != nil {
 		log.Fatalf("Block log failed: %v", err)
