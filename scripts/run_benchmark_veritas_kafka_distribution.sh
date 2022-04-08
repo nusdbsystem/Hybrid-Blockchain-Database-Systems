@@ -35,21 +35,21 @@ function copy_logs {
 ./restart_cluster_veritas.sh
 ./start_veritas_kafka.sh
 sleep 5
-../bin/veritas-kafka-bench --load-path=$WORKLOAD_FILE --run-path=$WORKLOAD_RUN_FILE --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS --tso-addr=:7070 2>&1 | tee $LOGS/veritas-uniform.txt
+../bin/veritas-kafka-bench --load-path=$WORKLOAD_FILE --run-path=$WORKLOAD_RUN_FILE --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS 2>&1 | tee $LOGS/veritas-uniform.txt
 copy_logs "$LOGS/veritas-uniform-logs"
 
 # Latest
 ./restart_cluster_veritas.sh
 ./start_veritas_kafka.sh
 sleep 5
-../bin/veritas-kafka-bench --load-path=$DEFAULT_WORKLOAD_PATH"_latest/"$DEFAULT_WORKLOAD".dat" --run-path=$DEFAULT_WORKLOAD_PATH"_latest/run_"$DEFAULT_WORKLOAD".dat" --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS --tso-addr=:7070 2>&1 | tee $LOGS/veritas-latest.txt
+../bin/veritas-kafka-bench --load-path=$DEFAULT_WORKLOAD_PATH"_latest/"$DEFAULT_WORKLOAD".dat" --run-path=$DEFAULT_WORKLOAD_PATH"_latest/run_"$DEFAULT_WORKLOAD".dat" --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS 2>&1 | tee $LOGS/veritas-latest.txt
 copy_logs "$LOGS/veritas-latest-logs"
 
 # Zipfian
 ./restart_cluster_veritas.sh
 ./start_veritas_kafka.sh
 sleep 5
-../bin/veritas-kafka-bench --load-path=$DEFAULT_WORKLOAD_PATH"_zipfian/"$DEFAULT_WORKLOAD".dat" --run-path=$DEFAULT_WORKLOAD_PATH"_zipfian/run_"$DEFAULT_WORKLOAD".dat" --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS --tso-addr=:7070 2>&1 | tee $LOGS/veritas-zipfian.txt
+../bin/veritas-kafka-bench --load-path=$DEFAULT_WORKLOAD_PATH"_zipfian/"$DEFAULT_WORKLOAD".dat" --run-path=$DEFAULT_WORKLOAD_PATH"_zipfian/run_"$DEFAULT_WORKLOAD".dat" --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS 2>&1 | tee $LOGS/veritas-zipfian.txt
 copy_logs "$LOGS/veritas-zipfian-logs"
 
 ./stop_veritas_kafka.sh

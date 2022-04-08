@@ -2,7 +2,7 @@ package veritas
 
 import (
 	"context"
-	"errors"
+	// "errors"
 	"fmt"
 	"log"
 	"time"
@@ -168,7 +168,8 @@ func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse
 }
 
 func (s *server) Set(ctx context.Context, req *pbv.SetRequest) (*pbv.SetResponse, error) {
-	// check version
+	// check version here or during block verification
+	/*
 	getReq := &pbv.GetRequest{
 		Signature: req.GetSignature(),
 		Key:       req.GetKey(),
@@ -177,6 +178,7 @@ func (s *server) Set(ctx context.Context, req *pbv.SetRequest) (*pbv.SetResponse
 	if record != nil && record.Version > req.GetVersion() {
 		return &pbv.SetResponse{}, errors.New("Rejected (wrong version)")
 	}
+	*/
 	// prepare request
 	sets := []*pbv.SetRequest{{
 		Signature: req.GetSignature(),

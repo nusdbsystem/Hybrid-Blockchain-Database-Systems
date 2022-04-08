@@ -24,6 +24,6 @@ for BLK in $BLKSIZES; do
     ./restart_cluster_veritas.sh
     ./start_veritas_kafka.sh 5 $BLK
     sleep 30
-    ../bin/veritas-kafka-bench --load-path=$WORKLOAD_FILE --run-path=$WORKLOAD_RUN_FILE --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS --tso-addr=:7070 2>&1 | tee $LOGS/veritas-kafka-blksize-$BLK.txt
+    ../bin/veritas-kafka-bench --load-path=$WORKLOAD_FILE --run-path=$WORKLOAD_RUN_FILE --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS 2>&1 | tee $LOGS/veritas-kafka-blksize-$BLK.txt
 done
 ./stop_veritas_kafka.sh

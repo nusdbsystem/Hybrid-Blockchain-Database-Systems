@@ -26,7 +26,7 @@ for W in $WORKLOADS; do
     ./restart_cluster_veritas.sh
     ./start_veritas_kafka.sh
     sleep 30
-    ../bin/veritas-kafka-bench --load-path=$DEFAULT_WORKLOAD_PATH/$W.dat --run-path=$DEFAULT_WORKLOAD_PATH/run_$W.dat --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS --tso-addr=:7070 2>&1 | tee $LOGS/veritas-kafka-$W.txt
+    ../bin/veritas-kafka-bench --load-path=$DEFAULT_WORKLOAD_PATH/$W.dat --run-path=$DEFAULT_WORKLOAD_PATH/run_$W.dat --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS 2>&1 | tee $LOGS/veritas-kafka-$W.txt
     SLOGS="$LOGS/veritas-kafka-$W-logs"
     mkdir -p $SLOGS
     for I in `seq 2 5`; do

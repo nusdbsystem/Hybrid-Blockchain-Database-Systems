@@ -23,7 +23,7 @@ for N in $NODES; do
         ADDRS="$ADDRS,$IPPREFIX.$IDX:1990"
     done
         
-    ../bin/veritas-kafka-bench --load-path=$WORKLOAD_FILE --run-path=$WORKLOAD_RUN_FILE --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS --tso-addr=:7070 2>&1 | tee $LOGS/veritas-nodes-$N.txt
+    ../bin/veritas-kafka-bench --load-path=$WORKLOAD_FILE --run-path=$WORKLOAD_RUN_FILE --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS 2>&1 | tee $LOGS/veritas-nodes-$N.txt
 
     sleep 10
     SLOGS=$LOGS/veritas-nodes-$N-logs

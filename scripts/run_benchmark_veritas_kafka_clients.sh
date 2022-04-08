@@ -26,11 +26,11 @@ for TH in $THREADS; do
     # copy logs
     SLOGS="$LOGS/veritas-clients-$TH-logs"
     mkdir -p $SLOGS
-    for I in `seq 2 5`; do
+    for I in `seq 2 $N`; do
 	    IDX=$(($I-1))
 	    scp -o StrictHostKeyChecking=no root@$IPPREFIX.$I:/veritas-$IDX.log $SLOGS/
     done
-    scp -o StrictHostKeyChecking=no root@$IPPREFIX.6:/kafka_2.12-2.7.0/zookeeper.log $SLOGS/
-    scp -o StrictHostKeyChecking=no root@$IPPREFIX.6:/kafka_2.12-2.7.0/kafka.log $SLOGS/
+    scp -o StrictHostKeyChecking=no root@$IPPREFIX.$(($N+1)):/kafka_2.12-2.7.0/zookeeper.log $SLOGS/
+    scp -o StrictHostKeyChecking=no root@$IPPREFIX.$(($N+1)):/kafka_2.12-2.7.0/kafka.log $SLOGS/
 done
 ./restart_cluster_veritas.sh

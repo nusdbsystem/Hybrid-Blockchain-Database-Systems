@@ -36,6 +36,6 @@ for BW in $BWS; do
         ./start_veritas_kafka.sh
 	    ./run_iperf_ping.sh 2>&1 | tee $LOGSD/net.txt
 	    sleep 3        
-	    ../bin/veritas-kafka-bench --load-path=$WORKLOAD_FILE --run-path=$WORKLOAD_RUN_FILE --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS --tso-addr=:7070 2>&1 | tee $LOGS/veritas-$BW-$RTT.txt
+	    ../bin/veritas-kafka-bench --load-path=$WORKLOAD_FILE --run-path=$WORKLOAD_RUN_FILE --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS 2>&1 | tee $LOGS/veritas-$BW-$RTT.txt
     done
 done

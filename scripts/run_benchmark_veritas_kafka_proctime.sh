@@ -25,6 +25,6 @@ for TXD in $TXDELAYS; do
     ./restart_cluster_veritas.sh
     ./start_veritas_kafka_delay.sh $N $BLKSIZE $TXD
     sleep 30
-    ../bin/veritas-kafka-bench-txdelay --load-path=$WORKLOAD_FILE --run-path=$WORKLOAD_RUN_FILE --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS --tso-addr=:7070 2>&1 | tee $LOGS/veritas-kafka-txdelay-$TXD.txt
+    ../bin/veritas-kafka-bench-txdelay --load-path=$WORKLOAD_FILE --run-path=$WORKLOAD_RUN_FILE --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS 2>&1 | tee $LOGS/veritas-kafka-txdelay-$TXD.txt
 done
 ./stop_veritas_kafka.sh
