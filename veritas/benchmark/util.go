@@ -32,7 +32,7 @@ func LineByLine(r io.Reader, fn func(line string) error) error {
 	br := bufio.NewReader(r)
 	// num := 0
 	for {
-		line, _, err := br.ReadLine()
+		line, err := br.ReadString('\n')
 
 		if err == io.EOF {
 			break
@@ -41,6 +41,7 @@ func LineByLine(r io.Reader, fn func(line string) error) error {
 		}
 
 		lineStr := string(line)
+		lineStr = strings.Trim(lineStr, "\n")
 		if !(strings.HasPrefix(lineStr, "INSERT") ||
 			strings.HasPrefix(lineStr, "READ") ||
 			strings.HasPrefix(lineStr, "UPDATE")) {

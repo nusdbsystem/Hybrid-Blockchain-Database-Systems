@@ -33,11 +33,12 @@ func EncodeVal(val string) string {
 func LineByLine(m map[string]int64, r io.Reader, w io.Writer) error {
 	br := bufio.NewReader(r)
 	for {
-		line, _, err := br.ReadLine()
+		line, err := br.ReadString('\n')
 
 		if err == io.EOF {
 			break
 		} else if err != nil {
+			fmt.Printf("%v\n", err)
 			return err
 		}
 
