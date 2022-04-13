@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/golang/protobuf/proto"
 	"github.com/hashicorp/raft"
 
@@ -33,18 +34,45 @@ func (f *fsm) Get(key string) (string, error) {
 	return string(v), nil
 }
 
+func (f *fsm) applyRequest(req *pb.SetRequest) error {
+	res, err := f.kv.Get([]byte(req.GetKey()))
+	if err != nil && err != redis.Nil {
+		log.Printf("Error in applyRequest %v\n", err)
+		return nil
+	}
+	if err == nil {
+		v, err := Decode(string(res))
+		if err != nil {
+			log.Fatalf("Error in applyRequest %v", err)
+		}
+		if v.Version > req.GetVersion() {
+			log.Printf("Abort transaction for key %s local version %d request version %d\n", req.GetKey(), v.Version, req.GetVersion())
+			return nil
+		}
+	}
+	entry, err := Encode(req.GetValue(), req.GetVersion()+1)
+	if err != nil {
+		log.Fatalf("Error in applyRequest %v", err)
+		return err
+	}
+	if err := f.kv.Set([]byte(req.GetKey()), []byte(entry)); err != nil {
+		log.Fatalf("Error in applyRequest %v", err)
+		return err
+	}
+	return nil
+}
+
 func (f *fsm) Apply(l *raft.Log) interface{} {
 	var blk pb.Block
 	if err := proto.Unmarshal(l.Data, &blk); err != nil {
 		f.logger.Fatalf("failed to unmarshal raft log: %v", err)
 	}
-	keys, values := make([]string, 0), make([]string, 0)
+
 	for _, req := range blk.Reqs {
-		keys = append(keys, req.Key)
-		values = append(values, req.Value)
+		f.applyRequest(req)
 	}
 
-	return f.applySet(keys, values)
+	return nil
 }
 
 func (f *fsm) Snapshot() (raft.FSMSnapshot, error) {

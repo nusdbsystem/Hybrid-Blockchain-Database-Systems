@@ -13,6 +13,8 @@ go build -o veritas-kafka ../cmd/veritas/main.go
 go build -o veritas-kafka-bench ../veritas/benchmark/ycsbbench/main.go
 go build -o veritas-tendermint ../cmd/veritastm/main.go
 go build -o veritas-tendermint-bench ../veritastm/benchmark/main.go
+go build -o veritas-raft ../cmd/raftkv/main.go
+go build -o veritas-raft-bench ../raftkv/benchmark/ycsbbench/main.go
 
 exit 1
 

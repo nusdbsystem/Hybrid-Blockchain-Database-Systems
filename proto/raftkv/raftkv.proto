@@ -25,10 +25,11 @@ message VerifyResponse {
 message SetRequest {
     string key = 1;
     string value = 2;
+    int64 version = 3;
 }
 
 message SetResponse {
-    // Empty
+    string txid = 1;
 }
 
 message Block {
@@ -58,6 +59,7 @@ message GetRequest {
 
 message GetResponse {
     string value = 1;
+    int64 version = 2;
 }
 
 message IsLeaderRequest {

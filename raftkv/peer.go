@@ -9,10 +9,10 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/hashicorp/raft"
 	raftboltdb "github.com/hashicorp/raft-boltdb"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/proto"
 
 	pb "hybrid/proto/raftkv"
 	"hybrid/veritas/ledger"
@@ -108,6 +108,7 @@ func (p *Peer) open() error {
 		if err := func() error {
 			cc, err := grpc.Dial(p.config.RaftJoin, grpc.WithInsecure())
 			if err != nil {
+				fmt.Printf("In dial %v\n", err)
 				return err
 			}
 			defer cc.Close()
@@ -115,6 +116,7 @@ func (p *Peer) open() error {
 			if _, err := cli.Join(context.Background(), &pb.JoinRequest{
 				PeerAddr: p.config.RaftBind,
 				PeerId:   p.config.Id}); err != nil {
+				fmt.Printf("In join %v\n", err)
 				return err
 			}
 			return nil
@@ -125,7 +127,27 @@ func (p *Peer) open() error {
 	return nil
 }
 
+func (p *Peer) sendBlock(buf []*SetMessage) {
+	block := &pb.Block{Reqs: make([]*pb.SetRequest, 0)}
+	for _, msg := range buf {
+		block.Reqs = append(block.Reqs, msg.req)
+	}
+	blkLog, err := proto.Marshal(block)
+	if err != nil {
+		log.Fatalf("Block log failed: %v", err)
+	}
+	f := p.raft.Apply(blkLog, 10*time.Second)
+	if err := f.Error(); err != nil {
+		log.Fatalf("Apply log failed: %v", err)
+	}
+	for _, msg := range buf {
+		msg.ch <- nil
+		p.l.Append([]byte(msg.req.Key), []byte(msg.req.Value))
+	}
+}
+
 func (p *Peer) applyLoop() {
+	fmt.Printf("Block size %d\n", p.config.BlockSize)
 	t := time.NewTicker(time.Second)
 	defer t.Stop()
 	setMsgBuffer := make([]*SetMessage, 0)
@@ -136,46 +158,13 @@ func (p *Peer) applyLoop() {
 			return
 		case <-t.C:
 			if len(setMsgBuffer) > 0 {
-				go func(buf []*SetMessage) {
-					block := &pb.Block{Reqs: make([]*pb.SetRequest, 0)}
-					for _, msg := range buf {
-						block.Reqs = append(block.Reqs, msg.req)
-					}
-					blkLog, err := proto.Marshal(block)
-					if err != nil {
-						log.Fatalf("Block log failed: %v", err)
-					}
-					f := p.raft.Apply(blkLog, 10*time.Second)
-					if err := f.Error(); err != nil {
-						log.Fatalf("Apply log failed: %v", err)
-					}
-					for _, msg := range buf {
-						msg.ch <- nil
-						p.l.Append([]byte(msg.req.Key), []byte(msg.req.Value))
-					}
-				}(setMsgBuffer)
+				p.sendBlock(setMsgBuffer)
 				setMsgBuffer = make([]*SetMessage, 0)
 			}
 		case setMsg := <-p.msgCh:
 			setMsgBuffer = append(setMsgBuffer, setMsg)
 			if len(setMsgBuffer) >= p.config.BlockSize {
-				go func(buf []*SetMessage) {
-					block := &pb.Block{Reqs: make([]*pb.SetRequest, 0)}
-					for _, msg := range buf {
-						block.Reqs = append(block.Reqs, msg.req)
-					}
-					blkLog, err := proto.Marshal(block)
-					if err != nil {
-						log.Fatalf("Block log failed: %v", err)
-					}
-					f := p.raft.Apply(blkLog, 10*time.Second)
-					if err := f.Error(); err != nil {
-						log.Fatalf("Apply log failed: %v", err)
-					}
-					for _, msg := range buf {
-						msg.ch <- nil
-					}
-				}(setMsgBuffer)
+				p.sendBlock(setMsgBuffer)
 				setMsgBuffer = make([]*SetMessage, 0)
 			}
 		}
@@ -191,34 +180,34 @@ func (p *Peer) IsLeader(ctx context.Context, req *pb.IsLeaderRequest) (*pb.IsLea
 }
 
 func (p *Peer) Get(ctx context.Context, req *pb.GetRequest) (*pb.GetResponse, error) {
-	if !p.isLeader() {
-		return nil, raft.ErrNotLeader
-	}
-
-	val, err := p.fsm.Get(req.GetKey())
+	res, err := p.fsm.Get(req.GetKey())
 	if err != nil {
+		fmt.Printf("Error in Get %v\n", err)
 		return nil, err
 	}
-
-	return &pb.GetResponse{Value: val}, nil
+	v, err := Decode(res)
+	if err != nil {
+		fmt.Printf("Error in Get %v\n", err)
+		return nil, err
+	}
+	return &pb.GetResponse{Value: v.Val, Version: v.Version}, nil
 }
 
 func (p *Peer) Set(ctx context.Context, req *pb.SetRequest) (*pb.SetResponse, error) {
+
 	if !p.isLeader() {
+		fmt.Printf("Error in Set: not leader!\n")
 		return nil, raft.ErrNotLeader
 	}
 
 	ch := make(chan error, 1)
 	p.msgCh <- &SetMessage{
 		req: &pb.SetRequest{
-			Key:   req.GetKey(),
-			Value: req.GetValue(),
+			Key:     req.GetKey(),
+			Value:   req.GetValue(),
+			Version: req.GetVersion(),
 		},
 		ch: ch,
-	}
-
-	if err := <-ch; err != nil {
-		return nil, err
 	}
 
 	return &pb.SetResponse{}, nil
