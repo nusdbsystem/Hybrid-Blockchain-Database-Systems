@@ -19,7 +19,6 @@ for IDX in `seq 3 $N`; do
 	ADDRS="$ADDRS,$IPPREFIX.$IDX:1900"
 done
 
-THREADS="64 128 192 256"
 for TH in $THREADS; do
     ./restart_cluster_veritas.sh
     ./start_veritas_raft.sh
@@ -33,4 +32,4 @@ for TH in $THREADS; do
 	    scp -o StrictHostKeyChecking=no root@$IPPREFIX.$IDX:/veritas-raft-$I.log $SLOGS/
     done    
 done
-# ./restart_cluster_veritas.sh
+./restart_cluster_veritas.sh

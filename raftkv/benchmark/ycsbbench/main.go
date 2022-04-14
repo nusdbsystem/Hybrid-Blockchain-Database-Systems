@@ -33,13 +33,22 @@ func main() {
 			cli.Close()
 		}
 	}()
-	for i := 0; i < *driverNum; i++ {
+	// first N/2 clients are used only for Get
+	for i := 0; i < *driverNum/2; i++ {
 		cli, err := benchmark.Open(addrs[i%len(addrs)], benchmark.GenRandString(16))
 		if err != nil {
 			panic(err)
 		}
 		clis = append(clis, cli)
 	}
+	// last N/2 clients are used only for Set (connected to the Raft leader only)
+	for i := 0; i < *driverNum/2; i++ {
+                cli, err := benchmark.Open(addrs[0], benchmark.GenRandString(16))
+                if err != nil {
+                        panic(err)
+                }
+                clis = append(clis, cli)
+        }
 
 	fmt.Println("Start loading ...")
 	reqNum := atomic.NewInt64(0)
@@ -131,7 +140,7 @@ func main() {
 	}()
 	time.Sleep(5 * time.Second)
 
-	for i := 0; i < *driverNum; i++ {
+	for i := 0; i < *driverNum/2; i++ {
 		for j := 0; j < *driverConcurrency; j++ {
 			wg.Add(1)
 			go func(seq int) {
@@ -144,7 +153,7 @@ func main() {
 						latencyCh <- time.Since(start)
 					case benchmark.SetOp:
 						start := time.Now()
-						clis[0].Set(context.Background(), op.Key, op.Val, op.Version)
+						clis[seq + *driverNum/2].Set(context.Background(), op.Key, op.Val, op.Version)
 						latencyCh <- time.Since(start)
 					default:
 						panic(fmt.Sprintf("invalid operation: %v", op.ReqType))
