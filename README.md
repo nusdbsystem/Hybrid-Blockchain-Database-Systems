@@ -1,6 +1,7 @@
 # Hybrid Blockchain Database Systems
 
-This repository contains the code and instructions to reproduce the experiments presented in the paper "Hybrid Blockchain Database Systems: Design and Performance".
+This branch contains the code and instructions to reproduce the experiments presented 
+in the paper "Hybrid Blockchain Database Systems: Design and Performance".
 
 ## Reproduce
 
@@ -14,7 +15,8 @@ This repository contains the code and instructions to reproduce the experiments 
 ```bash
 $ cd scripts
 $ ./install_dependencies.sh
-$ ./gen_ycsb_data.sh 
+$ ./gen_ycsb_data.sh
+$ ./preprocess_ycsb_data.sh
 $ ./build_binaries.sh
 $ cd ../docker/veritas
 $ ./build_docker.sh
@@ -66,6 +68,22 @@ Note that Veritas Kafka also needs a node for Kafka.
 
 To get the Kafka ops plotted in Figure 8, run ``./get_kafka_ops.sh <logs>`` on the logs obtained after running ``./run_benchmark_veritas_kafka_nodes.sh`` (effect of numbe rof nodes).
 
+### Veritas + Raft
+
+Run the following scripts to reproduce the above-mentioned experiments:
+
+```
+./run_benchmark_veritas_raft_clients.sh
+./run_benchmark_veritas_raft_nodes.sh
+./run_benchmark_veritas_raft_distribution.sh
+./run_benchmark_veritas_raft_workload.sh
+./run_benchmark_veritas_raft_blocksize.sh
+./run_benchmark_veritas_raft_recordsize.sh
+./run_benchmark_veritas_raft_proctime.sh
+./run_benchmark_veritas_raft_networking.sh
+```
+
+
 ### Veritas + Tendermint
 
 We use the same ``veritas`` docker images. Then, we run the following scripts:
@@ -80,48 +98,10 @@ We use the same ``veritas`` docker images. Then, we run the following scripts:
 ./run_benchmark_veritas_tendermint_networking.sh
 ```
 
-### BlockchainDB
 
-We use ``blockchaindb`` docker images. Then, we run the following scripts:
+### Veritas + HotStuff
 
-```
-./run_benchmark_blockchaindb_clients.sh
-./run_benchmark_blockchaindb_nodes.sh
-./run_benchmark_blockchaindb_distribution.sh
-./run_benchmark_blockchaindb_workload.sh
-./run_benchmark_blockchaindb_blocksize.sh
-./run_benchmark_blockchaindb_recordsize.sh
-./run_benchmark_blockchaindb_proctime.sh
-./run_benchmark_blockchaindb_networking.sh
-./run_benchmark_blockchaindb_sharding.sh
-```
 
-### 
-
-### BigchainDB
-
-We use ``bigchaindb`` docker images. Then, we run the following scripts:
-
-```
-./run_benchmark_bigchaindb_clients.sh
-./run_benchmark_bigchaindb_nodes.sh
-./run_benchmark_bigchaindb_distribution.sh
-./run_benchmark_bigchaindb_workload.sh
-./run_benchmark_bigchaindb_recordsize.sh
-./run_benchmark_bigchaindb_proctime.sh
-./run_benchmark_bigchaindb_networking.sh
-```
-
-### BigchainDB Parallel Validation
-
-To run BigchainDB with Parallel Validation (PV), modify lines 16 and 17 of [BigchainDB/scripts/start-all.sh](BigchainDB/scripts/start-all.sh), such as:
-
-```
-# bigchaindb start > /dev/null 2>&1 &
-bigchaindb start --experimental-parallel-validation > /dev/null 2>&1 &
-```
-
-Then repeat all the steps of BigchainDB.
 
 
 ### Aborted Transaction

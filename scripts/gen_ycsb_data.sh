@@ -106,3 +106,6 @@ done
 popd
 # shellcheck disable=SC2164
 popd
+
+cd ${WORK_DIR}/..
+mv temp temp1
