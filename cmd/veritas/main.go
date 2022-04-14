@@ -11,9 +11,9 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"hybrid/dbconn"
-	"hybrid/kafkarole"
 	pbv "hybrid/proto/veritas"
-	"hybrid/veritas"
+	veritas "hybrid/veritas_kafka"
+	"hybrid/veritas_kafka/kafkarole"
 )
 
 var (

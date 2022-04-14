@@ -8,7 +8,7 @@ import (
 
 	"github.com/dgraph-io/badger/v3"
 
-	"hybrid/veritas/ledger/merkletree"
+	"hybrid/veritas_kafka/ledger/merkletree"
 )
 
 type LogLedger struct {

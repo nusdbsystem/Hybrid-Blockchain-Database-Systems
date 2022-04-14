@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"hybrid/raftkv/benchmark"
+	"hybrid/veritas_raft/benchmark"
 	"os"
 	"strconv"
 	"strings"
@@ -43,12 +43,12 @@ func main() {
 	}
 	// last N/2 clients are used only for Set (connected to the Raft leader only)
 	for i := 0; i < *driverNum/2; i++ {
-                cli, err := benchmark.Open(addrs[0], benchmark.GenRandString(16))
-                if err != nil {
-                        panic(err)
-                }
-                clis = append(clis, cli)
-        }
+		cli, err := benchmark.Open(addrs[0], benchmark.GenRandString(16))
+		if err != nil {
+			panic(err)
+		}
+		clis = append(clis, cli)
+	}
 
 	fmt.Println("Start loading ...")
 	reqNum := atomic.NewInt64(0)
@@ -153,7 +153,7 @@ func main() {
 						latencyCh <- time.Since(start)
 					case benchmark.SetOp:
 						start := time.Now()
-						clis[seq + *driverNum/2].Set(context.Background(), op.Key, op.Val, op.Version)
+						clis[seq+*driverNum/2].Set(context.Background(), op.Key, op.Val, op.Version)
 						latencyCh <- time.Since(start)
 					default:
 						panic(fmt.Sprintf("invalid operation: %v", op.ReqType))

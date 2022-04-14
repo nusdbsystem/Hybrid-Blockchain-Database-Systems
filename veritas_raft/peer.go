@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc"
 
 	pb "hybrid/proto/raftkv"
-	"hybrid/veritas/ledger"
+	"hybrid/veritas_kafka/ledger"
 )
 
 var _ pb.DBServer = (*Peer)(nil)

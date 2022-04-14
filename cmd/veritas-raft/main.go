@@ -14,7 +14,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	pb "hybrid/proto/raftkv"
-	"hybrid/raftkv"
+	raftkv "hybrid/veritas_raft"
 )
 
 var (

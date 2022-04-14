@@ -14,7 +14,7 @@ import (
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 
 	pbv "hybrid/proto/veritas"
-	"hybrid/veritas/ledger"
+	"hybrid/veritas_kafka/ledger"
 )
 
 type server struct {
@@ -170,14 +170,14 @@ func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse
 func (s *server) Set(ctx context.Context, req *pbv.SetRequest) (*pbv.SetResponse, error) {
 	// check version here or during block verification
 	/*
-	getReq := &pbv.GetRequest{
-		Signature: req.GetSignature(),
-		Key:       req.GetKey(),
-	}
-	record, _ := s.Get(ctx, getReq)
-	if record != nil && record.Version > req.GetVersion() {
-		return &pbv.SetResponse{}, errors.New("Rejected (wrong version)")
-	}
+		getReq := &pbv.GetRequest{
+			Signature: req.GetSignature(),
+			Key:       req.GetKey(),
+		}
+		record, _ := s.Get(ctx, getReq)
+		if record != nil && record.Version > req.GetVersion() {
+			return &pbv.SetResponse{}, errors.New("Rejected (wrong version)")
+		}
 	*/
 	// prepare request
 	sets := []*pbv.SetRequest{{

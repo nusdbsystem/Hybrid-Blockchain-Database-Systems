@@ -13,8 +13,8 @@ import (
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"hybrid/veritas/benchmark"
-	"hybrid/veritas/driver"
+	"hybrid/veritas_kafka/benchmark"
+	"hybrid/veritas_kafka/driver"
 )
 
 var (

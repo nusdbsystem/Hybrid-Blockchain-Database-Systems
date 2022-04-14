@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"hybrid/veritastm"
+	veritastm "hybrid/veritas_tendermint"
 	"os"
 	"strings"
 	"sync"

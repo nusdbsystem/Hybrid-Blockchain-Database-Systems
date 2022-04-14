@@ -12,7 +12,7 @@ import (
 
 	"hybrid/dbconn"
 	pbv "hybrid/proto/veritas"
-	"hybrid/veritastm"
+	veritastm "hybrid/veritas_tendermint"
 
 	abciserver "github.com/tendermint/tendermint/abci/server"
 )
