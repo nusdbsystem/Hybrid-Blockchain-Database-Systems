@@ -101,6 +101,19 @@ We use the same ``veritas`` docker images. Then, we run the following scripts:
 
 ### Veritas + HotStuff
 
+Run the following scripts to reproduce the above-mentioned experiments:
+
+```
+./run_benchmark_veritas_hotstuff_clients.sh
+./run_benchmark_veritas_hotstuff_nodes.sh
+./run_benchmark_veritas_hotstuff_distribution.sh
+./run_benchmark_veritas_hotstuff_workload.sh
+./run_benchmark_veritas_hotstuff_blocksize.sh
+./run_benchmark_veritas_hotstuff_recordsize.sh
+./run_benchmark_veritas_hotstuff_proctime.sh
+./run_benchmark_veritas_hotstuff_networking.sh
+```
+
 
 
 

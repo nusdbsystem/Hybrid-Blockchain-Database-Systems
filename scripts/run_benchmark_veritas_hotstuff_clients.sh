@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TSTAMP=`date +%F-%H-%M-%S`
-LOGSD="logs-blksize-veritas_hotstuff-$TSTAMP"
+LOGSD="logs-clients-veritas_hotstuff-$TSTAMP"
 mkdir $LOGSD
 
 set -x
@@ -10,13 +10,12 @@ nodes=${1:-4}
 clients=${2:-256} 
 workload=${3:-a}
 distribution=${4:-ycsb_data}
-delay=${5:-0}
+
 ndrivers=${nodes}
-nthreads=$(( ${clients} / ${ndrivers} ))
-    
+
 dir=$(pwd)
 echo $dir
-bin="$dir/../../VeritasHotstuff/.bin/benchmark_veritashf"
+bin="$dir/../veritas_hotstuff/.bin/benchmark_veritashf"
 defaultAddrs="192.168.20.2:50001"
 loadPath="$dir/../temp/${distribution}/workload${workload}.dat"
 runPath="$dir/../temp/${distribution}/run_workload${workload}.dat"
@@ -25,7 +24,7 @@ if [ ! -f ${bin} ]; then
     echo "Binary file ${bin} not found!"
     echo "Hint: "
     echo " Please build binaries by run command: "
-    echo " cd ../VeritasHotstuff"
+    echo " cd ../veritas_hotstuff"
     echo " make build "
     echo " make docker (if never build veritas_hotstuff image before)"
     echo " cd -"
@@ -39,13 +38,18 @@ defaultAddrs="${defaultAddrs},192.168.20.$((1+ ${c})):50001"
 done
 echo "start test with nodes addrs: ${defaultAddrs}"
 
-# Block sizes
-BLKSIZES="10 100 1000 10000"
-for TH in ${BLKSIZES}; do
-    echo "Test start with node size: ${nodes}, client size: ${clients}, workload${workload}"
+#
+nCLIENTS="4 8 16 32 64 128 192 256"
+
+for TH in ${nCLIENTS}; do
+    echo "Test start with node size: ${nodes}, client size: ${TH}, workload${workload}"
+    nthreads=$(( ${TH} / ${ndrivers} ))
     ./restart_cluster_veritas_hotstuff.sh
-    ./start_veritas_hotstuff.sh ${nodes} ${delay} ${TH}
-   
-    $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/veritas_hotstuff-blk-duration-${GAS}-${TH}.txt 2>&1
+    ./start_veritas_hotstuff.sh        
+    
+    $bin --load-path=$loadPath --run-path=$runPath --ndrivers=$ndrivers --nthreads=$nthreads --server-addrs=${defaultAddrs} > $LOGSD/veritas_hotstuff-clients-$TH.txt 2>&1 
 done
+
+echo "Experiments ${LOGSD} finished!"
+
 

@@ -11,7 +11,7 @@ rm -rf ${tomlDir}/*
 mkdir -p ${tomlDir}
 rm -rf $dir/keys/*
 mkdir -p $dir/keys
-KEY_GEN_PATH=$dir/../../VeritasHotstuff/.bin
+KEY_GEN_PATH=$dir/../veritas_hotstuff/.bin
 
 
 
@@ -29,8 +29,8 @@ echo "self-id = ${c}" > ${tomlFile}
 echo 'pacemaker = "fixed"' >> ${tomlFile}
 # echo 'pacemaker = "round-robin"' >> ${tomlFile}
 echo 'leader-id = 1' >> ${tomlFile}
-echo "root-cas = [\"VeritasHotstuff/keys/ca.crt\"]" >> ${tomlFile}
-echo "privkey = \"VeritasHotstuff/keys/r${c}.key\"" >> ${tomlFile}
+echo "root-cas = [\"veritas_hotstuff/keys/ca.crt\"]" >> ${tomlFile}
+echo "privkey = \"veritas_hotstuff/keys/r${c}.key\"" >> ${tomlFile}
 echo 'rate-limit = 0' >> ${tomlFile}
 echo "tx-delay = ${delay}" >> ${tomlFile}
 echo 'tls = false' >> ${tomlFile}
@@ -53,8 +53,8 @@ echo '# This is the information that each replica is given about the other repli
 	echo "peer-address = \"${PREFIX}${IPY}:10070\"" >> ${tomlFile}
 	echo "client-address = \"${PREFIX}${IPY}:20070\"" >> ${tomlFile}
 	echo "redis-address = \"${PREFIX}${IPY}:6379\"" >> ${tomlFile}
-	echo "pubkey = \"VeritasHotstuff/keys/r${j}.key.pub\"" >> ${tomlFile}
-	echo "cert = \"VeritasHotstuff/keys/r${j}.crt\"" >> ${tomlFile}
+	echo "pubkey = \"veritas_hotstuff/keys/r${j}.key.pub\"" >> ${tomlFile}
+	echo "cert = \"veritas_hotstuff/keys/r${j}.crt\"" >> ${tomlFile}
 	echo  >> ${tomlFile}
 	done
 echo "Generate config file toml.${nodes}/hotstuff${c}.toml"
@@ -66,15 +66,15 @@ echo "##################### 3.start hotstuff nodes ####################"
 #killall -9 hotstuffserver; sleep 2; 
 for (( j=1; j<=${nodes}; j++ )); do
 	IPX=$((${j} + 1))
-	scp -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" ${tomlDir}/hotstuff${j}.toml root@${PREFIX}${IPX}:/root/VeritasHotstuff/
-	scp -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" keys/r${j}.key root@${PREFIX}${IPX}:/root/VeritasHotstuff/keys/
-	scp -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" keys/r*.key.pub root@${PREFIX}${IPX}:/root/VeritasHotstuff/keys/
+	scp -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" ${tomlDir}/hotstuff${j}.toml root@${PREFIX}${IPX}:/root/veritas_hotstuff/
+	scp -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" keys/r${j}.key root@${PREFIX}${IPX}:/root/veritas_hotstuff/keys/
+	scp -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" keys/r*.key.pub root@${PREFIX}${IPX}:/root/veritas_hotstuff/keys/
 	ssh -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" root@${PREFIX}${IPX} "service redis-server start"
 done
 sleep 5
 for (( j=1; j<=${nodes}; j++ )); do
 	IPX=$((${j} + 1))
-	ssh -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" root@${PREFIX}${IPX} "/root/VeritasHotstuff/bin/hotstuffserver --config=VeritasHotstuff/hotstuff${j} > /root/VeritasHotstuff/logs/hotstuff.log 2>&1 " &
+	ssh -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" root@${PREFIX}${IPX} "/root/veritas_hotstuff/bin/hotstuffserver --config=veritas_hotstuff/hotstuff${j} > /root/veritas_hotstuff/logs/hotstuff.log 2>&1 " &
 done
 #
 echo "Waiting for connections to the replicas..."
@@ -87,7 +87,7 @@ echo "##################### 3.start veritasnode nodes ####################"
 for (( j=1; j<=${nodes}; j++ ))
 do
 IPX=$((${j} + 1))
-ssh -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" root@${PREFIX}${IPX} "/root/VeritasHotstuff/bin/veritasnode --config=VeritasHotstuff/hotstuff${j} > /root/VeritasHotstuff/logs/veritas.log 2>&1 " &
+ssh -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" root@${PREFIX}${IPX} "/root/veritas_hotstuff/bin/veritasnode --config=veritas_hotstuff/hotstuff${j} > /root/veritas_hotstuff/logs/veritas.log 2>&1 " &
 echo "${IPX}"
 done
 sleep 10

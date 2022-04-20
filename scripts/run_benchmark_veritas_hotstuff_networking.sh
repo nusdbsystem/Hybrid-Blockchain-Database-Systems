@@ -15,7 +15,7 @@ ndrivers=${nodes}
 
 dir=$(pwd)
 echo $dir
-bin="$dir/../../VeritasHotstuff/.bin/benchmark_veritashf"
+bin="$dir/../veritas_hotstuff/.bin/benchmark_veritashf"
 defaultAddrs="192.168.20.2:50001"
 nthreads=$(( ${clients} / ${ndrivers} ))
 loadPath="$dir/../temp/${distribution}/workload${workload}.dat"
@@ -25,7 +25,7 @@ if [ ! -f ${bin} ]; then
     echo "Binary file ${bin} not found!"
     echo "Hint: "
     echo " Please build binaries by run command: "
-    echo " cd ../VeritasHotstuff"
+    echo " cd ../veritas_hotstuff"
     echo " make build "
     echo " make docker (if never build veritas_hotstuff image before)"
     echo " cd -"
