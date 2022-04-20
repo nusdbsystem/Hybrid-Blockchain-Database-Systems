@@ -12,8 +12,8 @@ import (
 	"google.golang.org/grpc"
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	benchmark "hybrid/VeritasHotstuff/benchmark/ycsb"
-	pbv "hybrid/VeritasHotstuff/proto/veritashs"
+	benchmark "hybrid/veritas_hotstuff/benchmark/ycsb"
+	pbv "hybrid/veritas_hotstuff/proto/veritashs"
 )
 
 var (

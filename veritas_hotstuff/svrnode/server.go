@@ -4,14 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"hybrid/VeritasHotstuff/cmd/config"
-	pbv "hybrid/VeritasHotstuff/proto/veritashs"
-	"hybrid/VeritasHotstuff/storage"
+	"hybrid/veritas_hotstuff/cmd/config"
+	pbv "hybrid/veritas_hotstuff/proto/veritashs"
+	"hybrid/veritas_hotstuff/storage"
 
 	hsc "github.com/EinWTW/hotstuff/cmd/hotstuffclient/client"
 
 	//hsc "github.com/EinWTW/hotstuff/client"
 	"google.golang.org/protobuf/proto"
+	//"hybrid/veritas_kafka/veritas"
 )
 
 var _ pbv.VeritasNodeServer = (*ServerNode)(nil)
@@ -43,6 +44,12 @@ func (sn *ServerNode) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetRes
 	if err != nil {
 		return nil, err
 	}
+	// v, err := veritas.Decode(string(res))
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// return &pbv.GetResponse{Value: v.Val, Version: v.Version}, nil
 	return &pbv.GetResponse{Value: string(val)}, nil
 }
 

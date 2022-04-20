@@ -97,8 +97,3 @@ $ make test nodes=4 clients=4
 2. Latency
 
 
-
-###### TODO: 
-
-1. ycsb tests
-2. handle docker exit

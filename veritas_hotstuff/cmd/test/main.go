@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	pbv "hybrid/VeritasHotstuff/proto/veritashs"
-	"hybrid/VeritasHotstuff/storage"
+	pbv "hybrid/veritas_hotstuff/proto/veritashs"
+	"hybrid/veritas_hotstuff/storage"
 
 	"google.golang.org/grpc"
 )

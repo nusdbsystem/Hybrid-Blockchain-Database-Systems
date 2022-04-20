@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 
-	"hybrid/VeritasHotstuff/storage/redisconn"
+	"hybrid/veritas_hotstuff/storage/redisconn"
 
 	"github.com/go-redis/redis/v8"
 )
