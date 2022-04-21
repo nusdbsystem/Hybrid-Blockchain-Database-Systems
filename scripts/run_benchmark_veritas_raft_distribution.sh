@@ -16,14 +16,14 @@ WORKLOAD_RUN_FILE="$DEFAULT_WORKLOAD_PATH/run_$DEFAULT_WORKLOAD".dat
 
 # Generate server addresses. Veritas port is 1900
 ADDRS="$IPPREFIX.2:1900"
-for IDX in `seq 3 $N`; do
+for IDX in `seq 3 $(($N+1))`; do
 	ADDRS="$ADDRS,$IPPREFIX.$IDX:1900"
 done
 
 function copy_logs {
     LOGSDIR=$1        
     mkdir -p $LOGSDIR
-    for I in `seq 2 5`; do
+    for I in `seq 2 $(($N+1))`; do
 	    IDX=$(($I-1))
 	    scp -o StrictHostKeyChecking=no root@$IPPREFIX.$I:/veritas-raft-$IDX.log $LOGSDIR/
     done

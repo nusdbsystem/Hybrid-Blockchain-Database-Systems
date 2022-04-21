@@ -13,6 +13,7 @@ THREADS=$DEFAULT_THREADS_VERITAS_RAFT
 WORKLOAD_FILE="$DEFAULT_WORKLOAD_PATH/$DEFAULT_WORKLOAD".dat
 WORKLOAD_RUN_FILE="$DEFAULT_WORKLOAD_PATH/run_$DEFAULT_WORKLOAD".dat
 
+NODES="32"
 for N in $NODES; do
     ./restart_cluster_veritas.sh $(($N+1))
     ./start_veritas_raft.sh $N
@@ -20,7 +21,7 @@ for N in $NODES; do
     # Generate server addresses. Veritas port is 1900
     ADDRS="$IPPREFIX.2:1900"
     for IDX in `seq 3 $(($N+1))`; do
-        ADDRS="$ADDRS,$IPPREFIX.$IDX:1990"
+        ADDRS="$ADDRS,$IPPREFIX.$IDX:1900"
     done
         
     ../bin/veritas-raft-bench --load-path=$WORKLOAD_FILE --run-path=$WORKLOAD_RUN_FILE --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS 2>&1 | tee $LOGS/veritas-nodes-$N.txt

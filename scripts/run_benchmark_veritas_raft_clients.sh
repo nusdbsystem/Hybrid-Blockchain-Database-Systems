@@ -15,7 +15,7 @@ WORKLOAD_RUN_FILE="$DEFAULT_WORKLOAD_PATH/run_$DEFAULT_WORKLOAD".dat
 
 # Generate server addresses. Veritas Raft port is 1900
 ADDRS="$IPPREFIX.2:1900"
-for IDX in `seq 3 $N`; do
+for IDX in `seq 3 $(($N+1))`; do
 	ADDRS="$ADDRS,$IPPREFIX.$IDX:1900"
 done
 
