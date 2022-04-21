@@ -35,7 +35,8 @@ For each system, we run the following set of experiments:
 - Effect of block size
 - Effect of transaction size (record size)
 - Effect of transaction processing time
-- Effect of Networking
+- Effect of networking (bandwidth and latency)
+
 
 ### Veritas + Kafka
 
@@ -57,16 +58,15 @@ Each script will generate a folder of the form ``logs-...-<timestamp>``. Check t
 In addition, we run the following experiments for Veritas + Kafka:
 
 - Effect of the Underlying Database
-- Effect of Zookeeper TSO
 
 ```
 ./run_benchmark_veritas_kafka_database.sh
-./run_benchmark_veritas_kafka_clients_tso_zk.sh
 ```
 
 Note that Veritas Kafka also needs a node for Kafka.
 
 To get the Kafka ops plotted in Figure 8, run ``./get_kafka_ops.sh <logs>`` on the logs obtained after running ``./run_benchmark_veritas_kafka_nodes.sh`` (effect of numbe rof nodes).
+
 
 ### Veritas + Raft
 
@@ -133,9 +133,11 @@ cat logs-distribution-veritas-kafka-.../veritas-latest-logs/veritas-* | grep Abo
 
 There are no aborted transactions in Veritas (TM) and BlockchainDB.
 
+
 ## License
 
 MIT License
+
 
 ## Authors
 
