@@ -11,8 +11,9 @@ import (
 	hsc "github.com/EinWTW/hotstuff/cmd/hotstuffclient/client"
 
 	//hsc "github.com/EinWTW/hotstuff/client"
+	veritas "hybrid/veritas_kafka"
+
 	"google.golang.org/protobuf/proto"
-	//"hybrid/veritas_kafka/veritas"
 )
 
 var _ pbv.VeritasNodeServer = (*ServerNode)(nil)
@@ -40,17 +41,16 @@ func NewServerNode(conf *config.Options, configFile string) (*ServerNode, error)
 }
 
 func (sn *ServerNode) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse, error) {
-	val, err := sn.sharedTable.Get([]byte(req.GetKey()))
+	res, err := sn.sharedTable.Get([]byte(req.GetKey()))
 	if err != nil {
 		return nil, err
 	}
-	// v, err := veritas.Decode(string(res))
-	// if err != nil {
-	// 	return nil, err
-	// }
+	v, err := veritas.Decode(string(res))
+	if err != nil {
+		return nil, err
+	}
 
-	// return &pbv.GetResponse{Value: v.Val, Version: v.Version}, nil
-	return &pbv.GetResponse{Value: string(val)}, nil
+	return &pbv.GetResponse{Value: v.Val, Version: v.Version}, nil
 }
 
 func (sn *ServerNode) Set(ctx context.Context, req *pbv.SetRequest) (*pbv.SetResponse, error) {

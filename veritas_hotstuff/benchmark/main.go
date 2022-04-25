@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -59,15 +60,15 @@ func main() {
 	}
 	defer loadFile.Close()
 
-	loadBuf := make(chan [2]string, 1024)
+	loadBuf := make(chan [3]string, 1024)
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		defer close(loadBuf)
 		if err := benchmark.LineByLine(loadFile, func(line string) error {
-			operands := strings.SplitN(line, " ", 4)
-			loadBuf <- [2]string{operands[2], operands[3]}
+			operands := strings.SplitN(line, " ", 5)
+			loadBuf <- [3]string{operands[2], operands[3], operands[4]}
 			return nil
 		}); err != nil {
 			panic(err)
@@ -93,13 +94,17 @@ func main() {
 			defer wg.Done()
 			for kv := range loadBuf {
 				lastkey = kv[0]
-
-				// if _, err := clis[0].Set(context.Background(), &pbv.SetRequest{
-				// 	Key:   kv[0],
-				// 	Value: kv[1],
-				// }); err != nil {
-				// 	panic(err)
-				// }
+				ver, err := strconv.ParseInt(kv[2], 10, 64)
+				if err != nil {
+					panic(err)
+				}
+				if _, err := clis[0].Set(context.Background(), &pbv.SetRequest{
+					Key:     kv[0],
+					Value:   kv[1],
+					Version: ver,
+				}); err != nil {
+					panic(err)
+				}
 			}
 		}()
 	}
@@ -119,7 +124,11 @@ func main() {
 		defer close(runBuf)
 		if err := benchmark.LineByLine(runFile, func(line string) error {
 			reqNum.Add(1)
-			operands := strings.SplitN(line, " ", 4)
+			operands := strings.SplitN(line, " ", 5)
+			ver, err := strconv.ParseInt(operands[4], 10, 64)
+			if err != nil {
+				panic(err)
+			}
 			r := &benchmark.Request{
 				Key: operands[2],
 			}
@@ -128,6 +137,7 @@ func main() {
 			} else {
 				r.ReqType = benchmark.SetOp
 				r.Val = operands[3]
+				r.Version = ver
 			}
 			runBuf <- r
 			return nil
@@ -155,8 +165,9 @@ func main() {
 					case benchmark.SetOp:
 						beginOp := time.Now()
 						_, err := clis[seq].Set(context.Background(), &pbv.SetRequest{
-							Key:   op.Key,
-							Value: op.Val,
+							Key:     op.Key,
+							Value:   op.Val,
+							Version: op.Version,
 						})
 						if err != nil {
 							fmt.Println("SetOp ", err)

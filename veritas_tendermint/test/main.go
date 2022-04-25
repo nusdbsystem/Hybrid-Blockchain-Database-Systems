@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"hybrid/veritas/benchmark"
-	"hybrid/veritastm"
+	veritastm "hybrid/veritas_tendermint"
+	"hybrid/veritas_tendermint/benchmark"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )

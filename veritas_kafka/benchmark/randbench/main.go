@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"hybrid/veritas/benchmark"
+	"hybrid/veritas_kafka/benchmark"
 	"math/rand"
 	"strings"
 	"sync"
@@ -11,7 +11,7 @@ import (
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"hybrid/veritas/driver"
+	"hybrid/veritas_kafka/driver"
 )
 
 func init() {

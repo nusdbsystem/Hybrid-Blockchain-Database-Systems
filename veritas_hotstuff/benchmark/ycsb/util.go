@@ -25,6 +25,7 @@ type Request struct {
 	ReqType RequestType
 	Key     string
 	Val     string
+	Version int64
 }
 
 func LineByLine(r io.Reader, fn func(line string) error) error {

@@ -13,7 +13,7 @@ index a91d6ff..b929d65 100644
  	pbv "hybrid/proto/veritas"
 -	"hybrid/tso"
 +	tso "hybrid/tso_zookeeper"
- 	"hybrid/veritas/db"
+ 	"hybrid/veritas_kafka/db"
  )
  
 @@ -18,6 +19,8 @@ type Driver struct {
