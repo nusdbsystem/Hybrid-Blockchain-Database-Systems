@@ -8,9 +8,9 @@ import (
 	"os"
 	"os/signal"
 
-	service "github.com/nusdbsystem/hybridBlockchainDB/bcdbnode"
-	"github.com/nusdbsystem/hybridBlockchainDB/bcdbnode/config"
-	pbv "github.com/nusdbsystem/hybridBlockchainDB/proto/blockchaindb"
+	service "github.com/nusdbsystem/hybrid/BlockchainDB/bcdbnode"
+	"github.com/nusdbsystem/hybrid/BlockchainDB/bcdbnode/config"
+	pbv "github.com/nusdbsystem/hybrid/BlockchainDB/proto/blockchaindb"
 	"google.golang.org/grpc"
 )
 

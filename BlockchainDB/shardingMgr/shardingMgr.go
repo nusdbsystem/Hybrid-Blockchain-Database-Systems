@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nusdbsystem/hybridBlockchainDB/bcdbnode/config"
-	Connectors "github.com/nusdbsystem/hybridBlockchainDB/blockchainconnectors"
-	EthClientSDK "github.com/nusdbsystem/hybridBlockchainDB/storage/ethereum/clientSDK"
-	//FabClientSDK "github.com/nusdbsystem/hybridBlockchainDB/storage/fabric/clientSDK"
+	"github.com/nusdbsystem/hybrid/BlockchainDB/bcdbnode/config"
+	Connectors "github.com/nusdbsystem/hybrid/BlockchainDB/blockchainconnectors"
+	EthClientSDK "github.com/nusdbsystem/hybrid/BlockchainDB/storage/ethereum/clientSDK"
+	//FabClientSDK "github.com/nusdbsystem/hybrid/BlockchainDB/storage/fabric/clientSDK"
 )
 
 type ShardingMgr struct {

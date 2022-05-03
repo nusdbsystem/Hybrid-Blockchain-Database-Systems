@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	pbv "github.com/nusdbsystem/hybridproto/raftkv"
+	pbv "github.com/nusdbsystem/hybrid/proto/raftkv"
 )
 
 type Driver struct {

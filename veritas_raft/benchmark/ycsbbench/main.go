@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/nusdbsystem/hybridveritas_raft/benchmark"
+	"github.com/nusdbsystem/hybrid/veritas_raft/benchmark"
 
 	"go.uber.org/atomic"
 

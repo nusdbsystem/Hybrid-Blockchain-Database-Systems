@@ -12,7 +12,7 @@ import (
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/nusdbsystem/hybridveritas_kafka/benchmark"
+	"github.com/nusdbsystem/hybrid/veritas_kafka/benchmark"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

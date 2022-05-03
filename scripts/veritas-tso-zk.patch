@@ -10,10 +10,10 @@ index a91d6ff..b929d65 100644
  
  	"google.golang.org/grpc"
  
- 	pbv "github.com/nusdbsystem/hybridproto/veritas"
--	"github.com/nusdbsystem/hybridtso"
-+	tso "github.com/nusdbsystem/hybridtso_zookeeper"
- 	"github.com/nusdbsystem/hybridveritas_kafka/db"
+ 	pbv "github.com/nusdbsystem/hybrid/proto/veritas"
+-	"github.com/nusdbsystem/hybrid/tso"
++	tso "github.com/nusdbsystem/hybrid/tso_zookeeper"
+ 	"github.com/nusdbsystem/hybrid/veritas_kafka/db"
  )
  
 @@ -18,6 +19,8 @@ type Driver struct {

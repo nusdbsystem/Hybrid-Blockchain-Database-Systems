@@ -7,7 +7,7 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/nusdbsystem/hybridveritas_kafka/ledger"
+	"github.com/nusdbsystem/hybrid/veritas_kafka/ledger"
 
 	"github.com/go-redis/redis/v8"
 	abcitypes "github.com/tendermint/tendermint/abci/types"

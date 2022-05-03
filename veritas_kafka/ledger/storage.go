@@ -8,7 +8,7 @@ import (
 
 	"github.com/dgraph-io/badger/v3"
 
-	"github.com/nusdbsystem/hybridveritas_kafka/ledger/merkletree"
+	"github.com/nusdbsystem/hybrid/veritas_kafka/ledger/merkletree"
 )
 
 type LogLedger struct {

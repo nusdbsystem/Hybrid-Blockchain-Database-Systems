@@ -8,11 +8,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/nusdbsystem/hybridveritas_kafka/benchmark"
+	"github.com/nusdbsystem/hybrid/veritas_kafka/benchmark"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/nusdbsystem/hybridveritas_kafka/driver"
+	"github.com/nusdbsystem/hybrid/veritas_kafka/driver"
 )
 
 func init() {

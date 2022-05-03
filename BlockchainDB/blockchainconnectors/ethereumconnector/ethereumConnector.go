@@ -7,8 +7,8 @@ import (
 	"log"
 	"math/big"
 
-	KVStore "github.com/nusdbsystem/hybridBlockchainDB/storage/ethereum/contracts/KVStore"
-	TxMgr "github.com/nusdbsystem/hybridBlockchainDB/transactionMgr"
+	KVStore "github.com/nusdbsystem/hybrid/BlockchainDB/storage/ethereum/contracts/KVStore"
+	TxMgr "github.com/nusdbsystem/hybrid/BlockchainDB/transactionMgr"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"

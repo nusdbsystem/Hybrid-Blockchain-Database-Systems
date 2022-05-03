@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	pbv "github.com/nusdbsystem/hybridveritas_hotstuff/proto/veritashs"
-	"github.com/nusdbsystem/hybridveritas_hotstuff/storage"
+	pbv "github.com/nusdbsystem/hybrid/veritas_hotstuff/proto/veritashs"
+	"github.com/nusdbsystem/hybrid/veritas_hotstuff/storage"
 
 	"google.golang.org/grpc"
 )

@@ -8,9 +8,9 @@ import (
 	pbv "hybrid/veritas_hotstuff/proto/veritashs"
 	"hybrid/veritas_hotstuff/storage"
 
-	hsc "github.com/EinWTW/hotstuff/cmd/hotstuffclient/client"
+	hsc "github.com/wtwinlab/hotstuff/cmd/hotstuffclient/client"
 
-	//hsc "github.com/EinWTW/hotstuff/client"
+	//hsc "github.com/wtwinlab/hotstuff/client"
 	veritas "hybrid/veritas_kafka"
 
 	"google.golang.org/protobuf/proto"

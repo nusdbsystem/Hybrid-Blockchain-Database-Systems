@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/nusdbsystem/hybridveritas_kafka/benchmark"
-	veritastm "github.com/nusdbsystem/hybridveritas_tendermint"
+	"github.com/nusdbsystem/hybrid/veritas_kafka/benchmark"
+	veritastm "github.com/nusdbsystem/hybrid/veritas_tendermint"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )

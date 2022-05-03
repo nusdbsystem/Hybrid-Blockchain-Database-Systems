@@ -11,9 +11,9 @@ import (
 	"google.golang.org/grpc"
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	pbv "github.com/nusdbsystem/hybridproto/veritas"
-	veritas "github.com/nusdbsystem/hybridveritas_kafka"
-	"github.com/nusdbsystem/hybridveritas_kafka/kafkarole"
+	pbv "github.com/nusdbsystem/hybrid/proto/veritas"
+	veritas "github.com/nusdbsystem/hybrid/veritas_kafka"
+	"github.com/nusdbsystem/hybrid/veritas_kafka/kafkarole"
 )
 
 var (

@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 
-	hs "github.com/EinWTW/hotstuff/cmd/hotstuffserver/clientsrv"
 	flag "github.com/spf13/pflag"
+	hs "github.com/wtwinlab/hotstuff/cmd/hotstuffserver/clientsrv"
 )
 
 func main() {

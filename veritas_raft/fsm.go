@@ -10,7 +10,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/hashicorp/raft"
 
-	pb "github.com/nusdbsystem/hybridproto/raftkv"
+	pb "github.com/nusdbsystem/hybrid/proto/raftkv"
 )
 
 type fsm struct {

@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	pbv "github.com/nusdbsystem/hybridproto/veritas"
+	pbv "github.com/nusdbsystem/hybrid/proto/veritas"
 )
 
 type Driver struct {

@@ -13,8 +13,8 @@ import (
 	"google.golang.org/grpc"
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	benchmark "github.com/nusdbsystem/hybridveritas_hotstuff/benchmark/ycsb"
-	pbv "github.com/nusdbsystem/hybridveritas_hotstuff/proto/veritashs"
+	benchmark "github.com/nusdbsystem/hybrid/veritas_hotstuff/benchmark/ycsb"
+	pbv "github.com/nusdbsystem/hybrid/veritas_hotstuff/proto/veritashs"
 )
 
 var (

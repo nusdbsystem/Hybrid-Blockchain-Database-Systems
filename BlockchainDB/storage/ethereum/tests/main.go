@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/nusdbsystem/hybridBlockchainDB/bcdbnode/config"
-	ClientSDK "github.com/nusdbsystem/hybridBlockchainDB/storage/ethereum/clientSDK"
+	"github.com/nusdbsystem/hybrid/BlockchainDB/bcdbnode/config"
+	ClientSDK "github.com/nusdbsystem/hybrid/BlockchainDB/storage/ethereum/clientSDK"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"

@@ -14,7 +14,7 @@ import (
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/nusdbsystem/hybridveritas_kafka/benchmark"
+	"github.com/nusdbsystem/hybrid/veritas_kafka/benchmark"
 )
 
 var (

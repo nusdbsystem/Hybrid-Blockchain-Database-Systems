@@ -29,6 +29,7 @@ require (
 	github.com/spf13/viper v1.9.0
 	github.com/stretchr/testify v1.7.0
 	github.com/tendermint/tendermint v0.35.0
+	github.com/wtwinlab/hotstuff v0.2.3-0.20220429084810-da90a9948260 // indirect
 	go.mongodb.org/mongo-driver v1.7.4
 	go.uber.org/atomic v1.9.0
 	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect

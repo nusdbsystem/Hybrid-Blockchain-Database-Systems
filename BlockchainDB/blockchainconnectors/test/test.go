@@ -1,7 +1,7 @@
 package test
 
 import (
-	Connectors "github.com/nusdbsystem/hybridBlockchainDB/blockchainconnectors"
+	Connectors "github.com/nusdbsystem/hybrid/BlockchainDB/blockchainconnectors"
 )
 
 func NewShardingMgr() (Connectors.BlockchainConnector, error) {

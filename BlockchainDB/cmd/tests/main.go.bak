@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	pbv "github.com/nusdbsystem/hybridBlockchainDB/proto/blockchaindb"
+	pbv "github.com/nusdbsystem/hybrid/BlockchainDB/proto/blockchaindb"
 
 	"google.golang.org/grpc"
 )

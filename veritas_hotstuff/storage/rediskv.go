@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 
-	"github.com/nusdbsystem/hybridveritas_hotstuff/storage/redisconn"
+	"github.com/nusdbsystem/hybrid/veritas_hotstuff/storage/redisconn"
 
 	"github.com/go-redis/redis/v8"
 )

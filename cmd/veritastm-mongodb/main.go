@@ -14,8 +14,8 @@ import (
 	"google.golang.org/grpc"
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	pbv "github.com/nusdbsystem/hybridproto/veritas"
-	veritastm "github.com/nusdbsystem/hybridveritas_tendermint"
+	pbv "github.com/nusdbsystem/hybrid/proto/veritas"
+	veritastm "github.com/nusdbsystem/hybrid/veritas_tendermint"
 
 	abciserver "github.com/tendermint/tendermint/abci/server"
 )

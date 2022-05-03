@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	veritastm "github.com/nusdbsystem/hybridveritas_tendermint"
+	veritastm "github.com/nusdbsystem/hybrid/veritas_tendermint"
 
 	"go.uber.org/atomic"
 

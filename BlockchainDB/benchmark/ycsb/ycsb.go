@@ -12,8 +12,8 @@ import (
 	"google.golang.org/grpc"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/nusdbsystem/hybridBlockchainDB/benchmark"
-	pbv "github.com/nusdbsystem/hybridBlockchainDB/proto/blockchaindb"
+	"github.com/nusdbsystem/hybrid/BlockchainDB/benchmark"
+	pbv "github.com/nusdbsystem/hybrid/BlockchainDB/proto/blockchaindb"
 )
 
 var (

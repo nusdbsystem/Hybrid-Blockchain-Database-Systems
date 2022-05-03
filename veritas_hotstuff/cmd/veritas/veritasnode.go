@@ -7,10 +7,10 @@ import (
 	"os"
 	"os/signal"
 
-	pbv "github.com/nusdbsystem/hybridveritas_hotstuff/proto/veritashs"
+	pbv "github.com/nusdbsystem/hybrid/veritas_hotstuff/proto/veritashs"
 
-	"github.com/nusdbsystem/hybridveritas_hotstuff/cmd/config"
-	"github.com/nusdbsystem/hybridveritas_hotstuff/svrnode"
+	"github.com/nusdbsystem/hybrid/veritas_hotstuff/cmd/config"
+	"github.com/nusdbsystem/hybrid/veritas_hotstuff/svrnode"
 
 	flag "github.com/spf13/pflag"
 	"google.golang.org/grpc"
