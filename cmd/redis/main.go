@@ -14,7 +14,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"hybrid/dbconn"
-	"hybrid/veritas/benchmark"
+	"hybrid/veritas_kafka/benchmark"
 )
 
 var (

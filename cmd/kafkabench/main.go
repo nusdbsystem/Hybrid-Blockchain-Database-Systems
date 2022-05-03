@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"hybrid/kafkarole"
+	"hybrid/veritas_kafka/kafkarole"
 	"log"
 	"math/rand"
 	"sync"

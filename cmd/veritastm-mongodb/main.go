@@ -8,14 +8,14 @@ import (
 	"os/signal"
 	"strings"
 
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	pbv "hybrid/proto/veritas"
-	"hybrid/veritastm"
+	veritastm "hybrid/veritas_tendermint"
 
 	abciserver "github.com/tendermint/tendermint/abci/server"
 )
@@ -43,14 +43,14 @@ func main() {
 	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(*mongoAddr))
 	check(err)
 
-        mod := mongo.IndexModel{
-                Keys: bson.M{
-                        "key": 1, // index in ascending order
-                }, Options: nil,
-        }
-        collection := client.Database("veritas").Collection("kv")
-        _, err = collection.Indexes().CreateOne(context.Background(), mod)
-        check(err)
+	mod := mongo.IndexModel{
+		Keys: bson.M{
+			"key": 1, // index in ascending order
+		}, Options: nil,
+	}
+	collection := client.Database("veritas").Collection("kv")
+	_, err = collection.Indexes().CreateOne(context.Background(), mod)
+	check(err)
 
 	pm := make(map[string]struct{})
 	pm[*signature] = struct{}{}

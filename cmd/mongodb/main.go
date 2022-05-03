@@ -12,7 +12,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"hybrid/dbconn"
-	"hybrid/veritas/benchmark"
+	"hybrid/veritas_kafka/benchmark"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -125,14 +125,14 @@ func main() {
 		avaLatency = float64(all) / (1000 * float64(atomic.LoadInt64(&reqNum)))
 		setlat := int64(0)
 		for ts := range latencySetCh {
-                        setlat += ts.Microseconds()
-                }
-                avgSetLatency = float64(setlat) / (1000 * float64(atomic.LoadInt64(&reqNumSet)))
+			setlat += ts.Microseconds()
+		}
+		avgSetLatency = float64(setlat) / (1000 * float64(atomic.LoadInt64(&reqNumSet)))
 		getlat := int64(0)
-                for ts := range latencyGetCh {
-                        getlat += ts.Microseconds()
-                }
-                avgGetLatency = float64(getlat) / (1000 * float64(atomic.LoadInt64(&reqNumGet)))
+		for ts := range latencyGetCh {
+			getlat += ts.Microseconds()
+		}
+		avgGetLatency = float64(getlat) / (1000 * float64(atomic.LoadInt64(&reqNumGet)))
 	}()
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
@@ -206,7 +206,7 @@ func main() {
 					dt := time.Since(start)
 					latencyCh <- dt
 					latencySetCh <- dt
-                                        atomic.AddInt64(&reqNumSet, 1)
+					atomic.AddInt64(&reqNumSet, 1)
 				default:
 					panic(fmt.Sprintf("invalid operation: %v", op.ReqType))
 				}

@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"hybrid/veritas_kafka/benchmark"
 	veritastm "hybrid/veritas_tendermint"
-	"hybrid/veritas_tendermint/benchmark"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )
@@ -24,7 +24,7 @@ func main() {
 	}
 	defer cli.Close()
 
-	res, err := cli.Set(ctx, "abc", "xyz")
+	res, err := cli.Set(ctx, "abc", "xyz", 0)
 	fmt.Printf("Set error %v\n", err)
 	fmt.Printf("Set result %v\n", res)
 

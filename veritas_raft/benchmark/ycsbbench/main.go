@@ -107,8 +107,8 @@ func main() {
 	}
 	defer runFile.Close()
 	runBuf := make(chan *benchmark.Request, 20*(*driverNum)*(*driverConcurrency))
-	var lastKey string
-	var lastVer int64
+	// var lastKey string
+	// var lastVer int64
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -129,8 +129,8 @@ func main() {
 				r.ReqType = benchmark.SetOp
 				r.Val = operands[3]
 				r.Version = ver
-				lastKey = operands[2]
-				lastVer = ver
+				// lastKey = operands[2]
+				// lastVer = ver
 			}
 			runBuf <- r
 			return nil
