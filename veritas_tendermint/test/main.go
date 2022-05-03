@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"hybrid/veritas_kafka/benchmark"
-	veritastm "hybrid/veritas_tendermint"
+
+	"github.com/nusdbsystem/hybridveritas_kafka/benchmark"
+	veritastm "github.com/nusdbsystem/hybridveritas_tendermint"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 )

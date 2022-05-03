@@ -10,9 +10,9 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	BlockchainConnector "hybrid/BlockchainDB/blockchainconnectors/ethereumconnector"
-	KVStore "hybrid/BlockchainDB/storage/ethereum/contracts/KVStore"
-	"hybrid/BlockchainDB/transactionMgr"
+	BlockchainConnector "github.com/nusdbsystem/hybridBlockchainDB/blockchainconnectors/ethereumconnector"
+	KVStore "github.com/nusdbsystem/hybridBlockchainDB/storage/ethereum/contracts/KVStore"
+	"github.com/nusdbsystem/hybridBlockchainDB/transactionMgr"
 
 	"github.com/ethereum/go-ethereum/ethclient"
 )

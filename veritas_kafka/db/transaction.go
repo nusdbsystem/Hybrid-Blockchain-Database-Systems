@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 
-	pbv "hybrid/proto/veritas"
+	pbv "github.com/nusdbsystem/hybridproto/veritas"
 )
 
 type TransactionDB struct {

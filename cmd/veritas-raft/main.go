@@ -13,8 +13,8 @@ import (
 	"google.golang.org/grpc"
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	pb "hybrid/proto/raftkv"
-	raftkv "hybrid/veritas_raft"
+	pb "github.com/nusdbsystem/hybridproto/raftkv"
+	raftkv "github.com/nusdbsystem/hybridveritas_raft"
 )
 
 var (

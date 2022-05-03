@@ -8,10 +8,10 @@ import (
 	"os"
 	"os/signal"
 
+	service "github.com/nusdbsystem/hybridBlockchainDB/bcdbnode"
+	"github.com/nusdbsystem/hybridBlockchainDB/bcdbnode/config"
+	pbv "github.com/nusdbsystem/hybridBlockchainDB/proto/blockchaindb"
 	"google.golang.org/grpc"
-	service "hybrid/BlockchainDB/bcdbnode"
-	"hybrid/BlockchainDB/bcdbnode/config"
-	pbv "hybrid/BlockchainDB/proto/blockchaindb"
 )
 
 func main() {

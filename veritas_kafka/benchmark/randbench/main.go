@@ -3,15 +3,16 @@ package main
 import (
 	"context"
 	"fmt"
-	"hybrid/veritas_kafka/benchmark"
 	"math/rand"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/nusdbsystem/hybridveritas_kafka/benchmark"
+
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"hybrid/veritas_kafka/driver"
+	"github.com/nusdbsystem/hybridveritas_kafka/driver"
 )
 
 func init() {

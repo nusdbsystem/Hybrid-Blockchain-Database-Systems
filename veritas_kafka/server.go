@@ -13,8 +13,8 @@ import (
 	"github.com/golang/protobuf/proto"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 
-	pbv "hybrid/proto/veritas"
-	"hybrid/veritas_kafka/ledger"
+	pbv "github.com/nusdbsystem/hybridproto/veritas"
+	"github.com/nusdbsystem/hybridveritas_kafka/ledger"
 )
 
 type server struct {

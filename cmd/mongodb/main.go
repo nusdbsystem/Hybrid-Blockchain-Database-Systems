@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"hybrid/dbconn"
 	"os"
 	"strings"
 	"sync"
@@ -11,8 +12,7 @@ import (
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"hybrid/dbconn"
-	"hybrid/veritas_kafka/benchmark"
+	"github.com/nusdbsystem/hybridveritas_kafka/benchmark"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

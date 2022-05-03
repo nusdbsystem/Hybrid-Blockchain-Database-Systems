@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"strconv"
 
-	veritastm "hybrid/veritas_tendermint"
 	"os"
 	"strings"
 	"sync"
 	"time"
+
+	veritastm "github.com/nusdbsystem/hybridveritas_tendermint"
 
 	"go.uber.org/atomic"
 

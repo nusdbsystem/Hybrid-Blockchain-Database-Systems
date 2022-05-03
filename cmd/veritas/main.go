@@ -1,6 +1,7 @@
 package main
 
 import (
+	"hybrid/dbconn"
 	"log"
 	"net"
 	"os"
@@ -10,10 +11,9 @@ import (
 	"google.golang.org/grpc"
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"hybrid/dbconn"
-	pbv "hybrid/proto/veritas"
-	veritas "hybrid/veritas_kafka"
-	"hybrid/veritas_kafka/kafkarole"
+	pbv "github.com/nusdbsystem/hybridproto/veritas"
+	veritas "github.com/nusdbsystem/hybridveritas_kafka"
+	"github.com/nusdbsystem/hybridveritas_kafka/kafkarole"
 )
 
 var (

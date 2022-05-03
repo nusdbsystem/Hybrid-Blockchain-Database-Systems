@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
-	"hybrid/veritas_raft/benchmark"
 	"os"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/nusdbsystem/hybridveritas_raft/benchmark"
 
 	"go.uber.org/atomic"
 

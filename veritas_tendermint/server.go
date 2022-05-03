@@ -9,7 +9,7 @@ import (
 	"github.com/pkg/errors"
 	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
 
-	pbv "hybrid/proto/veritas"
+	pbv "github.com/nusdbsystem/hybridproto/veritas"
 )
 
 type server struct {

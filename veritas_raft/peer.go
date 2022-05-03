@@ -14,8 +14,8 @@ import (
 	raftboltdb "github.com/hashicorp/raft-boltdb"
 	"google.golang.org/grpc"
 
-	pb "hybrid/proto/raftkv"
-	"hybrid/veritas_kafka/ledger"
+	pb "github.com/nusdbsystem/hybridproto/raftkv"
+	"github.com/nusdbsystem/hybridveritas_kafka/ledger"
 )
 
 var _ pb.DBServer = (*Peer)(nil)

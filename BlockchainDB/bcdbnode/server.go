@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"hybrid/BlockchainDB/bcdbnode/config"
-	pbv "hybrid/BlockchainDB/proto/blockchaindb"
-	sharding "hybrid/BlockchainDB/shardingMgr"
+	"github.com/nusdbsystem/hybridBlockchainDB/bcdbnode/config"
+	pbv "github.com/nusdbsystem/hybridBlockchainDB/proto/blockchaindb"
+	sharding "github.com/nusdbsystem/hybridBlockchainDB/shardingMgr"
 )
 
 var _ pbv.BCdbNodeServer = (*ServerNode)(nil)

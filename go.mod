@@ -1,4 +1,4 @@
-module hybrid
+module github.com/nusdbsystem/hybrid
 
 go 1.15
 

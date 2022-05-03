@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"hybrid/veritas_kafka/kafkarole"
 	"log"
 	"math/rand"
 	"sync"
 	"time"
+
+	"github.com/nusdbsystem/hybridveritas_kafka/kafkarole"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
