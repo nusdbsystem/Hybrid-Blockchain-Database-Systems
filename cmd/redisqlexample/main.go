@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"hybrid/dbconn"
 	"strconv"
+
+	"github.com/nusdbsystem/hybrid/dbconn"
 
 	"github.com/mediocregopher/radix/v3"
 

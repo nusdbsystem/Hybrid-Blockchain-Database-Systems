@@ -1,12 +1,13 @@
 package main
 
 import (
-	"hybrid/dbconn"
 	"log"
 	"net"
 	"os"
 	"os/signal"
 	"strings"
+
+	"github.com/nusdbsystem/hybrid/dbconn"
 
 	"google.golang.org/grpc"
 	"gopkg.in/alecthomas/kingpin.v2"

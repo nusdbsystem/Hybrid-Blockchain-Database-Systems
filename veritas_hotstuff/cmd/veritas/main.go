@@ -9,8 +9,8 @@ import (
 
 	pbv "github.com/nusdbsystem/hybrid/veritas_hotstuff/proto/veritashs"
 
-	"github.com/nusdbsystem/hybrid/veritas_hotstuff/cmd/config"
-	"github.com/nusdbsystem/hybrid/veritas_hotstuff/svrnode"
+	"github.com/nusdbsystem/hybrid/veritas_hotstuff/config"
+	veritas "github.com/nusdbsystem/hybrid/veritas_hotstuff/server"
 
 	flag "github.com/spf13/pflag"
 	"google.golang.org/grpc"
@@ -31,7 +31,7 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	svr, err := svrnode.NewServerNode(&conf, *configFile)
+	svr, err := veritas.NewServerNode(&conf, *configFile)
 	if err != nil {
 		//panic(err)
 		fmt.Printf("%v", err)

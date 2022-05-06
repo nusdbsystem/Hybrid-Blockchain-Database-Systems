@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"hybrid/dbconn"
 	"os"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/nusdbsystem/hybrid/dbconn"
 
 	"github.com/mediocregopher/radix/v3"
 

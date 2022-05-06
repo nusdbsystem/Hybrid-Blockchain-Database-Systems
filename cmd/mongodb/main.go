@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
-	"hybrid/dbconn"
 	"os"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/nusdbsystem/hybrid/dbconn"
 
 	"gopkg.in/alecthomas/kingpin.v2"
 

@@ -1,17 +1,17 @@
-package svrnode
+package server
 
 import (
 	"context"
 	"fmt"
 
-	"hybrid/veritas_hotstuff/cmd/config"
-	pbv "hybrid/veritas_hotstuff/proto/veritashs"
-	"hybrid/veritas_hotstuff/storage"
+	"github.com/nusdbsystem/hybrid/veritas_hotstuff/config"
+	pbv "github.com/nusdbsystem/hybrid/veritas_hotstuff/proto/veritashs"
+	"github.com/nusdbsystem/hybrid/veritas_hotstuff/storage"
 
 	hsc "github.com/wtwinlab/hotstuff/cmd/hotstuffclient/client"
 
 	//hsc "github.com/wtwinlab/hotstuff/client"
-	veritas "hybrid/veritas_kafka"
+	veritas "github.com/nusdbsystem/hybrid/veritas_kafka"
 
 	"google.golang.org/protobuf/proto"
 )

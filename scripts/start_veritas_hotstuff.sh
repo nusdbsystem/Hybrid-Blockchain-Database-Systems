@@ -42,6 +42,7 @@ echo "print-throughput = false" >> ${tomlFile}
 echo "client-listen = \"${PREFIX}${IPX}:20070\"" >> ${tomlFile}
 echo "self-veritas-node = \"${PREFIX}${IPX}:50001\"" >> ${tomlFile}
 echo "self-redis-address = \"${PREFIX}${IPX}:6379\"" >> ${tomlFile}
+echo "self-ledger-path = \"veritas${IPX}\"" >> ${tomlFile}
 echo  >> ${tomlFile}
 
 echo '# This is the information that each replica is given about the other replicas' >> ${tomlFile}
@@ -53,6 +54,7 @@ echo '# This is the information that each replica is given about the other repli
 	echo "peer-address = \"${PREFIX}${IPY}:10070\"" >> ${tomlFile}
 	echo "client-address = \"${PREFIX}${IPY}:20070\"" >> ${tomlFile}
 	echo "redis-address = \"${PREFIX}${IPY}:6379\"" >> ${tomlFile}
+	echo "ledger-path = \"veritas${IPY}\"" >> ${tomlFile}
 	echo "pubkey = \"veritas_hotstuff/keys/r${j}.key.pub\"" >> ${tomlFile}
 	echo "cert = \"veritas_hotstuff/keys/r${j}.crt\"" >> ${tomlFile}
 	echo  >> ${tomlFile}

@@ -2,7 +2,8 @@ package raftkv
 
 import (
 	"context"
-	"hybrid/dbconn"
+
+	"github.com/nusdbsystem/hybrid/dbconn"
 
 	"github.com/go-redis/redis/v8"
 )
