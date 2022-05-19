@@ -1,5 +1,11 @@
 # Veritas + HotStuff
 
+
+
+For benchmark experiments, you don't need to follow the steps. Just build the Dockerfile and run benchmark scripts, it will handle everything.
+
+
+
 ### Download
 
 1. ###### Download go pkg
@@ -95,5 +101,4 @@ $ make test nodes=4 clients=4
 1. Throughput
 
 2. Latency
-
 
