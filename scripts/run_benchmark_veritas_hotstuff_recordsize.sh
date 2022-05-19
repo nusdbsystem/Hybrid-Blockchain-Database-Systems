@@ -1,4 +1,5 @@
 #!/bin/bash
+. ./env.sh
 
 TSTAMP=`date +%F-%H-%M-%S`
 LOGSD="logs-txsize-veritas_hotstuff-$TSTAMP"
@@ -38,12 +39,12 @@ done
 echo "start test with nodes addrs: ${defaultAddrs}"
 
 
-nTXSIZES="ycsb_data_512B ycsb_data_2kB ycsb_data_8kB ycsb_data_32kB ycsb_data_128kB"
+#nTXSIZES="ycsb_data_512B ycsb_data_2kB ycsb_data_8kB ycsb_data_32kB ycsb_data_128kB"
 
-for TH in $nTXSIZES; do
+for TH in ${TXSIZES}; do
     echo "Test start with node size: ${nodes}, client size: ${clients}, workload${workload}, TxSize: ${TH}"
-    loadPath="$dir/../temp/${TH}/workload${workload}.dat"
-    runPath="$dir/../temp/${TH}/run_workload${workload}.dat"
+    loadPath="${DEFAULT_WORKLOAD_PATH}_${TH}/${DEFAULT_WORKLOAD}.dat"
+    runPath="${DEFAULT_WORKLOAD_PATH}_${TH}/run_${DEFAULT_WORKLOAD}.dat"
     ./restart_cluster_veritas_hotstuff.sh 
     ./start_veritas_hotstuff.sh       
     

@@ -1,4 +1,5 @@
 #!/bin/bash
+. ./env.sh
 
 TSTAMP=`date +%F-%H-%M-%S`
 LOGSD="logs-networking-veritas_hotstuff-$TSTAMP"
@@ -18,8 +19,8 @@ echo $dir
 bin="$dir/../veritas_hotstuff/.bin/benchmark_veritashf"
 defaultAddrs="192.168.20.2:50001"
 nthreads=$(( ${clients} / ${ndrivers} ))
-loadPath="$dir/../temp/${distribution}/workload${workload}.dat"
-runPath="$dir/../temp/${distribution}/run_workload${workload}.dat"
+loadPath="${DEFAULT_WORKLOAD_PATH}/${DEFAULT_WORKLOAD}.dat"
+runPath="${DEFAULT_WORKLOAD_PATH}/run_${DEFAULT_WORKLOAD}.dat"
 
 if [ ! -f ${bin} ]; then
     echo "Binary file ${bin} not found!"

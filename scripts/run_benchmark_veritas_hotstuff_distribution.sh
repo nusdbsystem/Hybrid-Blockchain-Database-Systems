@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. ./env.sh
+
 TSTAMP=`date +%F-%H-%M-%S`
 LOGSD="logs-distribution-veritas_hotstuff-$TSTAMP"
 mkdir $LOGSD
@@ -41,8 +43,8 @@ nDISTRIBUTIONS="ycsb_data ycsb_data_latest ycsb_data_zipfian"
 
 for TH in $nDISTRIBUTIONS; do
     echo "Test start with node size: ${size}, client size: ${clients}, workload${workload}, distribution: ${TH}"
-    loadPath="$dir/../temp/${TH}/workload${workload}.dat"
-    runPath="$dir/../temp/${TH}/run_workload${workload}.dat"
+    loadPath="$dir/temp/${TH}/workload${workload}.dat"
+    runPath="$dir/temp/${TH}/run_workload${workload}.dat"
     ./restart_cluster_veritas_hotstuff.sh
     ./start_veritas_hotstuff.sh        
     

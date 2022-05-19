@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. ./env.sh
+
 TSTAMP=`date +%F-%H-%M-%S`
 LOGSD="logs-workload-veritas_hotstuff-$TSTAMP"
 mkdir $LOGSD
@@ -11,7 +13,7 @@ clients=${2:-256}
 workload=${3:-a}
 distribution=${4:-ycsb_data}
 
-ndrivers=${nodes}
+ndrivers=${DEFAULT_DRIVERS_VERITAS_HOTSTUFF}
 
 dir=$(pwd)
 echo $dir
@@ -38,12 +40,10 @@ done
 echo "start test with nodes addrs: ${defaultAddrs}"
 
 
-nDISTRIBUTIONS="a b c"
-
-for TH in $nDISTRIBUTIONS; do
+for TH in $WORKLOADS; do
     echo "Test start with node size: ${nodes}, client size: ${clients}, workload${TH}"
-    loadPath="$dir/../temp/${distribution}/workload${TH}.dat"
-    runPath="$dir/../temp/${distribution}/run_workload${TH}.dat"
+    loadPath="$DEFAULT_WORKLOAD_PATH/${TH}.dat"
+    runPath="$DEFAULT_WORKLOAD_PATH/run_${TH}.dat"
     ./restart_cluster_veritas_hotstuff.sh
     ./start_veritas_hotstuff.sh        
     

@@ -5,6 +5,7 @@ nodes=${1:-4}
 delay=${2:-0}
 blksize=${3:-100}
 PREFIX="192.168.20."
+enabletls=false
 dir=$(dirname "$0")
 tomlDir="$dir/toml.${nodes}"
 rm -rf ${tomlDir}/*
@@ -20,7 +21,9 @@ echo "##################### 1.generate config ######################"
 for (( c=1; c<=${nodes}; c++ ))
 do
 IPX=$((${c} + 1))
-$KEY_GEN_PATH/hotstuffkeygen -p 'r*' -n ${nodes} --hosts ${PREFIX}${IPX} --tls keys
+if $enabletls ; then
+	$KEY_GEN_PATH/hotstuffkeygen -p 'r*' -n ${nodes} --hosts ${PREFIX}${IPX} --tls keys
+fi
 
 tomlFile="${tomlDir}/hotstuff${c}.toml"
 rm -f ${tomlFile}
@@ -29,8 +32,10 @@ echo "self-id = ${c}" > ${tomlFile}
 echo 'pacemaker = "fixed"' >> ${tomlFile}
 # echo 'pacemaker = "round-robin"' >> ${tomlFile}
 echo 'leader-id = 1' >> ${tomlFile}
-echo "root-cas = [\"veritas_hotstuff/keys/ca.crt\"]" >> ${tomlFile}
-echo "privkey = \"veritas_hotstuff/keys/r${c}.key\"" >> ${tomlFile}
+if $enabletls ; then
+	echo "root-cas = [\"veritas_hotstuff/keys/ca.crt\"]" >> ${tomlFile}
+	echo "privkey = \"veritas_hotstuff/keys/r${c}.key\"" >> ${tomlFile}
+fi
 echo 'rate-limit = 0' >> ${tomlFile}
 echo "tx-delay = ${delay}" >> ${tomlFile}
 echo 'tls = false' >> ${tomlFile}
@@ -55,8 +60,10 @@ echo '# This is the information that each replica is given about the other repli
 	echo "client-address = \"${PREFIX}${IPY}:20070\"" >> ${tomlFile}
 	echo "redis-address = \"${PREFIX}${IPY}:6379\"" >> ${tomlFile}
 	echo "ledger-path = \"veritas${IPY}\"" >> ${tomlFile}
-	echo "pubkey = \"veritas_hotstuff/keys/r${j}.key.pub\"" >> ${tomlFile}
-	echo "cert = \"veritas_hotstuff/keys/r${j}.crt\"" >> ${tomlFile}
+	if $enabletls ; then
+		echo "pubkey = \"veritas_hotstuff/keys/r${j}.key.pub\"" >> ${tomlFile}
+		echo "cert = \"veritas_hotstuff/keys/r${j}.crt\"" >> ${tomlFile}
+	fi
 	echo  >> ${tomlFile}
 	done
 echo "Generate config file toml.${nodes}/hotstuff${c}.toml"
@@ -69,8 +76,10 @@ echo "##################### 3.start hotstuff nodes ####################"
 for (( j=1; j<=${nodes}; j++ )); do
 	IPX=$((${j} + 1))
 	scp -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" ${tomlDir}/hotstuff${j}.toml root@${PREFIX}${IPX}:/root/veritas_hotstuff/
-	scp -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" keys/r${j}.key root@${PREFIX}${IPX}:/root/veritas_hotstuff/keys/
-	scp -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" keys/r*.key.pub root@${PREFIX}${IPX}:/root/veritas_hotstuff/keys/
+	if $enabletls ; then
+		scp -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" keys/r${j}.key root@${PREFIX}${IPX}:/root/veritas_hotstuff/keys/
+		scp -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" keys/r*.key.pub root@${PREFIX}${IPX}:/root/veritas_hotstuff/keys/
+	fi
 	ssh -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" root@${PREFIX}${IPX} "service redis-server start"
 done
 sleep 5
