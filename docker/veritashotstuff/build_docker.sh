@@ -4,16 +4,19 @@ set -e
 dir=$(dirname "$0")
 echo ${dir}
 
-if ! [ -d "${dir}/../../VeritasHotstuff/.bin" ]; then
-    echo "Please build the binaries first! (cd VeritasHotstuff && make build)"
-    exit 1
-fi
+
 
 rm -rf ${dir}/.bin
-cd ${dir}/../../VeritasHotstuff/
+cd ${dir}/../../veritas_hotstuff/
 make build
+# go build -o ./.bin/hotstuffkeygen ./hotstuff/cmd/hotstuffkeygen
 cd -
-cp -r ${dir}/../../VeritasHotstuff/.bin ${dir}/	
+
+if ! [ -d "${dir}/../../veritas_hotstuff/.bin" ]; then
+    echo "Please build the binaries first! (cd veritas_hotstuff && make build)"
+    exit 1
+fi
+cp -r ${dir}/../../veritas_hotstuff/.bin ${dir}/	
 
 
 if ! [ -f "${dir}/id_rsa.pub" ]; then

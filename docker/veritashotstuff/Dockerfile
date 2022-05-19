@@ -1,4 +1,4 @@
-#Dockerfile for VeritasHotstuff
+#Dockerfile for veritas_hotstuff
 FROM ubuntu:21.04
 RUN apt update && apt-get -y install tzdata
 RUN apt update && apt -y install build-essential git jq libc6 python3-pip \
@@ -42,11 +42,11 @@ RUN sed -i '/protected-mode yes/c protected-mode no' /etc/redis/redis.conf
 RUN service redis-server start
 
 RUN mkdir -p /Data/
-RUN mkdir -p ${HOME}/VeritasHotstuff/keys/
-RUN mkdir -p ${HOME}/VeritasHotstuff/config/
-RUN mkdir -p ${HOME}/VeritasHotstuff/logs/
-RUN mkdir -p ${HOME}/VeritasHotstuff/bin/
-COPY .bin ${HOME}/VeritasHotstuff/bin
-WORKDIR ${HOME}/VeritasHotstuff/
+RUN mkdir -p ${HOME}/veritas_hotstuff/keys/
+RUN mkdir -p ${HOME}/veritas_hotstuff/config/
+RUN mkdir -p ${HOME}/veritas_hotstuff/logs/
+RUN mkdir -p ${HOME}/veritas_hotstuff/bin/
+COPY .bin ${HOME}/veritas_hotstuff/bin
+WORKDIR ${HOME}/veritas_hotstuff/
 ENV HOTSTUFF_LOG="debug"
 ENV HOTSTUFF_LOG_TYPE="json"
