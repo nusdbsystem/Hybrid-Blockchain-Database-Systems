@@ -5,7 +5,7 @@ nodes=${1:-4}
 delay=${2:-0}
 blksize=${3:-100}
 PREFIX="192.168.20."
-enabletls=false
+enabletls=true
 dir=$(dirname "$0")
 tomlDir="$dir/toml.${nodes}"
 rm -rf ${tomlDir}/*

@@ -9,7 +9,9 @@ echo ${dir}
 rm -rf ${dir}/.bin
 cd ${dir}/../../veritas_hotstuff/
 make build
-# go build -o ./.bin/hotstuffkeygen ./hotstuff/cmd/hotstuffkeygen
+cd -
+cd ${dir}/../../veritas_hotstuff/hotstuff
+go build -o ../.bin/hotstuffkeygen ./cmd/hotstuffkeygen
 cd -
 
 if ! [ -d "${dir}/../../veritas_hotstuff/.bin" ]; then
