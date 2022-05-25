@@ -94,17 +94,17 @@ func main() {
 			defer wg.Done()
 			for kv := range loadBuf {
 				lastkey = kv[0]
-				ver, err := strconv.ParseInt(kv[2], 10, 64)
-				if err != nil {
-					panic(err)
-				}
-				if _, err := clis[0].Set(context.Background(), &pbv.SetRequest{
-					Key:     kv[0],
-					Value:   kv[1],
-					Version: ver,
-				}); err != nil {
-					panic(err)
-				}
+				// ver, err := strconv.ParseInt(kv[2], 10, 64)
+				// if err != nil {
+				// 	panic(err)
+				// }
+				// if _, err := clis[0].Set(context.Background(), &pbv.SetRequest{
+				// 	Key:     kv[0],
+				// 	Value:   kv[1],
+				// 	Version: ver,
+				// }); err != nil {
+				// 	panic(err)
+				// }
 			}
 		}()
 	}

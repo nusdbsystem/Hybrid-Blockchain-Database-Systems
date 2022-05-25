@@ -28,7 +28,7 @@ require (
 	github.com/spf13/viper v1.9.0
 	github.com/stretchr/testify v1.7.0
 	github.com/tendermint/tendermint v0.35.0
-	github.com/wtwinlab/hotstuff v0.2.3-0.20220506042151-9af6a587d449
+	github.com/wtwinlab/hotstuff v0.2.3-0.20220525095726-d68d0d762bb9
 	go.mongodb.org/mongo-driver v1.7.4
 	go.uber.org/atomic v1.9.0
 	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
@@ -43,5 +43,3 @@ require (
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 	gopkg.in/urfave/cli.v1 v1.20.0 // indirect
 )
-
-replace github.com/wtwinlab/hotstuff => ./veritas_hotstuff/hotstuff

@@ -25,8 +25,8 @@ type ServerNode struct {
 }
 
 func NewServerNode(conf *config.Options, configFile string) (*ServerNode, error) {
-	rdb, err := storage.NewRedisKV(conf.RedisAddr, "", 1)
-	//log.Println("New Server Node with redis address: " + conf.RedisAddr)
+	rdb, err := storage.NewRedisKV(conf.RedisAddr, "", 1) //int(conf.SelfID))
+	fmt.Println("New Server Node with redis address: " + conf.RedisAddr)
 	if err != nil {
 		return nil, err
 	}

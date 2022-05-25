@@ -40,14 +40,14 @@ echo 'rate-limit = 0' >> ${tomlFile}
 echo "tx-delay = ${delay}" >> ${tomlFile}
 echo 'tls = false' >> ${tomlFile}
 echo "batch-size = ${blksize}" >> ${tomlFile}
-echo "max-inflight = 100000" >> ${tomlFile}
+echo "max-inflight = 200000" >> ${tomlFile}
 echo "view-timeout = 1000" >> ${tomlFile}
 echo "print-commands = false" >> ${tomlFile}
 echo "print-throughput = false" >> ${tomlFile}
 echo "client-listen = \"${PREFIX}${IPX}:20070\"" >> ${tomlFile}
 echo "self-veritas-node = \"${PREFIX}${IPX}:50001\"" >> ${tomlFile}
 echo "self-redis-address = \"${PREFIX}${IPX}:6379\"" >> ${tomlFile}
-echo "self-ledger-path = \"veritas${IPX}\"" >> ${tomlFile}
+echo "ledger-path = \"veritas${c}\"" >> ${tomlFile}
 echo  >> ${tomlFile}
 
 echo '# This is the information that each replica is given about the other replicas' >> ${tomlFile}
@@ -85,7 +85,7 @@ done
 sleep 5
 for (( j=1; j<=${nodes}; j++ )); do
 	IPX=$((${j} + 1))
-	ssh -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" root@${PREFIX}${IPX} "/root/veritas_hotstuff/bin/hotstuffserver --config=veritas_hotstuff/hotstuff${j} > /root/veritas_hotstuff/logs/hotstuff.log 2>&1 " &
+	ssh -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" root@${PREFIX}${IPX} "HOTSTUFF_LOG=error GOLANG_PROTOBUF_REGISTRATION_CONFLICT=warn /root/veritas_hotstuff/bin/hotstuffserver --config=veritas_hotstuff/hotstuff${j} > /root/veritas_hotstuff/logs/hotstuff.log 2>&1 " &
 done
 #
 echo "Waiting for connections to the replicas..."
@@ -98,7 +98,7 @@ echo "##################### 3.start veritasnode nodes ####################"
 for (( j=1; j<=${nodes}; j++ ))
 do
 IPX=$((${j} + 1))
-ssh -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" root@${PREFIX}${IPX} "/root/veritas_hotstuff/bin/veritasnode --config=veritas_hotstuff/hotstuff${j} > /root/veritas_hotstuff/logs/veritas.log 2>&1 " &
+ssh -o LogLevel=ERROR -o "UserKnownHostsFile=/dev/null" -o "StrictHostKeyChecking=no" root@${PREFIX}${IPX} "GOLANG_PROTOBUF_REGISTRATION_CONFLICT=warn /root/veritas_hotstuff/bin/veritasnode --config=veritas_hotstuff/hotstuff${j} > /root/veritas_hotstuff/logs/veritas.log 2>&1 " &
 echo "${IPX}"
 done
 sleep 10

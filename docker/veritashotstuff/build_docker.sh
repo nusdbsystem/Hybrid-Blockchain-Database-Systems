@@ -10,7 +10,9 @@ rm -rf ${dir}/.bin
 cd ${dir}/../../veritas_hotstuff/
 make build
 cd -
+git submodule update --init
 cd ${dir}/../../veritas_hotstuff/hotstuff
+git checkout veritas
 go build -o ../.bin/hotstuffkeygen ./cmd/hotstuffkeygen
 cd -
 
