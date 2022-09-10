@@ -85,7 +85,7 @@ func main() {
 		}
 		avaLatency = float64(all) / (1000 * float64(reqNum.Load()))
 	}()
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -108,8 +108,8 @@ func main() {
 	}
 	defer runFile.Close()
 	runBuf := make(chan *benchmark.Request, 20*(*driverNum)*(*driverConcurrency))
-	// var lastKey string
-	// var lastVer int64
+	var lastSetKey string
+	var lastSetVer int64
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -130,8 +130,8 @@ func main() {
 				r.ReqType = benchmark.SetOp
 				r.Val = operands[3]
 				r.Version = ver
-				// lastKey = operands[2]
-				// lastVer = ver
+				lastSetKey = r.Key
+				lastSetVer = r.Version
 			}
 			runBuf <- r
 			return nil
@@ -154,7 +154,7 @@ func main() {
 						latencyCh <- time.Since(start)
 					case benchmark.SetOp:
 						start := time.Now()
-						clis[seq+*driverNum/2].Set(context.Background(), op.Key, op.Val, op.Version)
+						clis[seq].Set(context.Background(), op.Key, op.Val, op.Version)
 						latencyCh <- time.Since(start)
 					default:
 						panic(fmt.Sprintf("invalid operation: %v", op.ReqType))
@@ -167,10 +167,21 @@ func main() {
 	wg.Wait()
 	close(latencyCh)
 	wg2.Wait()
-
+	fmt.Println("Wait for last Set to take effect ...")
+	for {
+		_, ver, err := clis[0].Get(context.Background(), lastSetKey)
+		if err != nil {
+			fmt.Printf("Error in Get: %v\n", err)
+		} else {
+			if ver == lastSetVer+1 {
+				break
+			}
+		}
+	}
+	delta := time.Since(start).Seconds()
 	fmt.Printf("Throughput of %v drivers with %v concurrency to handle %v requests: %v req/s\n",
 		*driverNum, *driverConcurrency, reqNum,
-		int64(float64(reqNum.Load())/time.Since(start).Seconds()),
+		int64(float64(reqNum.Load())/delta),
 	)
 	fmt.Printf("Average latency: %v ms\n", avaLatency)
 }

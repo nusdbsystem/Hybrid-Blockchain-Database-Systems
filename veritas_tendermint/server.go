@@ -61,8 +61,12 @@ func (s *server) Get(ctx context.Context, req *pbv.GetRequest) (*pbv.GetResponse
 	if err != nil {
 		return nil, err
 	}
+	v, err := Decode(res)
+	if err != nil {
+		return nil, err
+	}
 
-	return &pbv.GetResponse{Value: res}, nil
+	return &pbv.GetResponse{Value: v.Val, Version: v.Version}, nil
 }
 
 func (s *server) Set(ctx context.Context, req *pbv.SetRequest) (*pbv.SetResponse, error) {

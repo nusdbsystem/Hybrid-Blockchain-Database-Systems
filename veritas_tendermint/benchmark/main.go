@@ -100,6 +100,8 @@ func main() {
 	}
 	defer runFile.Close()
 	runBuf := make(chan *veritastm.Request, 20*(*driverNum)*(*driverConcurrency))
+	var lastSetKey string
+	var lastSetVer int64
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -120,6 +122,8 @@ func main() {
 				r.ReqType = veritastm.SetOp
 				r.Val = operands[3]
 				r.Version = ver
+				lastSetKey = r.Key
+				lastSetVer = r.Version
 			}
 			runBuf <- r
 			return nil
@@ -155,9 +159,21 @@ func main() {
 	wg.Wait()
 	close(latencyCh)
 	wg2.Wait()
+	fmt.Println("Wait for last Set to take effect ...")
+	for {
+		_, ver, err := clis[0].Get(context.Background(), lastSetKey)
+		if err != nil {
+			fmt.Printf("Error in Get: %v\n", err)
+		} else {
+			if ver == lastSetVer+1 {
+				break
+			}
+		}
+	}
+	delta := time.Since(start).Seconds()
 	fmt.Printf("Throughput of %v drivers with %v concurrency to handle %v requests: %v req/s\n",
 		*driverNum, *driverConcurrency, reqNum,
-		int64(float64(reqNum.Load())/time.Since(start).Seconds()),
+		int64(float64(reqNum.Load())/delta),
 	)
 	fmt.Printf("Average latency: %v ms\n", avaLatency)
 }

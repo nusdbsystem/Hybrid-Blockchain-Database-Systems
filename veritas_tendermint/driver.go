@@ -28,15 +28,15 @@ func Open(serverAddr, signature string) (*Driver, error) {
 	}, nil
 }
 
-func (d *Driver) Get(ctx context.Context, key string) (string, error) {
+func (d *Driver) Get(ctx context.Context, key string) (string, int64, error) {
 	res, err := d.dbCli.Get(ctx, &pbv.GetRequest{
 		Signature: d.signature,
 		Key:       key,
 	})
 	if err != nil {
-		return "", err
+		return "", -1, err
 	}
-	return res.GetValue(), nil
+	return res.GetValue(), res.GetVersion(), nil
 }
 
 func (d *Driver) Set(ctx context.Context, key, value string, version int64) (string, error) {
