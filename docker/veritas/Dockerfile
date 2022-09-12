@@ -18,5 +18,6 @@ RUN wget https://github.com/RedBeardLab/rediSQL/releases/download/v1.1.1/RediSQL
 RUN wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-4.4.4.tgz && tar xf mongodb-linux-x86_64-ubuntu2004-4.4.4.tgz
 COPY tendermint /usr/local/bin
 COPY bin /bin
+COPY dstat /usr/bin/dstat
 RUN echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
 CMD ["bash", "service ssh start"]
