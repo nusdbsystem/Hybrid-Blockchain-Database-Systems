@@ -1,4 +1,4 @@
 [submodule "veritas_hotstuff/hotstuff"]
 	path = veritas_hotstuff/hotstuff
-	url = git@github.com:wtwinlab/hotstuff.git
+	url = https://github.com/wtwinlab/hotstuff.git
 	branch = veritas

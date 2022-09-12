@@ -88,23 +88,24 @@ func main() {
 		avaLatency = float64(all) / float64(reqNum.Load())
 	}()
 	// Init Data
+	fmt.Println("Start with init data")
 	for i := 0; i < 256; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			for kv := range loadBuf {
 				lastkey = kv[0]
-				// ver, err := strconv.ParseInt(kv[2], 10, 64)
-				// if err != nil {
-				// 	panic(err)
-				// }
-				// if _, err := clis[0].Set(context.Background(), &pbv.SetRequest{
-				// 	Key:     kv[0],
-				// 	Value:   kv[1],
-				// 	Version: ver,
-				// }); err != nil {
-				// 	panic(err)
-				// }
+				ver, err := strconv.ParseInt(kv[2], 10, 64)
+				if err != nil {
+					panic(err)
+				}
+				if _, err := clis[0].Set(context.Background(), &pbv.SetRequest{
+					Key:     kv[0],
+					Value:   kv[1],
+					Version: ver,
+				}); err != nil {
+					panic(err)
+				}
 			}
 		}()
 	}
@@ -159,7 +160,7 @@ func main() {
 						beginOp := time.Now()
 						if _, err := clis[seq].Get(context.Background(), &pbv.GetRequest{Key: op.Key}); err != nil {
 							// panic(err)
-							fmt.Println("GetOp ", err)
+							// fmt.Println("GetOp ", err)
 						}
 						latencyCh <- time.Since(beginOp)
 					case benchmark.SetOp:
@@ -170,7 +171,7 @@ func main() {
 							Version: op.Version,
 						})
 						if err != nil {
-							fmt.Println("SetOp ", err)
+							// fmt.Println("SetOp ", err)
 						}
 						latencyCh <- time.Since(beginOp)
 						lastopt = "set"

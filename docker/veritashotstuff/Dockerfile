@@ -1,5 +1,5 @@
 #Dockerfile for veritas_hotstuff
-FROM ubuntu:21.04
+FROM ubuntu:20.04
 RUN apt update && apt-get -y install tzdata
 RUN apt update && apt -y install build-essential git jq libc6 python3-pip \
     iperf wget iputils-ping net-tools libcurl4-openssl-dev libtool m4 automake openssh-server iproute2 psmisc \
