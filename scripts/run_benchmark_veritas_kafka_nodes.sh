@@ -22,6 +22,11 @@ for N in $NODES; do
     for IDX in `seq 3 $(($N+1))`; do
         ADDRS="$ADDRS,$IPPREFIX.$IDX:1990"
     done
+
+    for I in `seq 2 $(($N+1))`; do
+        IDX=$(($I-1))
+        ssh -o StrictHostKeyChecking=no root@$IPPREFIX.$I "rm -f /dstat-$IDX.csv; dstat --noheaders --nocolor --output /dstat-$IDX.csv > /dev/null 2>&1 &"
+    done
         
     ../bin/veritas-kafka-bench --load-path=$WORKLOAD_FILE --run-path=$WORKLOAD_RUN_FILE --ndrivers=$DRIVERS --nthreads=$THREADS --veritas-addrs=$ADDRS 2>&1 | tee $LOGS/veritas-nodes-$N.txt
 
@@ -30,7 +35,9 @@ for N in $NODES; do
     mkdir -p $SLOGS
     for I in `seq 2 $(($N+1))`; do
         IDX=$(($I-1))
-        scp -o StrictHostKeyChecking=no root@1$IPPREFIX.$I:/veritas-$IDX.log $SLOGS/
+	ssh -o StrictHostKeyChecking=no root@$IPPREFIX.$I "killall -SIGINT dstat"
+        scp -o StrictHostKeyChecking=no root@$IPPREFIX.$I:/veritas-$IDX.log $SLOGS/
+	scp -o StrictHostKeyChecking=no root@$IPPREFIX.$I:/dstat-$IDX.csv $SLOGS/
     done
     KAFKA_HOST="$IPPREFIX.$(($N+2))"
     scp -o StrictHostKeyChecking=no root@$KAFKA_HOST:/kafka_2.12-2.7.0/zookeeper.log $SLOGS/

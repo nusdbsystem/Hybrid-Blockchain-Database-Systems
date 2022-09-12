@@ -95,7 +95,11 @@ def edit_config() -> None:
                 'recv-rate = 20000000',
                 s4
             )
-            
+    s6 = re.sub(
+            'create-empty-blocks = true',
+            'create-empty-blocks = false',
+            s5
+        )
     s4 = re.sub(
                'log_level = "main:info,state:info,\*:error"',
                'log_level = "*:info"',
@@ -103,7 +107,7 @@ def edit_config() -> None:
             )
 
     with open(TM_CONFIG_FILE, 'w') as f:
-        f.write(s5)
+        f.write(s6)
 
     return None
 

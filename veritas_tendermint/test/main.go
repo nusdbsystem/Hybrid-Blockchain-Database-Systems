@@ -29,6 +29,6 @@ func main() {
 	fmt.Printf("Set error %v\n", err)
 	fmt.Printf("Set result %v\n", res)
 
-	res, err = cli.Get(ctx, "abc")
-	fmt.Printf("Get key %v value %v\n", "abc", res)
+	res, ver, err := cli.Get(ctx, "abc")
+	fmt.Printf("Get key %v value %v version %v\n", "abc", res, ver)
 }
